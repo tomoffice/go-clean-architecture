@@ -11,26 +11,26 @@ package mapper
 
 import (
 	"module-clean/internal/common/pagination"
-	"module-clean/internal/member/domain"
+	"module-clean/internal/member/domain/entities"
 	"module-clean/internal/member/interface_adapters/dto"
 	"module-clean/internal/member/usecase"
 	"module-clean/internal/shared/enum"
 )
 
-func CreateDTOtoEntity(request dto.CreateMemberRequest) *domain.Member {
-	return &domain.Member{
+func CreateDTOtoEntity(request dto.CreateMemberRequest) *entities.Member {
+	return &entities.Member{
 		Name:     request.Name,
 		Email:    request.Email,
 		Password: request.Password,
 	}
 }
-func GetMemberByIDToEntity(request dto.GetMemberByIDRequest) *domain.Member {
-	return &domain.Member{
+func GetMemberByIDToEntity(request dto.GetMemberByIDRequest) *entities.Member {
+	return &entities.Member{
 		ID: request.ID,
 	}
 }
-func GetMemberByEmailToEntity(request dto.GetMemberByEmailRequest) *domain.Member {
-	return &domain.Member{
+func GetMemberByEmailToEntity(request dto.GetMemberByEmailRequest) *entities.Member {
+	return &entities.Member{
 		Email: request.Email,
 	}
 }
@@ -60,8 +60,8 @@ func UpdateDTOToInputModel(dto dto.UpdateMemberRequest) *usecase.PatchUpdateMemb
 		Password: dto.Password,
 	}
 }
-func DeleteDTOToEntity(request dto.DeleteMemberRequest) *domain.Member {
-	return &domain.Member{
+func DeleteDTOToEntity(request dto.DeleteMemberRequest) *entities.Member {
+	return &entities.Member{
 		ID: request.ID,
 	}
 }

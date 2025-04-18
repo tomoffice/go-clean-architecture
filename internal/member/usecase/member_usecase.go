@@ -11,28 +11,29 @@ package usecase
 import (
 	"context"
 	"module-clean/internal/common/pagination"
-	"module-clean/internal/member/domain"
+	"module-clean/internal/member/domain/entities"
+	"module-clean/internal/member/domain/repository"
 )
 
 type UseCase struct {
-	MemberRepo domain.MemberRepository
+	MemberRepo repository.MemberRepository
 }
 
-func NewUseCase(memberRepo domain.MemberRepository) *UseCase {
+func NewUseCase(memberRepo repository.MemberRepository) *UseCase {
 	return &UseCase{
 		MemberRepo: memberRepo,
 	}
 }
-func (m *UseCase) RegisterMember(ctx context.Context, member *domain.Member) error {
+func (m *UseCase) RegisterMember(ctx context.Context, member *entities.Member) error {
 	return m.MemberRepo.Create(ctx, member)
 }
-func (m *UseCase) GetMemberByID(ctx context.Context, id int) (*domain.Member, error) {
+func (m *UseCase) GetMemberByID(ctx context.Context, id int) (*entities.Member, error) {
 	return m.MemberRepo.GetByID(ctx, id)
 }
-func (m *UseCase) GetMemberByEmail(ctx context.Context, email string) (*domain.Member, error) {
+func (m *UseCase) GetMemberByEmail(ctx context.Context, email string) (*entities.Member, error) {
 	return m.MemberRepo.GetByEmail(ctx, email)
 }
-func (m *UseCase) ListMembers(ctx context.Context, pagination pagination.Pagination) ([]*domain.Member, error) {
+func (m *UseCase) ListMembers(ctx context.Context, pagination pagination.Pagination) ([]*entities.Member, error) {
 	return m.MemberRepo.GetAll(ctx, pagination)
 }
 func (m *UseCase) UpdateMember(ctx context.Context, patch *PatchUpdateMemberInput) error {
