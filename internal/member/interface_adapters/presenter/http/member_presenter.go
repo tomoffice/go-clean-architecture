@@ -3,22 +3,54 @@ package http
 import (
 	"module-clean/internal/member/domain/entities"
 	"module-clean/internal/member/interface_adapters/dto"
+	"time"
 )
 
-// ToMemberResponse 轉換單一 member entity 為回應 DTO
-func ToMemberResponse(member *entities.Member) dto.MemberResponseDTO {
-	return dto.MemberResponseDTO{
+func PresentCreateMemberDTO(member *entities.Member) dto.CreateMemberResponseDTO {
+	return dto.CreateMemberResponseDTO{
 		ID:    member.ID,
 		Name:  member.Name,
 		Email: member.Email,
 	}
 }
-
-// ToMemberListResponse 轉換多筆 member entity 為回應 DTO 陣列
-func ToMemberListResponse(members []*entities.Member) []dto.MemberResponseDTO {
-	result := make([]dto.MemberResponseDTO, len(members))
-	for i, m := range members {
-		result[i] = ToMemberResponse(m)
+func PresentGetMemberByIDDTO(member *entities.Member) dto.GetMemberByIDResponseDTO {
+	return dto.GetMemberByIDResponseDTO{
+		ID:        member.ID,
+		Name:      member.Name,
+		Email:     member.Email,
+		CreatedAt: member.CreatedAt.Format(time.RFC3339),
 	}
-	return result
+}
+func PresentGetMemberByEmailDTO(member *entities.Member) dto.GetMemberByEmailResponseDTO {
+	return dto.GetMemberByEmailResponseDTO{
+		ID:        member.ID,
+		Name:      member.Name,
+		Email:     member.Email,
+		CreatedAt: member.CreatedAt.Format(time.RFC3339),
+	}
+}
+func PresentListMemberDTO(members []*entities.Member) dto.ListMemberResponseDTO {
+	items := make([]dto.MemberListItemDTO, len(members))
+	for i, m := range members {
+		items[i] = dto.MemberListItemDTO{
+			ID:    m.ID,
+			Name:  m.Name,
+			Email: m.Email,
+		}
+	}
+	return dto.ListMemberResponseDTO{Members: items}
+}
+func PresentUpdateMemberDTO(member *entities.Member) dto.UpdateMemberResponseDTO {
+	return dto.UpdateMemberResponseDTO{
+		ID:    member.ID,
+		Name:  &member.Name,
+		Email: &member.Email,
+	}
+}
+func PresentDeleteMemberDTO(member *entities.Member) dto.DeleteMemberResponseDTO {
+	return dto.DeleteMemberResponseDTO{
+		ID:    member.ID,
+		Name:  &member.Name,
+		Email: &member.Email,
+	}
 }

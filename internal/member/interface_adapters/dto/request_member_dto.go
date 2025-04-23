@@ -12,13 +12,13 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-type CreateMemberRequest struct {
+type CreateMemberRequestDTO struct {
 	Name     string `json:"name" validate:"required"`
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required,min=6"`
 }
 
-func (dto *CreateMemberRequest) Validate() error {
+func (dto *CreateMemberRequestDTO) Validate() error {
 	validate := validator.New()
 	if err := validate.Struct(dto); err != nil {
 		return err
@@ -26,11 +26,11 @@ func (dto *CreateMemberRequest) Validate() error {
 	return nil
 }
 
-type GetMemberByIDRequest struct {
+type GetMemberByIDRequestDTO struct {
 	ID int `json:"id" validate:"required,numeric"`
 }
 
-func (dto *GetMemberByIDRequest) Validate() error {
+func (dto *GetMemberByIDRequestDTO) Validate() error {
 	validate := validator.New()
 	if err := validate.Struct(dto); err != nil {
 		return err
@@ -38,11 +38,11 @@ func (dto *GetMemberByIDRequest) Validate() error {
 	return nil
 }
 
-type GetMemberByEmailRequest struct {
+type GetMemberByEmailRequestDTO struct {
 	Email string `form:"email" validate:"required,email"`
 }
 
-func (dto *GetMemberByEmailRequest) Validate() error {
+func (dto *GetMemberByEmailRequestDTO) Validate() error {
 	validate := validator.New()
 	if err := validate.Struct(dto); err != nil {
 		return err
@@ -50,14 +50,14 @@ func (dto *GetMemberByEmailRequest) Validate() error {
 	return nil
 }
 
-type ListMemberRequest struct {
+type ListMemberRequestDTO struct {
 	Page    int    `form:"page" validate:"required,min=1"`
 	Limit   int    `form:"limit" validate:"required,min=1,max=100"`
 	SortBy  string `form:"sort_by" validate:"omitempty,oneof=id name email created_at"`
 	OrderBy string `form:"order_by" validate:"omitempty,oneof=asc desc"`
 }
 
-func (dto *ListMemberRequest) Validate() error {
+func (dto *ListMemberRequestDTO) Validate() error {
 	validate := validator.New()
 	if err := validate.Struct(dto); err != nil {
 		return err
@@ -65,14 +65,14 @@ func (dto *ListMemberRequest) Validate() error {
 	return nil
 }
 
-type UpdateMemberRequest struct {
+type UpdateMemberRequestDTO struct {
 	ID       int     `json:"id" validate:"required,numeric"`
 	Name     *string `json:"name,omitempty" validate:"omitempty"`
 	Email    *string `json:"email,omitempty" validate:"omitempty,email"`
 	Password *string `json:"password,omitempty" validate:"omitempty,min=6"`
 }
 
-func (dto *UpdateMemberRequest) Validate() error {
+func (dto *UpdateMemberRequestDTO) Validate() error {
 	validate := validator.New()
 	if err := validate.Struct(dto); err != nil {
 		return err
@@ -80,11 +80,11 @@ func (dto *UpdateMemberRequest) Validate() error {
 	return nil
 }
 
-type DeleteMemberRequest struct {
+type DeleteMemberRequestDTO struct {
 	ID int `json:"id" validate:"required,numeric"`
 }
 
-func (dto *DeleteMemberRequest) Validate() error {
+func (dto *DeleteMemberRequestDTO) Validate() error {
 	validate := validator.New()
 	if err := validate.Struct(dto); err != nil {
 		return err

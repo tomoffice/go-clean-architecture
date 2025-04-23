@@ -2,16 +2,11 @@ package sqlx
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 	"fmt"
-	"strings"
-
 	"github.com/jmoiron/sqlx"
 	"module-clean/internal/common/pagination"
 	"module-clean/internal/member/domain/entities"
 	"module-clean/internal/member/domain/repository"
-	dbError "module-clean/internal/member/infrastructure/errors"
 )
 
 type sqlxMemberRepo struct {
@@ -25,10 +20,7 @@ func NewSQLXMemberRepo(db *sqlx.DB) repository.MemberRepository {
 func (s sqlxMemberRepo) Create(ctx context.Context, m *entities.Member) error {
 	result, err := s.db.ExecContext(ctx, queryInsertMember, m.Name, m.Email, m.Password)
 	if err != nil {
-		if strings.Contains(err.Error(), "UNIQUE constraint failed") {
-			return dbError.ErrDuplicateKey
-		}
-		return err
+		return mapSQLError(err)
 	}
 
 	id, err := result.LastInsertId()
@@ -40,84 +32,60 @@ func (s sqlxMemberRepo) Create(ctx context.Context, m *entities.Member) error {
 }
 
 func (s sqlxMemberRepo) GetByID(ctx context.Context, id int) (*entities.Member, error) {
-	if ctx.Err() != nil {
-		return nil, ctx.Err()
-	}
 	member := &entities.Member{}
 	err := s.db.GetContext(ctx, member, querySelectByID, id)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, dbError.ErrRecordNotFound
-		}
-		return nil, err
+		return nil, mapSQLError(err)
 	}
 	return member, nil
 }
 
 func (s sqlxMemberRepo) GetByEmail(ctx context.Context, email string) (*entities.Member, error) {
-	if ctx.Err() != nil {
-		return nil, ctx.Err()
-	}
 	member := &entities.Member{}
 	err := s.db.GetContext(ctx, member, querySelectByEmail, email)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, dbError.ErrRecordNotFound
-		}
-		return nil, err
+		return nil, mapSQLError(err)
 	}
 	return member, nil
 }
 
 func (s sqlxMemberRepo) GetAll(ctx context.Context, pagination pagination.Pagination) ([]*entities.Member, error) {
-	if ctx.Err() != nil {
-		return nil, ctx.Err()
-	}
 	members := make([]*entities.Member, 0)
 	query := fmt.Sprintf(querySelectAllBase, pagination.OrderBy, pagination.SortBy)
 	err := s.db.SelectContext(ctx, &members, query, pagination.Limit, pagination.Offset)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return nil, dbError.ErrRecordNotFound
-		}
-		return nil, err
+		return nil, mapSQLError(err)
 	}
 	return members, nil
 }
 
-func (s sqlxMemberRepo) Update(ctx context.Context, m *entities.Member) error {
-	if ctx.Err() != nil {
-		return ctx.Err()
-	}
+func (s sqlxMemberRepo) Update(ctx context.Context, m *entities.Member) (*entities.Member, error) {
 	result, err := s.db.ExecContext(ctx, queryUpdateMember, m.Name, m.Email, m.ID)
 	if err != nil {
-		return err
+		return nil, mapSQLError(err)
 	}
 
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if rowsAffected == 0 {
-		return dbError.ErrUpdateNoEffect
+		return nil, ErrDBUpdateNoEffect
 	}
-	return nil
+	return m, nil
 }
 
 func (s sqlxMemberRepo) Delete(ctx context.Context, id int) error {
-	if ctx.Err() != nil {
-		return ctx.Err()
-	}
 	result, err := s.db.ExecContext(ctx, queryDeleteMember, id)
 	if err != nil {
-		return err
+		return mapSQLError(err)
 	}
 	rows, err := result.RowsAffected()
 	if err != nil {
 		return err
 	}
 	if rows != 1 {
-		return dbError.ErrDeleteNoEffect
+		return ErrDBDeleteNoEffect
 	}
 	return nil
 }

@@ -36,10 +36,10 @@ func (m *UseCase) GetMemberByEmail(ctx context.Context, email string) (*entities
 func (m *UseCase) ListMembers(ctx context.Context, pagination pagination.Pagination) ([]*entities.Member, error) {
 	return m.MemberRepo.GetAll(ctx, pagination)
 }
-func (m *UseCase) UpdateMember(ctx context.Context, patch *PatchUpdateMemberInput) error {
+func (m *UseCase) UpdateMember(ctx context.Context, patch *PatchUpdateMemberInput) (*entities.Member, error) {
 	member, err := m.MemberRepo.GetByID(ctx, patch.ID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if patch.Name != nil {
 		member.Name = *patch.Name
@@ -52,6 +52,14 @@ func (m *UseCase) UpdateMember(ctx context.Context, patch *PatchUpdateMemberInpu
 	}
 	return m.MemberRepo.Update(ctx, member)
 }
-func (m *UseCase) DeleteMember(ctx context.Context, id int) error {
-	return m.MemberRepo.Delete(ctx, id)
+func (m *UseCase) DeleteMember(ctx context.Context, id int) (*entities.Member, error) {
+	member, err := m.MemberRepo.GetByID(ctx, id)
+	if err != nil {
+
+	}
+	err = m.MemberRepo.Delete(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return member, nil
 }

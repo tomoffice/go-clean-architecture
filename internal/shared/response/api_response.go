@@ -1,7 +1,7 @@
 package response
 
 type APIResponse[T any] struct {
-	Data  *T            `json:"data,omitempty"`
+	Data  T             `json:"data,omitempty"`
 	Error *ErrorPayload `json:"error,omitempty"`
 	Meta  *MetaPayload  `json:"meta,omitempty"`
 	BaseResponse

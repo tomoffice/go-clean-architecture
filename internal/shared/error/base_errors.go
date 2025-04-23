@@ -1,5 +1,5 @@
-// Package errors 系統通用錯誤（系統、不可預期）
-package errors
+// Package error 系統通用錯誤（系統、不可預期）
+package error
 
 import "errors"
 

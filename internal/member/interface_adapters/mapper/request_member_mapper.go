@@ -17,24 +17,24 @@ import (
 	"module-clean/internal/shared/enum"
 )
 
-func CreateDTOtoEntity(request dto.CreateMemberRequest) *entities.Member {
+func CreateDTOtoEntity(request dto.CreateMemberRequestDTO) *entities.Member {
 	return &entities.Member{
 		Name:     request.Name,
 		Email:    request.Email,
 		Password: request.Password,
 	}
 }
-func GetMemberByIDToEntity(request dto.GetMemberByIDRequest) *entities.Member {
+func GetMemberByIDDTOToEntity(request dto.GetMemberByIDRequestDTO) *entities.Member {
 	return &entities.Member{
 		ID: request.ID,
 	}
 }
-func GetMemberByEmailToEntity(request dto.GetMemberByEmailRequest) *entities.Member {
+func GetMemberByEmailDTOToEntity(request dto.GetMemberByEmailRequestDTO) *entities.Member {
 	return &entities.Member{
 		Email: request.Email,
 	}
 }
-func ListMemberToPagination(request dto.ListMemberRequest) *pagination.Pagination {
+func ListMemberToPagination(request dto.ListMemberRequestDTO) *pagination.Pagination {
 	var orderBy enum.OrderBy
 	offset := (request.Page - 1) * request.Limit
 	switch request.OrderBy {
@@ -52,7 +52,7 @@ func ListMemberToPagination(request dto.ListMemberRequest) *pagination.Paginatio
 		OrderBy: orderBy,
 	}
 }
-func UpdateDTOToInputModel(dto dto.UpdateMemberRequest) *usecase.PatchUpdateMemberInput {
+func UpdateDTOToInputModel(dto dto.UpdateMemberRequestDTO) *usecase.PatchUpdateMemberInput {
 	return &usecase.PatchUpdateMemberInput{
 		ID:       dto.ID,
 		Name:     dto.Name,
@@ -60,7 +60,7 @@ func UpdateDTOToInputModel(dto dto.UpdateMemberRequest) *usecase.PatchUpdateMemb
 		Password: dto.Password,
 	}
 }
-func DeleteDTOToEntity(request dto.DeleteMemberRequest) *entities.Member {
+func DeleteDTOToEntity(request dto.DeleteMemberRequestDTO) *entities.Member {
 	return &entities.Member{
 		ID: request.ID,
 	}
