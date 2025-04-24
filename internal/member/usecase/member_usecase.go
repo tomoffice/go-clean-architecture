@@ -15,28 +15,28 @@ import (
 	"module-clean/internal/member/domain/repository"
 )
 
-type UseCase struct {
+type MemberUseCase struct {
 	MemberRepo repository.MemberRepository
 }
 
-func NewUseCase(memberRepo repository.MemberRepository) *UseCase {
-	return &UseCase{
+func NewMemberUseCase(memberRepo repository.MemberRepository) *MemberUseCase {
+	return &MemberUseCase{
 		MemberRepo: memberRepo,
 	}
 }
-func (m *UseCase) RegisterMember(ctx context.Context, member *entities.Member) error {
+func (m *MemberUseCase) RegisterMember(ctx context.Context, member *entities.Member) error {
 	return m.MemberRepo.Create(ctx, member)
 }
-func (m *UseCase) GetMemberByID(ctx context.Context, id int) (*entities.Member, error) {
+func (m *MemberUseCase) GetMemberByID(ctx context.Context, id int) (*entities.Member, error) {
 	return m.MemberRepo.GetByID(ctx, id)
 }
-func (m *UseCase) GetMemberByEmail(ctx context.Context, email string) (*entities.Member, error) {
+func (m *MemberUseCase) GetMemberByEmail(ctx context.Context, email string) (*entities.Member, error) {
 	return m.MemberRepo.GetByEmail(ctx, email)
 }
-func (m *UseCase) ListMembers(ctx context.Context, pagination pagination.Pagination) ([]*entities.Member, error) {
+func (m *MemberUseCase) ListMembers(ctx context.Context, pagination pagination.Pagination) ([]*entities.Member, error) {
 	return m.MemberRepo.GetAll(ctx, pagination)
 }
-func (m *UseCase) UpdateMember(ctx context.Context, patch *PatchUpdateMemberInput) (*entities.Member, error) {
+func (m *MemberUseCase) UpdateMember(ctx context.Context, patch *PatchUpdateMemberInput) (*entities.Member, error) {
 	member, err := m.MemberRepo.GetByID(ctx, patch.ID)
 	if err != nil {
 		return nil, err
@@ -52,7 +52,7 @@ func (m *UseCase) UpdateMember(ctx context.Context, patch *PatchUpdateMemberInpu
 	}
 	return m.MemberRepo.Update(ctx, member)
 }
-func (m *UseCase) DeleteMember(ctx context.Context, id int) (*entities.Member, error) {
+func (m *MemberUseCase) DeleteMember(ctx context.Context, id int) (*entities.Member, error) {
 	member, err := m.MemberRepo.GetByID(ctx, id)
 	if err != nil {
 

@@ -12,10 +12,10 @@ import (
 )
 
 type MemberController struct {
-	memberUseCase usecase.UseCase
+	memberUseCase *usecase.MemberUseCase
 }
 
-func NewMemberController(memberUseCase usecase.UseCase) *MemberController {
+func NewMemberController(memberUseCase *usecase.MemberUseCase) *MemberController {
 	return &MemberController{
 		memberUseCase: memberUseCase,
 	}
