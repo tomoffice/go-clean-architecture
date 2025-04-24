@@ -45,8 +45,8 @@ func mapMemberUseCaseError(err error) (int, string) {
 	case errors.Is(err, usecase.ErrMemberDeleteFailed):
 		return errorcode.ErrMemberDeleteFailed, usecase.ErrMemberDeleteFailed.Error()
 	case errors.Is(err, usecase.ErrUnexpectedMemberUseCaseFail):
-		return errorcode.ErrInternalServer, usecase.ErrUnexpectedMemberUseCaseFail.Error()
+		return errorcode.ErrUnexpectedMemberUseCaseFail, usecase.ErrUnexpectedMemberUseCaseFail.Error()
 	default:
-		return 0, ""
+		return errorcode.ErrInternalServer, sharederrors.ErrInternalServer.Error()
 	}
 }

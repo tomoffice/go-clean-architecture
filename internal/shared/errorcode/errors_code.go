@@ -9,12 +9,13 @@ const (
 	ErrMissingField       = 1004
 	ErrInvalidQueryParams = 1005
 
-	// 業務邏輯錯誤
-	ErrMemberAlreadyExists = 2001
-	ErrMemberNotFound      = 2002
-	ErrMemberUpdateFailed  = 2003
-	ErrMemberDeleteFailed  = 2004
-
+	// usecase錯誤
+	ErrMemberAlreadyExists         = 2000
+	ErrMemberNotFound              = 2001
+	ErrMemberUpdateFailed          = 2002
+	ErrMemberDeleteFailed          = 2003
+	ErrMemberDBFailure             = 2004
+	ErrUnexpectedMemberUseCaseFail = 2005
 	// 例外捕獲
 	ErrInternalServer = 5000
 
