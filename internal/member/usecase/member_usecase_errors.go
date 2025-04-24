@@ -29,7 +29,7 @@ func MapInfraErrorToUseCaseError(err error) error {
 		return ErrMemberUpdateFailed
 	case errors.Is(err, infradberrors.ErrDBDeleteNoEffect):
 		return ErrMemberDeleteFailed
-		// 多種錯誤皆 map 成一種意義
+	// UseCase 不需要知道 “為什麼 DB 掛了”，只需要知道 “DB 掛了
 	case errors.Is(err, infradberrors.ErrDBContextTimeout),
 		errors.Is(err, infradberrors.ErrDBContextCanceled),
 		errors.Is(err, infradberrors.ErrDBConnectionClosed),
