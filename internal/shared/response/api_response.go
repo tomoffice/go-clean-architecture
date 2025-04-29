@@ -6,7 +6,6 @@ type APIResponse[T any] struct {
 	Meta  *MetaPayload  `json:"meta,omitempty"`
 	BaseResponse
 }
-
 type ErrorPayload struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`

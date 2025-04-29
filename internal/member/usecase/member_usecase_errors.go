@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"errors"
-	infradberrors "module-clean/internal/member/infrastructure/persistence/sqlx"
+	"module-clean/internal/member/infrastructure/persistence/sqlx/sqlite"
 )
 
 // MemberUseCase 錯誤碼
@@ -20,22 +20,32 @@ func MapInfraErrorToUseCaseError(err error) error {
 	if err == nil {
 		return nil
 	}
+
+	// 優先比對 CustomError
 	switch {
-	case errors.Is(err, infradberrors.ErrDBRecordNotFound):
+	case errors.Is(err, sqlite.ErrDBRecordNotFound):
 		return ErrMemberNotFound
-	case errors.Is(err, infradberrors.ErrDBDuplicateKey):
+	case errors.Is(err, sqlite.ErrDBDuplicateKey):
 		return ErrMemberAlreadyExists
-	case errors.Is(err, infradberrors.ErrDBUpdateNoEffect):
+	case errors.Is(err, sqlite.ErrDBUpdateNoEffect):
 		return ErrMemberUpdateFailed
-	case errors.Is(err, infradberrors.ErrDBDeleteNoEffect):
+	case errors.Is(err, sqlite.ErrDBDeleteNoEffect):
 		return ErrMemberDeleteFailed
-	// UseCase 不需要知道 “為什麼 DB 掛了”，只需要知道 “DB 掛了
-	case errors.Is(err, infradberrors.ErrDBContextTimeout),
-		errors.Is(err, infradberrors.ErrDBContextCanceled),
-		errors.Is(err, infradberrors.ErrDBConnectionClosed),
-		errors.Is(err, infradberrors.ErrDBTransactionDone):
-		return ErrMemberDBFailure
-	default:
-		return ErrUnexpectedMemberUseCaseFail
 	}
+
+	// 萬一錯誤不是 CustomError instance，要用 As 抓 DBError
+	var dbErr *sqlite.DBError
+	if errors.As(err, &dbErr) {
+		switch dbErr.CustomError {
+		case sqlite.ErrDBContextTimeout,
+			sqlite.ErrDBContextCanceled,
+			sqlite.ErrDBConnectionClosed,
+			sqlite.ErrDBTransactionDone,
+			sqlite.ErrDBUnknown:
+			return ErrMemberDBFailure
+		}
+	}
+
+	// fallback 落到底了，真的不認得就回 Unexpected
+	return ErrUnexpectedMemberUseCaseFail
 }

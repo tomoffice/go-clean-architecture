@@ -1,4 +1,4 @@
-package sqlx
+package sqlite
 
 import (
 	"context"
@@ -51,7 +51,7 @@ func (s sqlxMemberRepo) GetByEmail(ctx context.Context, email string) (*entities
 
 func (s sqlxMemberRepo) GetAll(ctx context.Context, pagination pagination.Pagination) ([]*entities.Member, error) {
 	members := make([]*entities.Member, 0)
-	query := fmt.Sprintf(querySelectAllBase, pagination.OrderBy, pagination.SortBy)
+	query := fmt.Sprintf(querySelectAllBase, pagination.SortBy, pagination.OrderBy)
 	err := s.db.SelectContext(ctx, &members, query, pagination.Limit, pagination.Offset)
 	if err != nil {
 		return nil, mapSQLError(err)

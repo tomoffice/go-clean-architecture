@@ -2,12 +2,15 @@ package errorcode
 
 const (
 	// 輸入驗證錯誤
-	ErrInvalidJSONSyntax  = 1000 // JSON 格式錯誤
-	ErrInvalidJSONType    = 1001 // JSON 欄位型別錯誤
-	ErrInvalidJSONInput   = 1002 // JSON 輸入錯誤 fallback
-	ErrValidationFailed   = 1003
-	ErrMissingField       = 1004
-	ErrInvalidQueryParams = 1005
+	ErrInvalidJSONSyntax   = 1000
+	ErrInvalidJSONType     = 1001
+	ErrInvalidJSONInput    = 1002
+	ErrValidationFailed    = 1003
+	ErrMissingField        = 1004
+	ErrInvalidQueryParams  = 1005
+	ErrInvalidURIParams    = 1006
+	ErrInvalidFormData     = 1007
+	ErrInvalidHeaderParams = 1008
 
 	// usecase錯誤
 	ErrMemberAlreadyExists         = 2000

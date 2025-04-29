@@ -25,16 +25,32 @@ func NewMemberUseCase(memberRepo repository.MemberRepository) *MemberUseCase {
 	}
 }
 func (m *MemberUseCase) RegisterMember(ctx context.Context, member *entities.Member) error {
-	return m.MemberRepo.Create(ctx, member)
+	err := m.MemberRepo.Create(ctx, member)
+	if err != nil {
+		return MapInfraErrorToUseCaseError(err)
+	}
+	return nil
 }
 func (m *MemberUseCase) GetMemberByID(ctx context.Context, id int) (*entities.Member, error) {
-	return m.MemberRepo.GetByID(ctx, id)
+	member, err := m.MemberRepo.GetByID(ctx, id)
+	if err != nil {
+		return nil, MapInfraErrorToUseCaseError(err)
+	}
+	return member, nil
 }
 func (m *MemberUseCase) GetMemberByEmail(ctx context.Context, email string) (*entities.Member, error) {
-	return m.MemberRepo.GetByEmail(ctx, email)
+	member, err := m.MemberRepo.GetByEmail(ctx, email)
+	if err != nil {
+		return nil, MapInfraErrorToUseCaseError(err)
+	}
+	return member, nil
 }
 func (m *MemberUseCase) ListMembers(ctx context.Context, pagination pagination.Pagination) ([]*entities.Member, error) {
-	return m.MemberRepo.GetAll(ctx, pagination)
+	members, err := m.MemberRepo.GetAll(ctx, pagination)
+	if err != nil {
+		return nil, MapInfraErrorToUseCaseError(err)
+	}
+	return members, nil
 }
 func (m *MemberUseCase) UpdateMember(ctx context.Context, patch *PatchUpdateMemberInput) (*entities.Member, error) {
 	member, err := m.MemberRepo.GetByID(ctx, patch.ID)
@@ -50,16 +66,19 @@ func (m *MemberUseCase) UpdateMember(ctx context.Context, patch *PatchUpdateMemb
 	if patch.Password != nil {
 		member.Password = *patch.Password
 	}
-	return m.MemberRepo.Update(ctx, member)
+	member, err = m.MemberRepo.Update(ctx, member)
+	if err != nil {
+		return nil, MapInfraErrorToUseCaseError(err)
+	}
+	return member, nil
+
 }
 func (m *MemberUseCase) DeleteMember(ctx context.Context, id int) (*entities.Member, error) {
 	member, err := m.MemberRepo.GetByID(ctx, id)
-	if err != nil {
 
-	}
 	err = m.MemberRepo.Delete(ctx, id)
 	if err != nil {
-		return nil, err
+		return nil, MapInfraErrorToUseCaseError(err)
 	}
 	return member, nil
 }

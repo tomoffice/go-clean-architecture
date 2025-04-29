@@ -1,24 +1,19 @@
 package main
 
 import (
-	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3" // or mysql, pgx, etc.
-	"log"
 	"module-clean/internal/framework/gin"
-
 	"module-clean/internal/framework/server"
-	memberrepo "module-clean/internal/member/infrastructure/persistence/sqlx"
+	"module-clean/internal/infrastructure/database"
+	memberrepo "module-clean/internal/member/infrastructure/persistence/sqlx/sqlite"
+
 	"module-clean/internal/member/interface_adapters/controller"
 	"module-clean/internal/member/usecase"
 )
 
 func main() {
-	// Step 1: 初始化 DB（可抽離至 infrastructure/init 資源載入）
-	db, err := sqlx.Open("sqlite3", "./identifier.sqlite")
-	if err != nil {
-		log.Fatalf("failed to connect database: %v", err)
-	}
-
+	// Step 1: 初始化 DB
+	db := database.InitSQLiteDB("./identifier.sqlite")
 	// Step 2: 初始化 Repository（Infrastructure → Outbound Adapter）
 	memberRepo := memberrepo.NewSQLXMemberRepo(db)
 

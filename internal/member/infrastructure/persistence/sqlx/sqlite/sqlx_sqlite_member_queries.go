@@ -1,4 +1,4 @@
-package sqlx
+package sqlite
 
 const (
 	queryInsertMember  = `INSERT INTO members (name, email, password) VALUES (?, ?, ?)`

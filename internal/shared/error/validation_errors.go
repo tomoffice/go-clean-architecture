@@ -4,10 +4,13 @@ package error
 import "errors"
 
 var (
-	ErrInvalidJSONSyntax  = errors.New("invalid JSON syntax")
-	ErrInvalidJSONType    = errors.New("invalid JSON field type")
-	ErrValidationFailed   = errors.New("field validation failed")
-	ErrMissingField       = errors.New("missing required field")
-	ErrInvalidQueryParams = errors.New("invalid query parameters")
-	ErrInvalidJSONInput   = errors.New("invalid JSON input")
+	ErrInvalidJSONSyntax   = errors.New("invalid JSON syntax")
+	ErrInvalidJSONType     = errors.New("invalid JSON field type")
+	ErrInvalidJSONInput    = errors.New("invalid JSON input")
+	ErrValidationFailed    = errors.New("field validation failed")
+	ErrMissingField        = errors.New("missing required field")
+	ErrInvalidQueryParams  = errors.New("invalid query parameters")
+	ErrInvalidURIParams    = errors.New("invalid URI parameters")
+	ErrInvalidFormData     = errors.New("invalid form data")
+	ErrInvalidHeaderParams = errors.New("invalid header parameters")
 )
