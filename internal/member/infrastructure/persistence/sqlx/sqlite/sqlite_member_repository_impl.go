@@ -58,7 +58,14 @@ func (s sqlxMemberRepo) GetAll(ctx context.Context, pagination pagination.Pagina
 	}
 	return members, nil
 }
-
+func (s sqlxMemberRepo) CountAll(ctx context.Context) (int, error) {
+	var count int
+	err := s.db.GetContext(ctx, &count, queryCountMembers)
+	if err != nil {
+		return 0, mapSQLError(err)
+	}
+	return count, nil
+}
 func (s sqlxMemberRepo) Update(ctx context.Context, m *entities.Member) (*entities.Member, error) {
 	result, err := s.db.ExecContext(ctx, queryUpdateMember, m.Name, m.Email, m.ID)
 	if err != nil {

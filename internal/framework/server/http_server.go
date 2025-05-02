@@ -8,6 +8,6 @@ import (
 func StartHTTPServer(addr string, handler http.Handler) {
 	log.Printf("Server starting at %s", addr)
 	if err := http.ListenAndServe(addr, handler); err != nil {
-		log.Fatalf("Server error: %v", err)
+		log.Fatalf("Server errordefs: %v", err)
 	}
 }

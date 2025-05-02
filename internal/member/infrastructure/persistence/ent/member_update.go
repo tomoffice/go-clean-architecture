@@ -94,7 +94,7 @@ func (mu *MemberUpdate) Save(ctx context.Context) (int, error) {
 	return withHooks(ctx, mu.sqlSave, mu.mutation, mu.hooks)
 }
 
-// SaveX is like Save, but panics if an error occurs.
+// SaveX is like Save, but panics if an errordefs occurs.
 func (mu *MemberUpdate) SaveX(ctx context.Context) int {
 	affected, err := mu.Save(ctx)
 	if err != nil {
@@ -109,7 +109,7 @@ func (mu *MemberUpdate) Exec(ctx context.Context) error {
 	return err
 }
 
-// ExecX is like Exec, but panics if an error occurs.
+// ExecX is like Exec, but panics if an errordefs occurs.
 func (mu *MemberUpdate) ExecX(ctx context.Context) {
 	if err := mu.Exec(ctx); err != nil {
 		panic(err)
@@ -254,7 +254,7 @@ func (muo *MemberUpdateOne) Save(ctx context.Context) (*Member, error) {
 	return withHooks(ctx, muo.sqlSave, muo.mutation, muo.hooks)
 }
 
-// SaveX is like Save, but panics if an error occurs.
+// SaveX is like Save, but panics if an errordefs occurs.
 func (muo *MemberUpdateOne) SaveX(ctx context.Context) *Member {
 	node, err := muo.Save(ctx)
 	if err != nil {
@@ -269,7 +269,7 @@ func (muo *MemberUpdateOne) Exec(ctx context.Context) error {
 	return err
 }
 
-// ExecX is like Exec, but panics if an error occurs.
+// ExecX is like Exec, but panics if an errordefs occurs.
 func (muo *MemberUpdateOne) ExecX(ctx context.Context) {
 	if err := muo.Exec(ctx); err != nil {
 		panic(err)

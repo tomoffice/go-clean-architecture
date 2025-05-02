@@ -3,14 +3,17 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 	"module-clean/internal/member/interface_adapters/controller"
-	"module-clean/internal/shared/router"
 )
 
-func RegisterMemberRoutes(rg router.RouteGroup, controller *controller.MemberController) {
-	member := rg.Group("/members")
-	member.Handle("POST", "", gin.HandlerFunc(controller.Register))
-	member.Handle("GET", "", gin.HandlerFunc(controller.List))
-	member.Handle("GET", "/:id", gin.HandlerFunc(controller.GetByID))
-	member.Handle("PUT", "/:id", gin.HandlerFunc(controller.Update))
-	member.Handle("DELETE", "/:id", gin.HandlerFunc(controller.Delete))
+func NewMemberRouter(controller *controller.MemberController) func(*gin.RouterGroup) {
+	return func(api *gin.RouterGroup) {
+		member := api.Group("/members")
+
+		member.POST("", controller.Register)
+		member.GET("/:id", controller.GetByID)
+		member.GET("/email/:email", controller.GetByEmail)
+		member.GET("", controller.List)
+		member.PUT("/:id", controller.Update)
+		member.DELETE("/:id", controller.Delete)
+	}
 }

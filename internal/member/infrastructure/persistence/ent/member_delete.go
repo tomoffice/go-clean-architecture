@@ -30,7 +30,7 @@ func (md *MemberDelete) Exec(ctx context.Context) (int, error) {
 	return withHooks(ctx, md.sqlExec, md.mutation, md.hooks)
 }
 
-// ExecX is like Exec, but panics if an error occurs.
+// ExecX is like Exec, but panics if an errordefs occurs.
 func (md *MemberDelete) ExecX(ctx context.Context) int {
 	n, err := md.Exec(ctx)
 	if err != nil {
@@ -80,7 +80,7 @@ func (mdo *MemberDeleteOne) Exec(ctx context.Context) error {
 	}
 }
 
-// ExecX is like Exec, but panics if an error occurs.
+// ExecX is like Exec, but panics if an errordefs occurs.
 func (mdo *MemberDeleteOne) ExecX(ctx context.Context) {
 	if err := mdo.Exec(ctx); err != nil {
 		panic(err)

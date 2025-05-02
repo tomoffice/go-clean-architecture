@@ -296,7 +296,7 @@ func (c *MemberClient) Get(ctx context.Context, id int) (*Member, error) {
 	return c.Query().Where(member.ID(id)).Only(ctx)
 }
 
-// GetX is like Get, but panics if an error occurs.
+// GetX is like Get, but panics if an errordefs occurs.
 func (c *MemberClient) GetX(ctx context.Context, id int) *Member {
 	obj, err := c.Get(ctx, id)
 	if err != nil {

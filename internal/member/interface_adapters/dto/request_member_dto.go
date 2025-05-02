@@ -27,7 +27,7 @@ func (dto *CreateMemberRequestDTO) Validate() error {
 }
 
 type GetMemberByIDRequestDTO struct {
-	ID int `json:"id" validate:"required,numeric"`
+	ID int `uri:"id" validate:"required,numeric"`
 }
 
 func (dto *GetMemberByIDRequestDTO) Validate() error {

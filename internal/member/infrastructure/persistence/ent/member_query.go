@@ -71,7 +71,7 @@ func (mq *MemberQuery) First(ctx context.Context) (*Member, error) {
 	return nodes[0], nil
 }
 
-// FirstX is like First, but panics if an error occurs.
+// FirstX is like First, but panics if an errordefs occurs.
 func (mq *MemberQuery) FirstX(ctx context.Context) *Member {
 	node, err := mq.First(ctx)
 	if err != nil && !IsNotFound(err) {
@@ -94,7 +94,7 @@ func (mq *MemberQuery) FirstID(ctx context.Context) (id int, err error) {
 	return ids[0], nil
 }
 
-// FirstIDX is like FirstID, but panics if an error occurs.
+// FirstIDX is like FirstID, but panics if an errordefs occurs.
 func (mq *MemberQuery) FirstIDX(ctx context.Context) int {
 	id, err := mq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
@@ -121,7 +121,7 @@ func (mq *MemberQuery) Only(ctx context.Context) (*Member, error) {
 	}
 }
 
-// OnlyX is like Only, but panics if an error occurs.
+// OnlyX is like Only, but panics if an errordefs occurs.
 func (mq *MemberQuery) OnlyX(ctx context.Context) *Member {
 	node, err := mq.Only(ctx)
 	if err != nil {
@@ -149,7 +149,7 @@ func (mq *MemberQuery) OnlyID(ctx context.Context) (id int, err error) {
 	return
 }
 
-// OnlyIDX is like OnlyID, but panics if an error occurs.
+// OnlyIDX is like OnlyID, but panics if an errordefs occurs.
 func (mq *MemberQuery) OnlyIDX(ctx context.Context) int {
 	id, err := mq.OnlyID(ctx)
 	if err != nil {
@@ -168,7 +168,7 @@ func (mq *MemberQuery) All(ctx context.Context) ([]*Member, error) {
 	return withInterceptors[[]*Member](ctx, mq, qr, mq.inters)
 }
 
-// AllX is like All, but panics if an error occurs.
+// AllX is like All, but panics if an errordefs occurs.
 func (mq *MemberQuery) AllX(ctx context.Context) []*Member {
 	nodes, err := mq.All(ctx)
 	if err != nil {
@@ -189,7 +189,7 @@ func (mq *MemberQuery) IDs(ctx context.Context) (ids []int, err error) {
 	return ids, nil
 }
 
-// IDsX is like IDs, but panics if an error occurs.
+// IDsX is like IDs, but panics if an errordefs occurs.
 func (mq *MemberQuery) IDsX(ctx context.Context) []int {
 	ids, err := mq.IDs(ctx)
 	if err != nil {
@@ -207,7 +207,7 @@ func (mq *MemberQuery) Count(ctx context.Context) (int, error) {
 	return withInterceptors[int](ctx, mq, querierCount[*MemberQuery](), mq.inters)
 }
 
-// CountX is like Count, but panics if an error occurs.
+// CountX is like Count, but panics if an errordefs occurs.
 func (mq *MemberQuery) CountX(ctx context.Context) int {
 	count, err := mq.Count(ctx)
 	if err != nil {
@@ -229,7 +229,7 @@ func (mq *MemberQuery) Exist(ctx context.Context) (bool, error) {
 	}
 }
 
-// ExistX is like Exist, but panics if an error occurs.
+// ExistX is like Exist, but panics if an errordefs occurs.
 func (mq *MemberQuery) ExistX(ctx context.Context) bool {
 	exist, err := mq.Exist(ctx)
 	if err != nil {

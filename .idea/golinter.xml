@@ -4,7 +4,6 @@
     <option name="enabledLinters">
       <list>
         <option value="staticcheck" />
-        <option value="exportloopref" />
         <option value="dupl" />
         <option value="govet" />
         <option value="funlen" />

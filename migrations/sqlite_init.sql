@@ -7,6 +7,3 @@ CREATE TABLE IF NOT EXISTS members
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- 測試用會員資料
-INSERT INTO members (name, email, password)
-VALUES ('王小明', 'xiaoming@example.com', '123456');

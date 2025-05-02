@@ -49,7 +49,7 @@ func (s *Schema) Create(ctx context.Context, opts ...schema.MigrateOption) error
 func Create(ctx context.Context, s *Schema, tables []*schema.Table, opts ...schema.MigrateOption) error {
 	migrate, err := schema.NewMigrate(s.drv, opts...)
 	if err != nil {
-		return fmt.Errorf("ent/migrate: %w", err)
+		return fmt.Errorf("ent/migrations: %w", err)
 	}
 	return migrate.Create(ctx, tables...)
 }

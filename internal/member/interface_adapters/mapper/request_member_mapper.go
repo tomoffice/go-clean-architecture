@@ -35,8 +35,11 @@ func GetMemberByEmailDTOToEntity(request dto.GetMemberByEmailRequestDTO) *entiti
 	}
 }
 func ListMemberToPagination(request dto.ListMemberRequestDTO) *pagination.Pagination {
+	sortBy := request.SortBy
+	if sortBy == "" {
+		sortBy = "id"
+	}
 	var orderBy enum.OrderBy
-	offset := (request.Page - 1) * request.Limit
 	switch request.OrderBy {
 	case "asc":
 		orderBy = enum.OrderByAsc
@@ -45,10 +48,11 @@ func ListMemberToPagination(request dto.ListMemberRequestDTO) *pagination.Pagina
 	default:
 		orderBy = enum.OrderByAsc
 	}
+	offset := (request.Page - 1) * request.Limit
 	return &pagination.Pagination{
 		Limit:   request.Limit,
 		Offset:  offset,
-		SortBy:  request.SortBy,
+		SortBy:  sortBy,
 		OrderBy: orderBy,
 	}
 }

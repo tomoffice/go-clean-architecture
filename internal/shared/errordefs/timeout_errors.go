@@ -1,5 +1,5 @@
-// Package error 超時、逾期等
-package error
+// Package errordefs 超時、逾期等
+package errordefs
 
 import "errors"
 

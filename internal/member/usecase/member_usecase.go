@@ -4,7 +4,7 @@
 // 職責:
 // - 接收 input_model 作為輸入
 // - 調用 domain service / repository 執行邏輯
-// - 回傳 entity、output_model 或 error 結果
+// - 回傳 entity、output_model 或 errordefs 結果
 // - 不依賴外部框架（如 HTTP、DB）
 package usecase
 
@@ -45,12 +45,16 @@ func (m *MemberUseCase) GetMemberByEmail(ctx context.Context, email string) (*en
 	}
 	return member, nil
 }
-func (m *MemberUseCase) ListMembers(ctx context.Context, pagination pagination.Pagination) ([]*entities.Member, error) {
+func (m *MemberUseCase) ListMembers(ctx context.Context, pagination pagination.Pagination) ([]*entities.Member, int, error) {
 	members, err := m.MemberRepo.GetAll(ctx, pagination)
 	if err != nil {
-		return nil, MapInfraErrorToUseCaseError(err)
+		return nil, 0, MapInfraErrorToUseCaseError(err)
 	}
-	return members, nil
+	total, err := m.MemberRepo.CountAll(ctx)
+	if err != nil {
+		return nil, 0, MapInfraErrorToUseCaseError(err)
+	}
+	return members, total, nil
 }
 func (m *MemberUseCase) UpdateMember(ctx context.Context, patch *PatchUpdateMemberInput) (*entities.Member, error) {
 	member, err := m.MemberRepo.GetByID(ctx, patch.ID)

@@ -2,14 +2,13 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	ginerror "module-clean/internal/framework/gin/errordefs"
 	"module-clean/internal/member/interface_adapters/dto"
 	"module-clean/internal/member/interface_adapters/mapper"
 	presenterhttp "module-clean/internal/member/interface_adapters/presenter/http"
 	"module-clean/internal/member/usecase"
-	"module-clean/internal/shared/enum"
 	"module-clean/internal/shared/response"
 	"net/http"
-	"strconv"
 )
 
 type MemberController struct {
@@ -22,192 +21,134 @@ func NewMemberController(memberUseCase *usecase.MemberUseCase) *MemberController
 	}
 }
 
-// Register handles POST /members
 func (c *MemberController) Register(ctx *gin.Context) {
 	var reqDTO dto.CreateMemberRequestDTO
 	if err := ctx.ShouldBindJSON(&reqDTO); err != nil {
-		errCode, msg := presenterhttp.MapInputValidationError(err)
-		ctx.JSON(http.StatusBadRequest, response.APIResponse[any]{
-			Error:        &response.ErrorPayload{Code: strconv.Itoa(errCode), Message: msg},
-			BaseResponse: response.NewBaseResponse(enum.APIStatusFailed),
-		})
+		errCode, msg := ginerror.MapGinBindingError(err)
+		response.FailureAPIResponse(ctx, http.StatusBadRequest, errCode, msg)
 		return
 	}
 	if err := reqDTO.Validate(); err != nil {
-		errCode, msg := presenterhttp.MapInputValidationError(err)
-		ctx.JSON(http.StatusBadRequest, response.APIResponse[any]{
-			Error:        &response.ErrorPayload{Code: strconv.Itoa(errCode), Message: msg},
-			BaseResponse: response.NewBaseResponse(enum.APIStatusFailed),
-		})
+		errCode, msg := presenterhttp.MapValidationError(err)
+		response.FailureAPIResponse(ctx, http.StatusBadRequest, errCode, msg)
 		return
 	}
-
 	entity := mapper.CreateDTOtoEntity(reqDTO)
 	if err := c.memberUseCase.RegisterMember(ctx, entity); err != nil {
 		errCode, msg := presenterhttp.MapMemberUseCaseError(err)
-		ctx.JSON(http.StatusInternalServerError, response.APIResponse[any]{
-			Error:        &response.ErrorPayload{Code: strconv.Itoa(errCode), Message: msg},
-			BaseResponse: response.NewBaseResponse(enum.APIStatusFailed),
-		})
+		response.FailureAPIResponse(ctx, http.StatusInternalServerError, errCode, msg)
 		return
 	}
 	respDTO := presenterhttp.PresentCreateMemberDTO(entity)
-	ctx.JSON(http.StatusCreated, response.APIResponse[any]{
-		Data: respDTO,
-	})
+	response.SuccessAPIResponse(ctx, respDTO)
 }
 func (c *MemberController) GetByID(ctx *gin.Context) {
 	var reqDTO dto.GetMemberByIDRequestDTO
-	if err := ctx.ShouldBindUri(&reqDTO); err != nil || reqDTO.Validate() != nil {
-		errCode, msg := presenterhttp.MapInputValidationError(err)
-		ctx.JSON(http.StatusBadRequest, response.APIResponse[any]{
-			Error: &response.ErrorPayload{Code: strconv.Itoa(errCode), Message: msg},
-		})
+	if err := ctx.ShouldBindUri(&reqDTO); err != nil {
+		errCode, msg := ginerror.MapGinBindingError(err)
+		response.FailureAPIResponse(ctx, http.StatusBadRequest, errCode, msg)
 		return
 	}
 	if err := reqDTO.Validate(); err != nil {
-		errCode, msg := presenterhttp.MapInputValidationError(err)
-		ctx.JSON(http.StatusBadRequest, response.APIResponse[any]{
-			Error:        &response.ErrorPayload{Code: strconv.Itoa(errCode), Message: msg},
-			BaseResponse: response.NewBaseResponse(enum.APIStatusFailed),
-		})
+		errCode, msg := presenterhttp.MapValidationError(err)
+		response.FailureAPIResponse(ctx, http.StatusBadRequest, errCode, msg)
 		return
 	}
 	entity := mapper.GetMemberByIDDTOToEntity(reqDTO)
 	member, err := c.memberUseCase.GetMemberByID(ctx, entity.ID)
 	if err != nil {
 		errCode, msg := presenterhttp.MapMemberUseCaseError(err)
-		ctx.JSON(http.StatusNotFound, response.APIResponse[any]{
-			Error:        &response.ErrorPayload{Code: strconv.Itoa(errCode), Message: msg},
-			BaseResponse: response.NewBaseResponse(enum.APIStatusFailed),
-		})
+		response.FailureAPIResponse(ctx, http.StatusNotFound, errCode, msg)
 		return
 	}
 	respDTO := presenterhttp.PresentGetMemberByIDDTO(member)
-	ctx.JSON(http.StatusOK, response.APIResponse[any]{
-		Data:         respDTO,
-		BaseResponse: response.NewBaseResponse(enum.APIStatusSuccess),
-	})
+	response.SuccessAPIResponse(ctx, respDTO)
 }
 func (c *MemberController) GetByEmail(ctx *gin.Context) {
 	var reqDTO dto.GetMemberByEmailRequestDTO
 	if err := ctx.ShouldBindQuery(&reqDTO); err != nil {
-		errCode, mag := presenterhttp.MapMemberUseCaseError(err)
-		ctx.JSON(http.StatusBadRequest, response.APIResponse[any]{
-			Error: &response.ErrorPayload{Code: strconv.Itoa(errCode), Message: mag},
-		})
+		errCode, msg := ginerror.MapGinBindingError(err)
+		response.FailureAPIResponse(ctx, http.StatusBadRequest, errCode, msg)
 		return
 	}
 	if err := reqDTO.Validate(); err != nil {
-		errCode, msg := presenterhttp.MapInputValidationError(err)
-		ctx.JSON(http.StatusBadRequest, response.APIResponse[any]{
-			Error: &response.ErrorPayload{Code: strconv.Itoa(errCode), Message: msg},
-		})
+		errCode, msg := presenterhttp.MapValidationError(err)
+		response.FailureAPIResponse(ctx, http.StatusBadRequest, errCode, msg)
 		return
 	}
 	entity := mapper.GetMemberByEmailDTOToEntity(reqDTO)
 	member, err := c.memberUseCase.GetMemberByEmail(ctx, entity.Email)
 	if err != nil {
 		errCode, msg := presenterhttp.MapMemberUseCaseError(err)
-		ctx.JSON(http.StatusNotFound, response.APIResponse[any]{
-			Error: &response.ErrorPayload{Code: strconv.Itoa(errCode), Message: msg},
-		})
+		response.FailureAPIResponse(ctx, http.StatusNotFound, errCode, msg)
 		return
 	}
 	respDTO := presenterhttp.PresentGetMemberByEmailDTO(member)
-	ctx.JSON(http.StatusOK, response.APIResponse[any]{
-		Data: respDTO,
-	})
+	response.SuccessAPIResponse(ctx, respDTO)
 }
 func (c *MemberController) List(ctx *gin.Context) {
 	var reqDTO dto.ListMemberRequestDTO
 	if err := ctx.ShouldBindQuery(&reqDTO); err != nil {
-		errorCode, msg := presenterhttp.MapInputValidationError(err)
-		ctx.JSON(http.StatusBadRequest, response.APIResponse[any]{
-			Error: &response.ErrorPayload{Code: strconv.Itoa(errorCode), Message: msg},
-		})
+		errCode, msg := ginerror.MapGinBindingError(err)
+		response.FailureAPIResponse(ctx, http.StatusBadRequest, errCode, msg)
 		return
 	}
 	if err := reqDTO.Validate(); err != nil {
-		errorCode, msg := presenterhttp.MapInputValidationError(err)
-		ctx.JSON(http.StatusBadRequest, response.APIResponse[any]{
-			Error: &response.ErrorPayload{Code: strconv.Itoa(errorCode), Message: msg},
-		})
+		errorCode, msg := presenterhttp.MapValidationError(err)
+		response.FailureAPIResponse(ctx, http.StatusBadRequest, errorCode, msg)
 		return
 	}
 	pagination := mapper.ListMemberToPagination(reqDTO)
-	members, err := c.memberUseCase.ListMembers(ctx, *pagination)
+	members, total, err := c.memberUseCase.ListMembers(ctx, *pagination)
 	if err != nil {
 		errorCode, msg := presenterhttp.MapMemberUseCaseError(err)
-		ctx.JSON(http.StatusInternalServerError, response.APIResponse[any]{
-			Error:        &response.ErrorPayload{Code: strconv.Itoa(errorCode), Message: msg},
-			BaseResponse: response.NewBaseResponse(enum.APIStatusFailed),
-		})
+		response.FailureAPIResponse(ctx, http.StatusInternalServerError, errorCode, msg)
 		return
 	}
 	respDTO := presenterhttp.PresentListMemberDTO(members)
-	ctx.JSON(http.StatusOK, response.APIResponse[any]{
-		Data:         respDTO,
-		BaseResponse: response.NewBaseResponse(enum.APIStatusSuccess),
-	})
+	response.SuccessAPIResponseWithMeta(ctx, respDTO, total, reqDTO.Page, pagination.Limit, pagination.Offset)
 }
 func (c *MemberController) Update(ctx *gin.Context) {
 	var reqDTO dto.UpdateMemberRequestDTO
 	if err := ctx.ShouldBindJSON(&reqDTO); err != nil {
-		errorCode, msg := presenterhttp.MapInputValidationError(err)
-		ctx.JSON(http.StatusBadRequest, response.APIResponse[any]{
-			Error: &response.ErrorPayload{Code: strconv.Itoa(errorCode), Message: msg},
-		})
+		errCode, msg := ginerror.MapGinBindingError(err)
+		response.FailureAPIResponse(ctx, http.StatusBadRequest, errCode, msg)
 		return
 	}
 	if err := reqDTO.Validate(); err != nil {
-		errorCode, msg := presenterhttp.MapInputValidationError(err)
-		ctx.JSON(http.StatusBadRequest, response.APIResponse[any]{
-			Error: &response.ErrorPayload{Code: strconv.Itoa(errorCode), Message: msg},
-		})
+		errorCode, msg := presenterhttp.MapValidationError(err)
+		response.FailureAPIResponse(ctx, http.StatusBadRequest, errorCode, msg)
 		return
 	}
 	inputModel := mapper.UpdateDTOToInputModel(reqDTO)
 	member, err := c.memberUseCase.UpdateMember(ctx, inputModel)
 	if err != nil {
 		errorCode, msg := presenterhttp.MapMemberUseCaseError(err)
-		ctx.JSON(http.StatusInternalServerError, response.APIResponse[any]{
-			Error: &response.ErrorPayload{Code: strconv.Itoa(errorCode), Message: msg},
-		})
+		response.FailureAPIResponse(ctx, http.StatusInternalServerError, errorCode, msg)
 		return
 	}
 	respDTO := presenterhttp.PresentUpdateMemberDTO(member)
-	ctx.JSON(http.StatusOK, response.APIResponse[any]{
-		Data: respDTO,
-	})
+	response.SuccessAPIResponse(ctx, respDTO)
 }
 func (c *MemberController) Delete(ctx *gin.Context) {
 	var reqDTO dto.DeleteMemberRequestDTO
 	if err := ctx.ShouldBindUri(&reqDTO); err != nil {
-		errorCode, msg := presenterhttp.MapInputValidationError(err)
-		ctx.JSON(http.StatusBadRequest, response.APIResponse[any]{
-			Error: &response.ErrorPayload{Code: strconv.Itoa(errorCode), Message: msg},
-		})
+		errCode, msg := ginerror.MapGinBindingError(err)
+		response.FailureAPIResponse(ctx, http.StatusBadRequest, errCode, msg)
 		return
 	}
 	if err := reqDTO.Validate(); err != nil {
-		errorCode, msg := presenterhttp.MapInputValidationError(err)
-		ctx.JSON(http.StatusBadRequest, response.APIResponse[any]{
-			Error: &response.ErrorPayload{Code: strconv.Itoa(errorCode), Message: msg},
-		})
+		errorCode, msg := presenterhttp.MapValidationError(err)
+		response.FailureAPIResponse(ctx, http.StatusBadRequest, errorCode, msg)
 		return
 	}
 	entity := mapper.DeleteDTOToEntity(reqDTO)
 	member, err := c.memberUseCase.DeleteMember(ctx, entity.ID)
 	if err != nil {
 		errorCode, msg := presenterhttp.MapMemberUseCaseError(err)
-		ctx.JSON(http.StatusInternalServerError, response.APIResponse[any]{
-			Error: &response.ErrorPayload{Code: strconv.Itoa(errorCode), Message: msg},
-		})
+		response.FailureAPIResponse(ctx, http.StatusInternalServerError, errorCode, msg)
 		return
 	}
 	respDTO := presenterhttp.PresentDeleteMemberDTO(member)
-	ctx.JSON(http.StatusOK, response.APIResponse[any]{
-		Data: respDTO,
-	})
+	response.SuccessAPIResponse(ctx, respDTO)
 }
