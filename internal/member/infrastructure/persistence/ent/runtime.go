@@ -3,8 +3,8 @@
 package ent
 
 import (
-	"crud-clean/internal/infrastructure/db/ent/member"
-	"crud-clean/internal/infrastructure/db/ent/schema"
+	"module-clean/internal/member/infrastructure/persistence/ent/member"
+	"module-clean/internal/member/infrastructure/persistence/ent/schema"
 	"time"
 )
 

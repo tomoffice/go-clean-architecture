@@ -3,7 +3,7 @@
 package member
 
 import (
-	"crud-clean/internal/infrastructure/db/ent/predicate"
+	"module-clean/internal/member/infrastructure/persistence/ent/predicate"
 	"time"
 
 	"entgo.io/ent/dialect/sql"

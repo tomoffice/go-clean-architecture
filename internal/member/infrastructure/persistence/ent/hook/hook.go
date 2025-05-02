@@ -4,8 +4,8 @@ package hook
 
 import (
 	"context"
-	"crud-clean/internal/infrastructure/db/ent"
 	"fmt"
+	"module-clean/internal/member/infrastructure/persistence/ent"
 )
 
 // The MemberFunc type is an adapter to allow the use of ordinary
@@ -140,7 +140,7 @@ func Unless(hk ent.Hook, op ent.Op) ent.Hook {
 	return If(hk, Not(HasOp(op)))
 }
 
-// FixedError is a hook returning a fixed errordefs.
+// FixedError is a hook returning a fixed error.
 func FixedError(err error) ent.Hook {
 	return func(ent.Mutator) ent.Mutator {
 		return ent.MutateFunc(func(context.Context, ent.Mutation) (ent.Value, error) {

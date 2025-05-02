@@ -9,9 +9,9 @@ import (
 	"log"
 	"reflect"
 
-	"crud-clean/internal/infrastructure/db/ent/migrate"
+	"module-clean/internal/member/infrastructure/persistence/ent/migrate"
 
-	"crud-clean/internal/infrastructure/db/ent/member"
+	"module-clean/internal/member/infrastructure/persistence/ent/member"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -296,7 +296,7 @@ func (c *MemberClient) Get(ctx context.Context, id int) (*Member, error) {
 	return c.Query().Where(member.ID(id)).Only(ctx)
 }
 
-// GetX is like Get, but panics if an errordefs occurs.
+// GetX is like Get, but panics if an error occurs.
 func (c *MemberClient) GetX(ctx context.Context, id int) *Member {
 	obj, err := c.Get(ctx, id)
 	if err != nil {

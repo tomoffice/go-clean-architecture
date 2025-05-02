@@ -4,9 +4,9 @@ package ent
 
 import (
 	"context"
-	"crud-clean/internal/infrastructure/db/ent/member"
 	"errors"
 	"fmt"
+	"module-clean/internal/member/infrastructure/persistence/ent/member"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -63,7 +63,7 @@ func (mc *MemberCreate) Save(ctx context.Context) (*Member, error) {
 	return withHooks(ctx, mc.sqlSave, mc.mutation, mc.hooks)
 }
 
-// SaveX calls Save and panics if Save returns an errordefs.
+// SaveX calls Save and panics if Save returns an error.
 func (mc *MemberCreate) SaveX(ctx context.Context) *Member {
 	v, err := mc.Save(ctx)
 	if err != nil {
@@ -78,7 +78,7 @@ func (mc *MemberCreate) Exec(ctx context.Context) error {
 	return err
 }
 
-// ExecX is like Exec, but panics if an errordefs occurs.
+// ExecX is like Exec, but panics if an error occurs.
 func (mc *MemberCreate) ExecX(ctx context.Context) {
 	if err := mc.Exec(ctx); err != nil {
 		panic(err)
@@ -228,7 +228,7 @@ func (mcb *MemberCreateBulk) Save(ctx context.Context) ([]*Member, error) {
 	return nodes, nil
 }
 
-// SaveX is like Save, but panics if an errordefs occurs.
+// SaveX is like Save, but panics if an error occurs.
 func (mcb *MemberCreateBulk) SaveX(ctx context.Context) []*Member {
 	v, err := mcb.Save(ctx)
 	if err != nil {
@@ -243,7 +243,7 @@ func (mcb *MemberCreateBulk) Exec(ctx context.Context) error {
 	return err
 }
 
-// ExecX is like Exec, but panics if an errordefs occurs.
+// ExecX is like Exec, but panics if an error occurs.
 func (mcb *MemberCreateBulk) ExecX(ctx context.Context) {
 	if err := mcb.Exec(ctx); err != nil {
 		panic(err)

@@ -4,9 +4,9 @@ package ent
 
 import (
 	"context"
-	"crud-clean/internal/infrastructure/db/ent/member"
 	"errors"
 	"fmt"
+	"module-clean/internal/member/infrastructure/persistence/ent/member"
 	"reflect"
 	"sync"
 
@@ -174,17 +174,17 @@ type ValidationError struct {
 	err  error
 }
 
-// Error implements the errordefs interface.
+// Error implements the error interface.
 func (e *ValidationError) Error() string {
 	return e.err.Error()
 }
 
-// Unwrap implements the errordefs.Wrapper interface.
+// Unwrap implements the errors.Wrapper interface.
 func (e *ValidationError) Unwrap() error {
 	return e.err
 }
 
-// IsValidationError returns a boolean indicating whether the errordefs is a validation errordefs.
+// IsValidationError returns a boolean indicating whether the error is a validation error.
 func IsValidationError(err error) bool {
 	if err == nil {
 		return false
@@ -198,12 +198,12 @@ type NotFoundError struct {
 	label string
 }
 
-// Error implements the errordefs interface.
+// Error implements the error interface.
 func (e *NotFoundError) Error() string {
 	return "ent: " + e.label + " not found"
 }
 
-// IsNotFound returns a boolean indicating whether the errordefs is a not found errordefs.
+// IsNotFound returns a boolean indicating whether the error is a not found error.
 func IsNotFound(err error) bool {
 	if err == nil {
 		return false
@@ -212,7 +212,7 @@ func IsNotFound(err error) bool {
 	return errors.As(err, &e)
 }
 
-// MaskNotFound masks not found errordefs.
+// MaskNotFound masks not found error.
 func MaskNotFound(err error) error {
 	if IsNotFound(err) {
 		return nil
@@ -225,12 +225,12 @@ type NotSingularError struct {
 	label string
 }
 
-// Error implements the errordefs interface.
+// Error implements the error interface.
 func (e *NotSingularError) Error() string {
 	return "ent: " + e.label + " not singular"
 }
 
-// IsNotSingular returns a boolean indicating whether the errordefs is a not singular errordefs.
+// IsNotSingular returns a boolean indicating whether the error is a not singular error.
 func IsNotSingular(err error) bool {
 	if err == nil {
 		return false
@@ -244,12 +244,12 @@ type NotLoadedError struct {
 	edge string
 }
 
-// Error implements the errordefs interface.
+// Error implements the error interface.
 func (e *NotLoadedError) Error() string {
 	return "ent: " + e.edge + " edge was not loaded"
 }
 
-// IsNotLoaded returns a boolean indicating whether the errordefs is a not loaded errordefs.
+// IsNotLoaded returns a boolean indicating whether the error is a not loaded error.
 func IsNotLoaded(err error) bool {
 	if err == nil {
 		return false
@@ -266,17 +266,17 @@ type ConstraintError struct {
 	wrap error
 }
 
-// Error implements the errordefs interface.
+// Error implements the error interface.
 func (e ConstraintError) Error() string {
 	return "ent: constraint failed: " + e.msg
 }
 
-// Unwrap implements the errordefs.Wrapper interface.
+// Unwrap implements the errors.Wrapper interface.
 func (e *ConstraintError) Unwrap() error {
 	return e.wrap
 }
 
-// IsConstraintError returns a boolean indicating whether the errordefs is a constraint failure.
+// IsConstraintError returns a boolean indicating whether the error is a constraint failure.
 func IsConstraintError(err error) bool {
 	if err == nil {
 		return false
@@ -293,7 +293,7 @@ type selector struct {
 	scan  func(context.Context, any) error
 }
 
-// ScanX is like Scan, but panics if an errordefs occurs.
+// ScanX is like Scan, but panics if an error occurs.
 func (s *selector) ScanX(ctx context.Context, v any) {
 	if err := s.scan(ctx, v); err != nil {
 		panic(err)
@@ -312,7 +312,7 @@ func (s *selector) Strings(ctx context.Context) ([]string, error) {
 	return v, nil
 }
 
-// StringsX is like Strings, but panics if an errordefs occurs.
+// StringsX is like Strings, but panics if an error occurs.
 func (s *selector) StringsX(ctx context.Context) []string {
 	v, err := s.Strings(ctx)
 	if err != nil {
@@ -338,7 +338,7 @@ func (s *selector) String(ctx context.Context) (_ string, err error) {
 	return
 }
 
-// StringX is like String, but panics if an errordefs occurs.
+// StringX is like String, but panics if an error occurs.
 func (s *selector) StringX(ctx context.Context) string {
 	v, err := s.String(ctx)
 	if err != nil {
@@ -359,7 +359,7 @@ func (s *selector) Ints(ctx context.Context) ([]int, error) {
 	return v, nil
 }
 
-// IntsX is like Ints, but panics if an errordefs occurs.
+// IntsX is like Ints, but panics if an error occurs.
 func (s *selector) IntsX(ctx context.Context) []int {
 	v, err := s.Ints(ctx)
 	if err != nil {
@@ -385,7 +385,7 @@ func (s *selector) Int(ctx context.Context) (_ int, err error) {
 	return
 }
 
-// IntX is like Int, but panics if an errordefs occurs.
+// IntX is like Int, but panics if an error occurs.
 func (s *selector) IntX(ctx context.Context) int {
 	v, err := s.Int(ctx)
 	if err != nil {
@@ -406,7 +406,7 @@ func (s *selector) Float64s(ctx context.Context) ([]float64, error) {
 	return v, nil
 }
 
-// Float64sX is like Float64s, but panics if an errordefs occurs.
+// Float64sX is like Float64s, but panics if an error occurs.
 func (s *selector) Float64sX(ctx context.Context) []float64 {
 	v, err := s.Float64s(ctx)
 	if err != nil {
@@ -432,7 +432,7 @@ func (s *selector) Float64(ctx context.Context) (_ float64, err error) {
 	return
 }
 
-// Float64X is like Float64, but panics if an errordefs occurs.
+// Float64X is like Float64, but panics if an error occurs.
 func (s *selector) Float64X(ctx context.Context) float64 {
 	v, err := s.Float64(ctx)
 	if err != nil {
@@ -453,7 +453,7 @@ func (s *selector) Bools(ctx context.Context) ([]bool, error) {
 	return v, nil
 }
 
-// BoolsX is like Bools, but panics if an errordefs occurs.
+// BoolsX is like Bools, but panics if an error occurs.
 func (s *selector) BoolsX(ctx context.Context) []bool {
 	v, err := s.Bools(ctx)
 	if err != nil {
@@ -479,7 +479,7 @@ func (s *selector) Bool(ctx context.Context) (_ bool, err error) {
 	return
 }
 
-// BoolX is like Bool, but panics if an errordefs occurs.
+// BoolX is like Bool, but panics if an error occurs.
 func (s *selector) BoolX(ctx context.Context) bool {
 	v, err := s.Bool(ctx)
 	if err != nil {

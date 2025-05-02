@@ -79,6 +79,9 @@ func (m *MemberUseCase) UpdateMember(ctx context.Context, patch *PatchUpdateMemb
 }
 func (m *MemberUseCase) DeleteMember(ctx context.Context, id int) (*entities.Member, error) {
 	member, err := m.MemberRepo.GetByID(ctx, id)
+	if err != nil {
+		return nil, MapInfraErrorToUseCaseError(err)
+	}
 
 	err = m.MemberRepo.Delete(ctx, id)
 	if err != nil {

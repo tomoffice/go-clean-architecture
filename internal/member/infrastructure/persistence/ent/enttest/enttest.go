@@ -5,11 +5,11 @@ package enttest
 import (
 	"context"
 
-	"crud-clean/internal/infrastructure/db/ent"
+	"module-clean/internal/member/infrastructure/persistence/ent"
 	// required by schema hooks.
-	_ "crud-clean/internal/infrastructure/db/ent/runtime"
+	_ "module-clean/internal/member/infrastructure/persistence/ent/runtime"
 
-	"crud-clean/internal/infrastructure/db/ent/migrate"
+	"module-clean/internal/member/infrastructure/persistence/ent/migrate"
 
 	"entgo.io/ent/dialect/sql/schema"
 )

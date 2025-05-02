@@ -4,10 +4,10 @@ package ent
 
 import (
 	"context"
-	"crud-clean/internal/infrastructure/db/ent/member"
-	"crud-clean/internal/infrastructure/db/ent/predicate"
 	"errors"
 	"fmt"
+	"module-clean/internal/member/infrastructure/persistence/ent/member"
+	"module-clean/internal/member/infrastructure/persistence/ent/predicate"
 	"sync"
 	"time"
 
@@ -103,7 +103,7 @@ func (m MemberMutation) Client() *Client {
 }
 
 // Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an errordefs otherwise.
+// it returns an error otherwise.
 func (m MemberMutation) Tx() (*Tx, error) {
 	if _, ok := m.driver.(*txDriver); !ok {
 		return nil, errors.New("ent: mutation is not running in a transaction")
@@ -157,7 +157,7 @@ func (m *MemberMutation) Name() (r string, exists bool) {
 
 // OldName returns the old "name" field's value of the Member entity.
 // If the Member object wasn't provided to the builder, the object is fetched from the database.
-// An errordefs is returned if the mutation operation is not UpdateOne, or the database query fails.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *MemberMutation) OldName(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldName is only allowed on UpdateOne operations")
@@ -193,7 +193,7 @@ func (m *MemberMutation) Email() (r string, exists bool) {
 
 // OldEmail returns the old "email" field's value of the Member entity.
 // If the Member object wasn't provided to the builder, the object is fetched from the database.
-// An errordefs is returned if the mutation operation is not UpdateOne, or the database query fails.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *MemberMutation) OldEmail(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldEmail is only allowed on UpdateOne operations")
@@ -229,7 +229,7 @@ func (m *MemberMutation) Password() (r string, exists bool) {
 
 // OldPassword returns the old "password" field's value of the Member entity.
 // If the Member object wasn't provided to the builder, the object is fetched from the database.
-// An errordefs is returned if the mutation operation is not UpdateOne, or the database query fails.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *MemberMutation) OldPassword(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldPassword is only allowed on UpdateOne operations")
@@ -265,7 +265,7 @@ func (m *MemberMutation) CreatedAt() (r time.Time, exists bool) {
 
 // OldCreatedAt returns the old "created_at" field's value of the Member entity.
 // If the Member object wasn't provided to the builder, the object is fetched from the database.
-// An errordefs is returned if the mutation operation is not UpdateOne, or the database query fails.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *MemberMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
@@ -352,7 +352,7 @@ func (m *MemberMutation) Field(name string) (ent.Value, bool) {
 	return nil, false
 }
 
-// OldField returns the old value of the field from the database. An errordefs is
+// OldField returns the old value of the field from the database. An error is
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
 func (m *MemberMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
@@ -369,7 +369,7 @@ func (m *MemberMutation) OldField(ctx context.Context, name string) (ent.Value, 
 	return nil, fmt.Errorf("unknown Member field %s", name)
 }
 
-// SetField sets the value of a field with the given name. It returns an errordefs if
+// SetField sets the value of a field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
 func (m *MemberMutation) SetField(name string, value ent.Value) error {
@@ -419,7 +419,7 @@ func (m *MemberMutation) AddedField(name string) (ent.Value, bool) {
 	return nil, false
 }
 
-// AddField adds the value to the field with the given name. It returns an errordefs if
+// AddField adds the value to the field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
 func (m *MemberMutation) AddField(name string, value ent.Value) error {
@@ -442,13 +442,13 @@ func (m *MemberMutation) FieldCleared(name string) bool {
 }
 
 // ClearField clears the value of the field with the given name. It returns an
-// errordefs if the field is not defined in the schema.
+// error if the field is not defined in the schema.
 func (m *MemberMutation) ClearField(name string) error {
 	return fmt.Errorf("unknown Member nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation for the field with the given name.
-// It returns an errordefs if the field is not defined in the schema.
+// It returns an error if the field is not defined in the schema.
 func (m *MemberMutation) ResetField(name string) error {
 	switch name {
 	case member.FieldName:
@@ -503,14 +503,14 @@ func (m *MemberMutation) EdgeCleared(name string) bool {
 	return false
 }
 
-// ClearEdge clears the value of the edge with the given name. It returns an errordefs
+// ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *MemberMutation) ClearEdge(name string) error {
 	return fmt.Errorf("unknown Member unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an errordefs if the edge is not defined in the schema.
+// It returns an error if the edge is not defined in the schema.
 func (m *MemberMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Member edge %s", name)
 }
