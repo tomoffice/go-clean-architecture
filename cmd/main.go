@@ -2,14 +2,13 @@ package main
 
 import (
 	_ "github.com/mattn/go-sqlite3" // or mysql, pgx, etc.
-	"module-clean/internal/framework/gin"
-	"module-clean/internal/framework/server"
-	"module-clean/internal/infrastructure/database"
-	memberrepo "module-clean/internal/member/infrastructure/persistence/sqlx/sqlite"
-	"module-clean/internal/member/interface_adapters/router"
-
-	"module-clean/internal/member/interface_adapters/controller"
-	"module-clean/internal/member/usecase"
+	"module-clean/internal/modules/member/adapter/controller"
+	"module-clean/internal/modules/member/adapter/router"
+	memberrepo "module-clean/internal/modules/member/infrastructure/persistence/sqlx/sqlite"
+	"module-clean/internal/modules/member/usecase"
+	"module-clean/internal/platform/database"
+	"module-clean/internal/platform/gin"
+	router2 "module-clean/internal/platform/gin/router"
 )
 
 func main() {
@@ -28,8 +27,8 @@ func main() {
 	memberRouter := router.NewMemberRouter(memberController)
 
 	// Step 6: 初始化 Router（Gin）並綁定所有模組路由
-	engine := gin.InitGinRouter("/api/v1", memberRouter)
+	engine := router2.NewGinEngine("/api/v1", memberRouter.RegisterRoutes)
 
 	// Step 7: 啟動 HTTP Server（或 gRPC / WebSocket 等其他協定）
-	server.StartHTTPServer(":81", engine)
+	gin.StartHTTPServer(":81", engine)
 }
