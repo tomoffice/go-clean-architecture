@@ -2,13 +2,13 @@ package main
 
 import (
 	_ "github.com/mattn/go-sqlite3" // or mysql, pgx, etc.
-	"module-clean/internal/modules/member/adapter/controller"
-	"module-clean/internal/modules/member/adapter/router"
-	memberrepo "module-clean/internal/modules/member/infrastructure/persistence/sqlx/sqlite"
+	"module-clean/internal/framework/database"
+	"module-clean/internal/framework/gin"
+	router2 "module-clean/internal/framework/gin/router"
+	memberrepo "module-clean/internal/modules/member/driver/persistence/sqlx/sqlite"
+	"module-clean/internal/modules/member/interface_adapter/controller"
+	"module-clean/internal/modules/member/interface_adapter/router"
 	"module-clean/internal/modules/member/usecase"
-	"module-clean/internal/platform/database"
-	"module-clean/internal/platform/gin"
-	router2 "module-clean/internal/platform/gin/router"
 )
 
 func main() {

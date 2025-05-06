@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"errors"
-	sqlite2 "module-clean/internal/modules/member/infrastructure/persistence/sqlx/sqlite"
+	sqlite2 "module-clean/internal/modules/member/driver/persistence/sqlx/sqlite"
 )
 
 // MapInfraErrorToUseCaseError 將 infra 錯誤轉換為 usecase 層語意錯誤
