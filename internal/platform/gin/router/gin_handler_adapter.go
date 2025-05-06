@@ -9,7 +9,7 @@ type GinHandler struct {
 	H gin.HandlerFunc
 }
 
-func NewGinHandler(h gin.HandlerFunc) *GinHandler
+func NewGinHandler(h gin.HandlerFunc) *GinHandler 
 func NewGinHandler(h gin.HandlerFunc) *GinHandler {
 	return &GinHandler{H: h}
 }
