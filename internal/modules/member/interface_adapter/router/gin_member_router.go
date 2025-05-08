@@ -3,7 +3,7 @@ package router
 import (
 	router2 "module-clean/internal/framework/gin/router"
 	"module-clean/internal/modules/member/interface_adapter/controller"
-	sharedrouter "module-clean/internal/shared/router"
+	sharedrouter "module-clean/internal/shared/interface_adapter/router"
 )
 
 type MemberRouter struct {

@@ -15,4 +15,5 @@ var (
 	ErrDBConnectionClosed = errors.New("db: connection closed")
 	ErrDBTransactionDone  = errors.New("db: transaction done")
 	ErrDBUnknown          = errors.New("db: unknown errordefs")
+	ErrDBLastInsertId     = errors.New("db: failed to get last insert id")
 )

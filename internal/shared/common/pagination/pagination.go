@@ -1,6 +1,8 @@
 package pagination
 
-import "module-clean/internal/shared/enum"
+import (
+	"module-clean/internal/shared/common/enum"
+)
 
 type Pagination struct {
 	Limit   int          `json:"limit"`    // 一次最多拿幾筆

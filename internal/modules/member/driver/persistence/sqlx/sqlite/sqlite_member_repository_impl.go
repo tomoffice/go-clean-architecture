@@ -6,7 +6,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"module-clean/internal/modules/member/domain/entities"
 	"module-clean/internal/modules/member/domain/repository"
-	"module-clean/internal/shared/pagination"
+	"module-clean/internal/shared/common/pagination"
 )
 
 type sqlxMemberRepo struct {
@@ -18,16 +18,16 @@ func NewSQLXMemberRepo(db *sqlx.DB) repository.MemberRepository {
 }
 
 func (s sqlxMemberRepo) Create(ctx context.Context, m *entities.Member) error {
-	result, err := s.db.ExecContext(ctx, queryInsertMember, m.Name, m.Email, m.Password)
+	_, err := s.db.ExecContext(ctx, queryInsertMember, m.Name, m.Email, m.Password)
 	if err != nil {
 		return mapSQLError(err)
 	}
 
-	id, err := result.LastInsertId()
-	if err != nil {
-		return err
-	}
-	m.ID = int(id)
+	//id, err := result.LastInsertId()
+	//if err != nil {
+	//	return err
+	//}
+	//m.ID = int(id)
 	return nil
 }
 

@@ -2,7 +2,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	sharedrouter "module-clean/internal/shared/router"
+	sharedrouter "module-clean/internal/shared/interface_adapter/router"
 )
 
 type GinRouterGroup struct {

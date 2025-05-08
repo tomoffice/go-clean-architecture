@@ -12,7 +12,7 @@ import (
 	"context"
 	"module-clean/internal/modules/member/domain/entities"
 	"module-clean/internal/modules/member/domain/repository"
-	"module-clean/internal/shared/pagination"
+	"module-clean/internal/shared/common/pagination"
 )
 
 type MemberUseCase struct {
@@ -24,42 +24,53 @@ func NewMemberUseCase(memberRepo repository.MemberRepository) *MemberUseCase {
 		MemberRepo: memberRepo,
 	}
 }
-func (m *MemberUseCase) RegisterMember(ctx context.Context, member *entities.Member) error {
+func (m *MemberUseCase) RegisterMember(ctx context.Context, member *entities.Member) (*entities.Member, error) {
 	err := m.MemberRepo.Create(ctx, member)
 	if err != nil {
-		return MapInfraErrorToUseCaseError(err)
+		ucErr := MapInfraErrorToUseCaseError(err)
+		return nil, ucErr
 	}
-	return nil
+	retrieveMember, err := m.MemberRepo.GetByEmail(ctx, member.Email)
+	if err != nil {
+		ucErr := MapInfraErrorToUseCaseError(err)
+		return nil, ucErr
+	}
+	return retrieveMember, nil
 }
 func (m *MemberUseCase) GetMemberByID(ctx context.Context, id int) (*entities.Member, error) {
 	member, err := m.MemberRepo.GetByID(ctx, id)
 	if err != nil {
-		return nil, MapInfraErrorToUseCaseError(err)
+		ucErr := MapInfraErrorToUseCaseError(err)
+		return nil, ucErr
 	}
 	return member, nil
 }
 func (m *MemberUseCase) GetMemberByEmail(ctx context.Context, email string) (*entities.Member, error) {
 	member, err := m.MemberRepo.GetByEmail(ctx, email)
 	if err != nil {
-		return nil, MapInfraErrorToUseCaseError(err)
+		ucErr := MapInfraErrorToUseCaseError(err)
+		return nil, ucErr
 	}
 	return member, nil
 }
 func (m *MemberUseCase) ListMembers(ctx context.Context, pagination pagination.Pagination) ([]*entities.Member, int, error) {
 	members, err := m.MemberRepo.GetAll(ctx, pagination)
 	if err != nil {
-		return nil, 0, MapInfraErrorToUseCaseError(err)
+		ucErr := MapInfraErrorToUseCaseError(err)
+		return nil, 0, ucErr
 	}
 	total, err := m.MemberRepo.CountAll(ctx)
 	if err != nil {
-		return nil, 0, MapInfraErrorToUseCaseError(err)
+		ucErr := MapInfraErrorToUseCaseError(err)
+		return nil, 0, ucErr
 	}
 	return members, total, nil
 }
 func (m *MemberUseCase) UpdateMember(ctx context.Context, patch *PatchUpdateMemberInput) (*entities.Member, error) {
 	member, err := m.MemberRepo.GetByID(ctx, patch.ID)
 	if err != nil {
-		return nil, err
+		ucErr := MapInfraErrorToUseCaseError(err)
+		return nil, ucErr
 	}
 	if patch.Name != nil {
 		member.Name = *patch.Name
@@ -72,7 +83,8 @@ func (m *MemberUseCase) UpdateMember(ctx context.Context, patch *PatchUpdateMemb
 	}
 	member, err = m.MemberRepo.Update(ctx, member)
 	if err != nil {
-		return nil, MapInfraErrorToUseCaseError(err)
+		ucErr := MapInfraErrorToUseCaseError(err)
+		return nil, ucErr
 	}
 	return member, nil
 
@@ -80,12 +92,14 @@ func (m *MemberUseCase) UpdateMember(ctx context.Context, patch *PatchUpdateMemb
 func (m *MemberUseCase) DeleteMember(ctx context.Context, id int) (*entities.Member, error) {
 	member, err := m.MemberRepo.GetByID(ctx, id)
 	if err != nil {
-		return nil, MapInfraErrorToUseCaseError(err)
+		ucErr := MapInfraErrorToUseCaseError(err)
+		return nil, ucErr
 	}
 
 	err = m.MemberRepo.Delete(ctx, id)
 	if err != nil {
-		return nil, MapInfraErrorToUseCaseError(err)
+		ucErr := MapInfraErrorToUseCaseError(err)
+		return nil, ucErr
 	}
 	return member, nil
 }

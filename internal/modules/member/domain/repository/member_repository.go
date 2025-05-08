@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"module-clean/internal/modules/member/domain/entities"
-	"module-clean/internal/shared/pagination"
+	"module-clean/internal/shared/common/pagination"
 )
 
 type MemberRepository interface {

@@ -3,33 +3,54 @@ package http
 import (
 	"module-clean/internal/modules/member/domain/entities"
 	"module-clean/internal/modules/member/interface_adapter/dto"
+	sharedenum "module-clean/internal/shared/common/enum"
+	sharedviewmodel "module-clean/internal/shared/interface_adapter/viewmodel/http"
+	"strconv"
 	"time"
 )
 
-func PresentCreateMemberDTO(member *entities.Member) dto.CreateMemberResponseDTO {
-	return dto.CreateMemberResponseDTO{
-		ID:    member.ID,
-		Name:  member.Name,
-		Email: member.Email,
+type MemberPresenter struct{}
+
+func NewMemberPresenter() *MemberPresenter {
+	return &MemberPresenter{}
+}
+
+func (p *MemberPresenter) PresentCreateMember(member *entities.Member) sharedviewmodel.HTTPResponse[dto.CreateMemberResponseDTO] {
+	return sharedviewmodel.HTTPResponse[dto.CreateMemberResponseDTO]{
+		Data: dto.CreateMemberResponseDTO{
+			ID:    member.ID,
+			Name:  member.Name,
+			Email: member.Email,
+		},
+		BaseHTTPResponse: sharedviewmodel.NewBaseHTTPResponse(sharedenum.APIStatusSuccess),
 	}
 }
-func PresentGetMemberByIDDTO(member *entities.Member) dto.GetMemberByIDResponseDTO {
-	return dto.GetMemberByIDResponseDTO{
-		ID:        member.ID,
-		Name:      member.Name,
-		Email:     member.Email,
-		CreatedAt: member.CreatedAt.Format(time.RFC3339),
+
+func (p *MemberPresenter) PresentGetMemberByID(member *entities.Member) sharedviewmodel.HTTPResponse[dto.GetMemberByIDResponseDTO] {
+	return sharedviewmodel.HTTPResponse[dto.GetMemberByIDResponseDTO]{
+		Data: dto.GetMemberByIDResponseDTO{
+			ID:        member.ID,
+			Name:      member.Name,
+			Email:     member.Email,
+			CreatedAt: member.CreatedAt.Format(time.RFC3339),
+		},
+		BaseHTTPResponse: sharedviewmodel.NewBaseHTTPResponse(sharedenum.APIStatusSuccess),
 	}
 }
-func PresentGetMemberByEmailDTO(member *entities.Member) dto.GetMemberByEmailResponseDTO {
-	return dto.GetMemberByEmailResponseDTO{
-		ID:        member.ID,
-		Name:      member.Name,
-		Email:     member.Email,
-		CreatedAt: member.CreatedAt.Format(time.RFC3339),
+
+func (p *MemberPresenter) PresentGetMemberByEmail(member *entities.Member) sharedviewmodel.HTTPResponse[dto.GetMemberByEmailResponseDTO] {
+	return sharedviewmodel.HTTPResponse[dto.GetMemberByEmailResponseDTO]{
+		Data: dto.GetMemberByEmailResponseDTO{
+			ID:        member.ID,
+			Name:      member.Name,
+			Email:     member.Email,
+			CreatedAt: member.CreatedAt.Format(time.RFC3339),
+		},
+		BaseHTTPResponse: sharedviewmodel.NewBaseHTTPResponse(sharedenum.APIStatusSuccess),
 	}
 }
-func PresentListMemberDTO(members []*entities.Member) dto.ListMemberResponseDTO {
+
+func (p *MemberPresenter) PresentListMembers(members []*entities.Member, total int) sharedviewmodel.HTTPResponse[dto.ListMemberResponseDTO] {
 	items := make([]dto.MemberListItemDTO, len(members))
 	for i, m := range members {
 		items[i] = dto.MemberListItemDTO{
@@ -38,19 +59,47 @@ func PresentListMemberDTO(members []*entities.Member) dto.ListMemberResponseDTO 
 			Email: m.Email,
 		}
 	}
-	return dto.ListMemberResponseDTO{Members: items}
-}
-func PresentUpdateMemberDTO(member *entities.Member) dto.UpdateMemberResponseDTO {
-	return dto.UpdateMemberResponseDTO{
-		ID:    member.ID,
-		Name:  &member.Name,
-		Email: &member.Email,
+	return sharedviewmodel.HTTPResponse[dto.ListMemberResponseDTO]{
+		Data: dto.ListMemberResponseDTO{
+			Members: items,
+		},
+		Meta: &sharedviewmodel.MetaPayload{
+			Total: total,
+		},
+		BaseHTTPResponse: sharedviewmodel.NewBaseHTTPResponse(sharedenum.APIStatusSuccess),
 	}
 }
-func PresentDeleteMemberDTO(member *entities.Member) dto.DeleteMemberResponseDTO {
-	return dto.DeleteMemberResponseDTO{
-		ID:    member.ID,
-		Name:  &member.Name,
-		Email: &member.Email,
+
+func (p *MemberPresenter) PresentUpdateMember(member *entities.Member) sharedviewmodel.HTTPResponse[dto.UpdateMemberResponseDTO] {
+	return sharedviewmodel.HTTPResponse[dto.UpdateMemberResponseDTO]{
+		Data: dto.UpdateMemberResponseDTO{
+			ID:    member.ID,
+			Name:  &member.Name,
+			Email: &member.Email,
+		},
+		BaseHTTPResponse: sharedviewmodel.NewBaseHTTPResponse(sharedenum.APIStatusSuccess),
+	}
+}
+
+func (p *MemberPresenter) PresentDeleteMember(member *entities.Member) sharedviewmodel.HTTPResponse[dto.DeleteMemberResponseDTO] {
+	return sharedviewmodel.HTTPResponse[dto.DeleteMemberResponseDTO]{
+		Data: dto.DeleteMemberResponseDTO{
+			ID:    member.ID,
+			Name:  &member.Name,
+			Email: &member.Email,
+		},
+		BaseHTTPResponse: sharedviewmodel.NewBaseHTTPResponse(sharedenum.APIStatusSuccess),
+	}
+}
+
+func (p *MemberPresenter) PresentError(err error) (int, sharedviewmodel.HTTPResponse[any]) {
+	errCode, message := MapMemberUseCaseError(err)
+	httpStatus := MapErrorCodeToHTTPStatus(errCode)
+	return httpStatus, sharedviewmodel.HTTPResponse[any]{
+		Error: &sharedviewmodel.ErrorPayload{
+			Code:    strconv.Itoa(errCode),
+			Message: message,
+		},
+		BaseHTTPResponse: sharedviewmodel.NewBaseHTTPResponse(sharedenum.APIStatusFailed),
 	}
 }
