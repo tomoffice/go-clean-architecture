@@ -1,7 +1,7 @@
 package router
 
 import (
-	router2 "module-clean/internal/framework/gin/router"
+	router2 "module-clean/internal/framework/http/gin/router"
 	"module-clean/internal/modules/member/interface_adapter/controller"
 	sharedrouter "module-clean/internal/shared/interface_adapter/router"
 )
