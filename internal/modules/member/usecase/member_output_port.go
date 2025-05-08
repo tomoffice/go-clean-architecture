@@ -3,15 +3,21 @@ package usecase
 import (
 	"module-clean/internal/modules/member/domain/entities"
 	"module-clean/internal/modules/member/interface_adapter/dto"
-	"module-clean/internal/shared/interface_adapter/viewmodel/http"
+	sharedviewmodel "module-clean/internal/shared/interface_adapter/viewmodel/http"
 )
 
 type MemberOutputPort interface {
-	PresentCreateMember(member *entities.Member) http.HTTPResponse[dto.CreateMemberResponseDTO]
-	PresentGetMemberByID(member *entities.Member) http.HTTPResponse[dto.GetMemberByIDResponseDTO]
-	PresentGetMemberByEmail(member *entities.Member) http.HTTPResponse[dto.GetMemberByEmailResponseDTO]
-	PresentListMembers(members []*entities.Member, total int) http.HTTPResponse[dto.ListMemberResponseDTO]
-	PresentUpdateMember(member *entities.Member) http.HTTPResponse[dto.UpdateMemberResponseDTO]
-	PresentDeleteMember(member *entities.Member) http.HTTPResponse[dto.DeleteMemberResponseDTO]
-	PresentError(err error) (int, http.HTTPResponse[any])
+	PresentCreateMember(member *entities.Member) sharedviewmodel.HTTPResponse[dto.CreateMemberResponseDTO]
+	PresentGetMemberByID(member *entities.Member) sharedviewmodel.HTTPResponse[dto.GetMemberByIDResponseDTO]
+	PresentGetMemberByEmail(member *entities.Member) sharedviewmodel.HTTPResponse[dto.GetMemberByEmailResponseDTO]
+	PresentListMembers(members []*entities.Member, total int) sharedviewmodel.HTTPResponse[dto.ListMemberResponseDTO]
+	PresentUpdateMember(member *entities.Member) sharedviewmodel.HTTPResponse[dto.UpdateMemberResponseDTO]
+	PresentDeleteMember(member *entities.Member) sharedviewmodel.HTTPResponse[dto.DeleteMemberResponseDTO]
+
+	// UseCase 層業務錯誤處理
+	PresentUseCaseError(err error) (int, sharedviewmodel.HTTPResponse[any])
+	// Input 驗證錯誤處理
+	PresentValidationError(err error) (int, sharedviewmodel.HTTPResponse[any])
+	// Binding error 處理
+	PresentBindingError(err error) (int, sharedviewmodel.HTTPResponse[any])
 }
