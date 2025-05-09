@@ -32,7 +32,7 @@ func (c *MemberController) Register(ctx *gin.Context) {
 		ctx.JSON(httpStatus, resp)
 		return
 	}
-	entity := mapper.CreateDTOtoEntity(reqDTO)
+	entity := mapper.CreateMemberDTOToEntity(reqDTO)
 	member, err := c.useCase.RegisterMember(ctx, entity)
 	if err != nil {
 		httpStatus, resp := c.presenter.PresentUseCaseError(err)
@@ -98,7 +98,7 @@ func (c *MemberController) List(ctx *gin.Context) {
 		ctx.JSON(httpStatus, resp)
 		return
 	}
-	pagination := mapper.ListMemberToPagination(reqDTO)
+	pagination := mapper.ListMemberDTOToPagination(reqDTO)
 	members, total, err := c.useCase.ListMembers(ctx, *pagination)
 	if err != nil {
 		httpStatus, resp := c.presenter.PresentUseCaseError(err)
@@ -120,7 +120,7 @@ func (c *MemberController) Update(ctx *gin.Context) {
 		ctx.JSON(httpStatus, resp)
 		return
 	}
-	inputModel := mapper.UpdateDTOToInputModel(reqDTO)
+	inputModel := mapper.UpdateMemberDTOToInputModel(reqDTO)
 	member, err := c.useCase.UpdateMember(ctx, inputModel)
 	if err != nil {
 		httpStatus, resp := c.presenter.PresentUseCaseError(err)
@@ -142,7 +142,7 @@ func (c *MemberController) Delete(ctx *gin.Context) {
 		ctx.JSON(httpStatus, resp)
 		return
 	}
-	entity := mapper.DeleteDTOToEntity(reqDTO)
+	entity := mapper.DeleteMemberDTOToEntity(reqDTO)
 	member, err := c.useCase.DeleteMember(ctx, entity.ID)
 	if err != nil {
 		httpStatus, resp := c.presenter.PresentUseCaseError(err)

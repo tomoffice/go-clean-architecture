@@ -1,9 +1,8 @@
 package router
 
 import (
-	router2 "module-clean/internal/framework/http/gin/router"
+	"github.com/gin-gonic/gin"
 	"module-clean/internal/modules/member/interface_adapter/controller"
-	sharedrouter "module-clean/internal/shared/interface_adapter/router"
 )
 
 type MemberRouter struct {
@@ -14,12 +13,12 @@ func NewMemberRouter(controller *controller.MemberController) *MemberRouter {
 	return &MemberRouter{controller: controller}
 }
 
-func (r *MemberRouter) RegisterRoutes(router sharedrouter.RouterGroup) {
+func (r *MemberRouter) RegisterRoutes(router *gin.RouterGroup) {
 	member := router.Group("/members")
-	member.Handle("POST", "", router2.NewGinHandler(r.controller.Register))
-	member.Handle("GET", "/:id", router2.NewGinHandler(r.controller.GetByID))
-	member.Handle("GET", "/email/:email", router2.NewGinHandler(r.controller.GetByEmail))
-	member.Handle("GET", "", router2.NewGinHandler(r.controller.List))
-	member.Handle("PUT", "/:id", router2.NewGinHandler(r.controller.Update))
-	member.Handle("DELETE", "/:id", router2.NewGinHandler(r.controller.Delete))
+	member.POST("", r.controller.Register)
+	member.GET("/:id", r.controller.GetByID)
+	member.GET("/email/:email", r.controller.GetByEmail)
+	member.GET("", r.controller.List)
+	member.PUT("/:id", r.controller.Update)
+	member.DELETE("/:id", r.controller.Delete)
 }

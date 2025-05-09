@@ -2,17 +2,16 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	sharedrouter "module-clean/internal/shared/interface_adapter/router"
 )
 
-func NewGinEngine(rootPath string, groupRegisterFunc ...func(group sharedrouter.RouterGroup)) *gin.Engine {
+func NewGinEngine(rootPath string, groupRegisterFuncs ...func(group *gin.RouterGroup)) *gin.Engine {
 	engine := gin.New()
 	engine.Use(gin.Recovery())
 
-	ginRoot := NewGinRouterGroup(engine.Group(rootPath))
+	ginRoot := engine.Group(rootPath)
 
-	for _, registerFunc := range groupRegisterFunc {
-		registerFunc(ginRoot)
+	for _, registerFunc := range groupRegisterFuncs {
+		registerFunc(ginRoot) // 呼叫註冊函式，把 ginRoot 傳進去
 	}
 
 	return engine
