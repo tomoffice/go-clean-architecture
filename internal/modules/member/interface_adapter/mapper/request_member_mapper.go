@@ -17,7 +17,7 @@ import (
 	"module-clean/internal/shared/common/pagination"
 )
 
-func CreateDTOtoEntity(request dto.CreateMemberRequestDTO) *entities.Member {
+func CreateMemberDTOToEntity(request dto.CreateMemberRequestDTO) *entities.Member {
 	return &entities.Member{
 		Name:     request.Name,
 		Email:    request.Email,
@@ -34,7 +34,7 @@ func GetMemberByEmailDTOToEntity(request dto.GetMemberByEmailRequestDTO) *entiti
 		Email: request.Email,
 	}
 }
-func ListMemberToPagination(request dto.ListMemberRequestDTO) *pagination.Pagination {
+func ListMemberDTOToPagination(request dto.ListMemberRequestDTO) *pagination.Pagination {
 	sortBy := request.SortBy
 	if sortBy == "" {
 		sortBy = "id"
@@ -56,7 +56,7 @@ func ListMemberToPagination(request dto.ListMemberRequestDTO) *pagination.Pagina
 		OrderBy: orderBy,
 	}
 }
-func UpdateDTOToInputModel(dto dto.UpdateMemberRequestDTO) *usecase.PatchUpdateMemberInput {
+func UpdateMemberDTOToInputModel(dto dto.UpdateMemberRequestDTO) *usecase.PatchUpdateMemberInput {
 	return &usecase.PatchUpdateMemberInput{
 		ID:       dto.ID,
 		Name:     dto.Name,
@@ -64,7 +64,7 @@ func UpdateDTOToInputModel(dto dto.UpdateMemberRequestDTO) *usecase.PatchUpdateM
 		Password: dto.Password,
 	}
 }
-func DeleteDTOToEntity(request dto.DeleteMemberRequestDTO) *entities.Member {
+func DeleteMemberDTOToEntity(request dto.DeleteMemberRequestDTO) *entities.Member {
 	return &entities.Member{
 		ID: request.ID,
 	}

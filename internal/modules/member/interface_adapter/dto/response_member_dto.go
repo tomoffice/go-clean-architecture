@@ -17,13 +17,13 @@ type GetMemberByEmailResponseDTO struct {
 	Email     string `json:"email"`
 	CreatedAt string `json:"created_at"`
 }
-type MemberListItemDTO struct {
+type ListMemberItemDTO struct {
 	ID    int    `json:"id"`
 	Name  string `json:"name"`
 	Email string `json:"email"`
 }
 type ListMemberResponseDTO struct {
-	Members []MemberListItemDTO `json:"members"`
+	Members []ListMemberItemDTO `json:"members"`
 }
 type UpdateMemberResponseDTO struct {
 	ID    int     `json:"id"`
