@@ -2,7 +2,7 @@ package usecase
 
 import (
 	"errors"
-	sqlite2 "module-clean/internal/modules/member/driver/persistence/sqlx/sqlite"
+	gateway "module-clean/internal/modules/member/interface_adapter/gateway/repository"
 )
 
 // MapInfraErrorToUseCaseError 將 infra 錯誤轉換為 usecase 層語意錯誤
@@ -13,27 +13,14 @@ func MapInfraErrorToUseCaseError(err error) error {
 
 	// 優先比對 CustomError
 	switch {
-	case errors.Is(err, sqlite2.ErrDBRecordNotFound):
+	case errors.Is(err, gateway.ErrMemberNotFound):
 		return ErrMemberNotFound
-	case errors.Is(err, sqlite2.ErrDBDuplicateKey):
+	case errors.Is(err, gateway.ErrMemberAlreadyExists):
 		return ErrMemberAlreadyExists
-	case errors.Is(err, sqlite2.ErrDBUpdateNoEffect):
+	case errors.Is(err, gateway.ErrMemberUpdateFailed):
 		return ErrMemberUpdateFailed
-	case errors.Is(err, sqlite2.ErrDBDeleteNoEffect):
+	case errors.Is(err, gateway.ErrMemberDeleteFailed):
 		return ErrMemberDeleteFailed
-	}
-
-	// 萬一錯誤不是 CustomError instance，要用 As 抓 DBError
-	var dbErr *sqlite2.DBError
-	if errors.As(err, &dbErr) {
-		switch dbErr.CustomError {
-		case sqlite2.ErrDBContextTimeout,
-			sqlite2.ErrDBContextCanceled,
-			sqlite2.ErrDBConnectionClosed,
-			sqlite2.ErrDBTransactionDone,
-			sqlite2.ErrDBUnknown:
-			return ErrMemberDBFailure
-		}
 	}
 
 	// fallback 落到底了，真的不認得就回 Unexpected

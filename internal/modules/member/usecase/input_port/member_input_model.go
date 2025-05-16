@@ -7,7 +7,7 @@
 // - 定義 UseCase 所需的輸入資料結構
 // - 提供與外部資料格式（DTO）及內部 entity 之間的緩衝層
 // - 表達 UseCase 的輸入意圖與可選欄位
-package usecase
+package input_port
 
 type PatchUpdateMemberInput struct {
 	ID       int

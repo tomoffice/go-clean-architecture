@@ -1,3 +1,50 @@
+### 查詢會員列表（List Members）
 GET http://localhost:81/api/v1/members?page=1&limit=10&sort_by=id&order_by=asc
 Accept: application/json
 
+###
+
+### 查詢會員 By ID
+GET http://localhost:81/api/v1/members/1
+Accept: application/json
+
+###
+
+### 查詢會員 By Email
+GET http://localhost:81/api/v1/members/by-email?email=xiaoming@example.com
+Accept: application/json
+
+###
+
+### 建立會員（Create Member）
+POST http://localhost:81/api/v1/members
+Content-Type: application/json
+
+{
+  "name": "測試使用者",
+  "email": "testuser@example.com",
+  "password": "password123"
+}
+
+###
+
+### 更新會員（Update Member）
+PUT http://localhost:81/api/v1/members
+Content-Type: application/json
+
+{
+  "id": 1,
+  "name": "更新後的名字",
+  "email": "updated.email@example.com",
+  "password": "newpassword123"
+}
+
+###
+
+### 刪除會員（Delete Member）
+DELETE http://localhost:81/api/v1/members
+Content-Type: application/json
+
+{
+  "id": 1
+}

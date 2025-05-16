@@ -4,8 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/jmoiron/sqlx"
-	"module-clean/internal/modules/member/domain/entities"
-	"module-clean/internal/modules/member/domain/repository"
+	"module-clean/internal/modules/member/driver/persistence"
 	"module-clean/internal/shared/common/pagination"
 )
 
@@ -13,11 +12,10 @@ type sqlxMemberRepo struct {
 	db *sqlx.DB
 }
 
-func NewSQLXMemberRepo(db *sqlx.DB) repository.MemberRepository {
+func NewSQLXMemberRepo(db *sqlx.DB) persistence.MemberRepository {
 	return &sqlxMemberRepo{db: db}
 }
-
-func (s sqlxMemberRepo) Create(ctx context.Context, m *entities.Member) error {
+func (s sqlxMemberRepo) Create(ctx context.Context, m *persistence.MemberRepoModel) error {
 	_, err := s.db.ExecContext(ctx, queryInsertMember, m.Name, m.Email, m.Password)
 	if err != nil {
 		return mapSQLError(err)
@@ -30,27 +28,24 @@ func (s sqlxMemberRepo) Create(ctx context.Context, m *entities.Member) error {
 	//m.ID = int(id)
 	return nil
 }
-
-func (s sqlxMemberRepo) GetByID(ctx context.Context, id int) (*entities.Member, error) {
-	member := &entities.Member{}
+func (s sqlxMemberRepo) GetByID(ctx context.Context, id int) (*persistence.MemberRepoModel, error) {
+	member := &persistence.MemberRepoModel{}
 	err := s.db.GetContext(ctx, member, querySelectByID, id)
 	if err != nil {
 		return nil, mapSQLError(err)
 	}
 	return member, nil
 }
-
-func (s sqlxMemberRepo) GetByEmail(ctx context.Context, email string) (*entities.Member, error) {
-	member := &entities.Member{}
+func (s sqlxMemberRepo) GetByEmail(ctx context.Context, email string) (*persistence.MemberRepoModel, error) {
+	member := &persistence.MemberRepoModel{}
 	err := s.db.GetContext(ctx, member, querySelectByEmail, email)
 	if err != nil {
 		return nil, mapSQLError(err)
 	}
 	return member, nil
 }
-
-func (s sqlxMemberRepo) GetAll(ctx context.Context, pagination pagination.Pagination) ([]*entities.Member, error) {
-	members := make([]*entities.Member, 0)
+func (s sqlxMemberRepo) GetAll(ctx context.Context, pagination pagination.Pagination) ([]*persistence.MemberRepoModel, error) {
+	members := make([]*persistence.MemberRepoModel, 0)
 	query := fmt.Sprintf(querySelectAllBase, pagination.SortBy, pagination.OrderBy)
 	err := s.db.SelectContext(ctx, &members, query, pagination.Limit, pagination.Offset)
 	if err != nil {
@@ -66,7 +61,7 @@ func (s sqlxMemberRepo) CountAll(ctx context.Context) (int, error) {
 	}
 	return count, nil
 }
-func (s sqlxMemberRepo) Update(ctx context.Context, m *entities.Member) (*entities.Member, error) {
+func (s sqlxMemberRepo) Update(ctx context.Context, m *persistence.MemberRepoModel) (*persistence.MemberRepoModel, error) {
 	result, err := s.db.ExecContext(ctx, queryUpdateMember, m.Name, m.Email, m.ID)
 	if err != nil {
 		return nil, mapSQLError(err)
@@ -81,7 +76,6 @@ func (s sqlxMemberRepo) Update(ctx context.Context, m *entities.Member) (*entiti
 	}
 	return m, nil
 }
-
 func (s sqlxMemberRepo) Delete(ctx context.Context, id int) error {
 	result, err := s.db.ExecContext(ctx, queryDeleteMember, id)
 	if err != nil {

@@ -12,4 +12,5 @@ var (
 	ErrMemberDeleteFailed          = errors.New("usecase: member delete failed")
 	ErrMemberDBFailure             = errors.New("usecase: member db operation failed")
 	ErrUnexpectedMemberUseCaseFail = errors.New("usecase: unexpected member usecase errordefs")
+	ErrGatewayFailure              = errors.New("usecase: member gateway failure")
 )

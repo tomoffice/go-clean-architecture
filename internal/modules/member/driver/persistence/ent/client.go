@@ -42,9 +42,9 @@ type (
 	config struct {
 		// driver used for executing database requests.
 		driver dialect.Driver
-		// debug enable a debug logging.
+		// debug enable a debug logger.
 		debug bool
-		// log used for logging on debug mode.
+		// log used for logger on debug mode.
 		log func(...any)
 		// hooks to execute on mutations.
 		hooks *hooks
@@ -72,14 +72,14 @@ func (c *config) options(opts ...Option) {
 	}
 }
 
-// Debug enables debug logging on the ent.Driver.
+// Debug enables debug logger on the ent.Driver.
 func Debug() Option {
 	return func(c *config) {
 		c.debug = true
 	}
 }
 
-// Log sets the logging function for debug mode.
+// Log sets the logger function for debug mode.
 func Log(fn func(...any)) Option {
 	return func(c *config) {
 		c.log = fn
@@ -151,7 +151,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	}, nil
 }
 
-// Debug returns a new debug-client. It's used to get verbose logging on specific operations.
+// Debug returns a new debug-client. It's used to get verbose logger on specific operations.
 //
 //	client.Debug().
 //		Member.

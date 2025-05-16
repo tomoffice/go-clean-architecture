@@ -10,27 +10,27 @@
 package mapper
 
 import (
-	"module-clean/internal/modules/member/domain/entities"
+	"module-clean/internal/modules/member/entity"
 	"module-clean/internal/modules/member/interface_adapter/dto"
-	"module-clean/internal/modules/member/usecase"
+	"module-clean/internal/modules/member/usecase/input_port"
 	"module-clean/internal/shared/common/enum"
 	"module-clean/internal/shared/common/pagination"
 )
 
-func CreateMemberDTOToEntity(request dto.CreateMemberRequestDTO) *entities.Member {
-	return &entities.Member{
+func CreateMemberDTOToEntity(request dto.CreateMemberRequestDTO) *entity.Member {
+	return &entity.Member{
 		Name:     request.Name,
 		Email:    request.Email,
 		Password: request.Password,
 	}
 }
-func GetMemberByIDDTOToEntity(request dto.GetMemberByIDRequestDTO) *entities.Member {
-	return &entities.Member{
+func GetMemberByIDDTOToEntity(request dto.GetMemberByIDRequestDTO) *entity.Member {
+	return &entity.Member{
 		ID: request.ID,
 	}
 }
-func GetMemberByEmailDTOToEntity(request dto.GetMemberByEmailRequestDTO) *entities.Member {
-	return &entities.Member{
+func GetMemberByEmailDTOToEntity(request dto.GetMemberByEmailRequestDTO) *entity.Member {
+	return &entity.Member{
 		Email: request.Email,
 	}
 }
@@ -56,16 +56,16 @@ func ListMemberDTOToPagination(request dto.ListMemberRequestDTO) *pagination.Pag
 		OrderBy: orderBy,
 	}
 }
-func UpdateMemberDTOToInputModel(dto dto.UpdateMemberRequestDTO) *usecase.PatchUpdateMemberInput {
-	return &usecase.PatchUpdateMemberInput{
+func UpdateMemberDTOToInputModel(dto dto.UpdateMemberRequestDTO) *input_port.PatchUpdateMemberInput {
+	return &input_port.PatchUpdateMemberInput{
 		ID:       dto.ID,
 		Name:     dto.Name,
 		Email:    dto.Email,
 		Password: dto.Password,
 	}
 }
-func DeleteMemberDTOToEntity(request dto.DeleteMemberRequestDTO) *entities.Member {
-	return &entities.Member{
+func DeleteMemberDTOToEntity(request dto.DeleteMemberRequestDTO) *entity.Member {
+	return &entity.Member{
 		ID: request.ID,
 	}
 }

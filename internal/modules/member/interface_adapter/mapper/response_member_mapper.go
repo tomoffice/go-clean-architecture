@@ -1,19 +1,19 @@
 package mapper
 
 import (
-	"module-clean/internal/modules/member/domain/entities"
+	"module-clean/internal/modules/member/entity"
 	"module-clean/internal/modules/member/interface_adapter/dto"
 	"time"
 )
 
-func EntityToCreateMemberResponseDTO(member *entities.Member) dto.CreateMemberResponseDTO {
+func EntityToCreateMemberResponseDTO(member *entity.Member) dto.CreateMemberResponseDTO {
 	return dto.CreateMemberResponseDTO{
 		ID:    member.ID,
 		Name:  member.Name,
 		Email: member.Email,
 	}
 }
-func EntityToGetMemberByIDResponseDTO(member *entities.Member) dto.GetMemberByIDResponseDTO {
+func EntityToGetMemberByIDResponseDTO(member *entity.Member) dto.GetMemberByIDResponseDTO {
 	return dto.GetMemberByIDResponseDTO{
 		ID:        member.ID,
 		Name:      member.Name,
@@ -21,7 +21,7 @@ func EntityToGetMemberByIDResponseDTO(member *entities.Member) dto.GetMemberByID
 		CreatedAt: member.CreatedAt.Format(time.RFC3339),
 	}
 }
-func EntityToGetMemberByEmailResponseDTO(member *entities.Member) dto.GetMemberByEmailResponseDTO {
+func EntityToGetMemberByEmailResponseDTO(member *entity.Member) dto.GetMemberByEmailResponseDTO {
 	return dto.GetMemberByEmailResponseDTO{
 		ID:        member.ID,
 		Name:      member.Name,
@@ -29,7 +29,7 @@ func EntityToGetMemberByEmailResponseDTO(member *entities.Member) dto.GetMemberB
 		CreatedAt: member.CreatedAt.Format(time.RFC3339),
 	}
 }
-func EntityToListMemberResponseDTO(members []*entities.Member) dto.ListMemberResponseDTO {
+func EntityToListMemberResponseDTO(members []*entity.Member) dto.ListMemberResponseDTO {
 	items := make([]dto.ListMemberItemDTO, len(members))
 	for i, m := range members {
 		items[i] = dto.ListMemberItemDTO{
@@ -42,14 +42,14 @@ func EntityToListMemberResponseDTO(members []*entities.Member) dto.ListMemberRes
 		Members: items,
 	}
 }
-func EntityToUpdateMemberResponseDTO(member *entities.Member) dto.UpdateMemberResponseDTO {
+func EntityToUpdateMemberResponseDTO(member *entity.Member) dto.UpdateMemberResponseDTO {
 	return dto.UpdateMemberResponseDTO{
 		ID:    member.ID,
 		Name:  &member.Name,
 		Email: &member.Email,
 	}
 }
-func EntityToDeleteMemberResponseDTO(member *entities.Member) dto.DeleteMemberResponseDTO {
+func EntityToDeleteMemberResponseDTO(member *entity.Member) dto.DeleteMemberResponseDTO {
 	return dto.DeleteMemberResponseDTO{
 		ID:    member.ID,
 		Name:  &member.Name,

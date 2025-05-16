@@ -2,7 +2,7 @@ package http
 
 import (
 	"module-clean/internal/framework/http/gin/errordefs"
-	"module-clean/internal/modules/member/domain/entities"
+	"module-clean/internal/modules/member/entity"
 	"module-clean/internal/modules/member/interface_adapter/dto"
 	"module-clean/internal/modules/member/interface_adapter/mapper"
 	sharedenum "module-clean/internal/shared/common/enum"
@@ -17,22 +17,22 @@ func NewMemberPresenter() *MemberPresenter {
 	return &MemberPresenter{}
 }
 
-func (p *MemberPresenter) PresentCreateMember(member *entities.Member) sharedviewmodel.HTTPResponse[dto.CreateMemberResponseDTO] {
+func (p *MemberPresenter) PresentCreateMember(member *entity.Member) sharedviewmodel.HTTPResponse[dto.CreateMemberResponseDTO] {
 	respDTO := mapper.EntityToCreateMemberResponseDTO(member)
 	return buildSuccessResponse(respDTO)
 }
 
-func (p *MemberPresenter) PresentGetMemberByID(member *entities.Member) sharedviewmodel.HTTPResponse[dto.GetMemberByIDResponseDTO] {
+func (p *MemberPresenter) PresentGetMemberByID(member *entity.Member) sharedviewmodel.HTTPResponse[dto.GetMemberByIDResponseDTO] {
 	respDTO := mapper.EntityToGetMemberByIDResponseDTO(member)
 	return buildSuccessResponse(respDTO)
 }
 
-func (p *MemberPresenter) PresentGetMemberByEmail(member *entities.Member) sharedviewmodel.HTTPResponse[dto.GetMemberByEmailResponseDTO] {
+func (p *MemberPresenter) PresentGetMemberByEmail(member *entity.Member) sharedviewmodel.HTTPResponse[dto.GetMemberByEmailResponseDTO] {
 	respDTO := mapper.EntityToGetMemberByEmailResponseDTO(member)
 	return buildSuccessResponse(respDTO)
 }
 
-func (p *MemberPresenter) PresentListMembers(members []*entities.Member, total int) sharedviewmodel.HTTPResponse[dto.ListMemberResponseDTO] {
+func (p *MemberPresenter) PresentListMembers(members []*entity.Member, total int) sharedviewmodel.HTTPResponse[dto.ListMemberResponseDTO] {
 	respDTO := mapper.EntityToListMemberResponseDTO(members)
 	meta := &sharedviewmodel.MetaPayload{
 		Total: total,
@@ -40,12 +40,12 @@ func (p *MemberPresenter) PresentListMembers(members []*entities.Member, total i
 	return buildSuccessResponseWithMeta(respDTO, meta)
 }
 
-func (p *MemberPresenter) PresentUpdateMember(member *entities.Member) sharedviewmodel.HTTPResponse[dto.UpdateMemberResponseDTO] {
+func (p *MemberPresenter) PresentUpdateMember(member *entity.Member) sharedviewmodel.HTTPResponse[dto.UpdateMemberResponseDTO] {
 	respDTO := mapper.EntityToUpdateMemberResponseDTO(member)
 	return buildSuccessResponse(respDTO)
 }
 
-func (p *MemberPresenter) PresentDeleteMember(member *entities.Member) sharedviewmodel.HTTPResponse[dto.DeleteMemberResponseDTO] {
+func (p *MemberPresenter) PresentDeleteMember(member *entity.Member) sharedviewmodel.HTTPResponse[dto.DeleteMemberResponseDTO] {
 	respDTO := mapper.EntityToDeleteMemberResponseDTO(member)
 	return buildSuccessResponse(respDTO)
 }

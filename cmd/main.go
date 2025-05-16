@@ -4,9 +4,10 @@ import (
 	_ "github.com/mattn/go-sqlite3" // or mysql, pgx, etc.
 	"module-clean/internal/framework/database"
 	"module-clean/internal/framework/http/gin"
-	router2 "module-clean/internal/framework/http/gin/router"
+	ginrouter "module-clean/internal/framework/http/gin/router"
 	memberrepo "module-clean/internal/modules/member/driver/persistence/sqlx/sqlite"
 	"module-clean/internal/modules/member/interface_adapter/controller"
+	membergateway "module-clean/internal/modules/member/interface_adapter/gateway/repository"
 	"module-clean/internal/modules/member/interface_adapter/presenter/http"
 	"module-clean/internal/modules/member/interface_adapter/router"
 	"module-clean/internal/modules/member/usecase"
@@ -19,8 +20,11 @@ func main() {
 	// 初始化 Repository（Infrastructure → Outbound Adapter）
 	memberRepo := memberrepo.NewSQLXMemberRepo(db)
 
+	// 建立 Gateway（Domain → Inbound Adapter）
+	memberGateway := membergateway.NewMemberRepositoryGateway(memberRepo)
+
 	// 建立 UseCase（Application Layer）
-	memberUseCase := usecase.NewMemberUseCase(memberRepo)
+	memberUseCase := usecase.NewMemberUseCase(memberGateway)
 
 	// 建立 Presenter（Interface Adapter）
 	memberPresenter := http.NewMemberPresenter()
@@ -32,7 +36,7 @@ func main() {
 	memberRouter := router.NewMemberRouter(memberController)
 
 	// 初始化 Router（Gin）並綁定所有模組路由
-	engine := router2.NewGinEngine("/api/v1", memberRouter.RegisterRoutes)
+	engine := ginrouter.NewGinEngine("/api/v1", memberRouter.RegisterRoutes)
 
 	// 啟動 HTTP Server（或 gRPC / WebSocket 等其他協定）
 	gin.StartHTTPServer(":81", engine)

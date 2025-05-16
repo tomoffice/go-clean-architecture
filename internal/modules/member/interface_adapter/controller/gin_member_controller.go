@@ -4,16 +4,17 @@ import (
 	"github.com/gin-gonic/gin"
 	"module-clean/internal/modules/member/interface_adapter/dto"
 	"module-clean/internal/modules/member/interface_adapter/mapper"
-	"module-clean/internal/modules/member/usecase"
+	"module-clean/internal/modules/member/usecase/input_port"
+	"module-clean/internal/modules/member/usecase/output_port"
 	"net/http"
 )
 
 type MemberController struct {
-	useCase   usecase.MemberInputPort
-	presenter usecase.MemberOutputPort
+	useCase   input_port.MemberInputPort
+	presenter output_port.MemberOutputPort
 }
 
-func NewMemberController(memberUseCase *usecase.MemberUseCase, presenter usecase.MemberOutputPort) *MemberController {
+func NewMemberController(memberUseCase input_port.MemberInputPort, presenter output_port.MemberOutputPort) *MemberController {
 	return &MemberController{
 		useCase:   memberUseCase,
 		presenter: presenter,
