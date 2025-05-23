@@ -11,10 +11,10 @@ import (
 
 type MemberController struct {
 	useCase   input_port.MemberInputPort
-	presenter output_port.MemberOutputPort
+	presenter output_port.MemberPresenter
 }
 
-func NewMemberController(memberUseCase input_port.MemberInputPort, presenter output_port.MemberOutputPort) *MemberController {
+func NewMemberController(memberUseCase input_port.MemberInputPort, presenter output_port.MemberPresenter) *MemberController {
 	return &MemberController{
 		useCase:   memberUseCase,
 		presenter: presenter,

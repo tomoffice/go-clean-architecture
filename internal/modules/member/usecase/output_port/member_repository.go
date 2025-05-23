@@ -1,5 +1,6 @@
 package output_port
 
+//go:generate mockgen -source=member_repository.go -destination=../mock/mock_member_repository.go -package=mock
 import (
 	"context"
 	"module-clean/internal/modules/member/entity"

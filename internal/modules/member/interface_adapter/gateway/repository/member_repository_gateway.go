@@ -38,7 +38,7 @@ func (m2 MemberRepositoryGateway) GetByID(ctx context.Context, id int) (*entity.
 	}
 	createdAt, err := time.Parse("2006-01-02 15:04:05", repoModel.CreatedAt)
 	if err != nil {
-		return nil, ErrMappingFailed
+		return nil, ErrGatewayMemberMappingFailed
 	}
 	return &entity.Member{
 		ID:        repoModel.ID,
@@ -56,7 +56,7 @@ func (m2 MemberRepositoryGateway) GetByEmail(ctx context.Context, email string) 
 	}
 	createdAt, err := time.Parse("2006-01-02 15:04:05", repoModel.CreatedAt)
 	if err != nil {
-		return nil, ErrMappingFailed
+		return nil, ErrGatewayMemberMappingFailed
 	}
 	return &entity.Member{
 		ID:        repoModel.ID,
@@ -76,7 +76,7 @@ func (m2 MemberRepositoryGateway) GetAll(ctx context.Context, pagination paginat
 	for _, repoModel := range repoModels {
 		createdAt, err := time.Parse("2006-01-02 15:04:05", repoModel.CreatedAt)
 		if err != nil {
-			return nil, ErrMappingFailed
+			return nil, ErrGatewayMemberMappingFailed
 		}
 		members = append(members, &entity.Member{
 			ID:        repoModel.ID,

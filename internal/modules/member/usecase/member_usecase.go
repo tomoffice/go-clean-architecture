@@ -28,12 +28,12 @@ func NewMemberUseCase(memberRepo output_port.MemberRepository) input_port.Member
 func (m *MemberUseCase) RegisterMember(ctx context.Context, member *entity.Member) (*entity.Member, error) {
 	err := m.MemberRepo.Create(ctx, member)
 	if err != nil {
-		ucErr := MapInfraErrorToUseCaseError(err)
+		ucErr := MapGatewayErrorToUseCaseError(err)
 		return nil, ucErr
 	}
 	retrieveMember, err := m.MemberRepo.GetByEmail(ctx, member.Email)
 	if err != nil {
-		ucErr := MapInfraErrorToUseCaseError(err)
+		ucErr := MapGatewayErrorToUseCaseError(err)
 		return nil, ucErr
 	}
 	return retrieveMember, nil
@@ -41,7 +41,7 @@ func (m *MemberUseCase) RegisterMember(ctx context.Context, member *entity.Membe
 func (m *MemberUseCase) GetMemberByID(ctx context.Context, id int) (*entity.Member, error) {
 	member, err := m.MemberRepo.GetByID(ctx, id)
 	if err != nil {
-		ucErr := MapInfraErrorToUseCaseError(err)
+		ucErr := MapGatewayErrorToUseCaseError(err)
 		return nil, ucErr
 	}
 	return member, nil
@@ -49,7 +49,7 @@ func (m *MemberUseCase) GetMemberByID(ctx context.Context, id int) (*entity.Memb
 func (m *MemberUseCase) GetMemberByEmail(ctx context.Context, email string) (*entity.Member, error) {
 	member, err := m.MemberRepo.GetByEmail(ctx, email)
 	if err != nil {
-		ucErr := MapInfraErrorToUseCaseError(err)
+		ucErr := MapGatewayErrorToUseCaseError(err)
 		return nil, ucErr
 	}
 	return member, nil
@@ -57,20 +57,20 @@ func (m *MemberUseCase) GetMemberByEmail(ctx context.Context, email string) (*en
 func (m *MemberUseCase) ListMembers(ctx context.Context, pagination pagination.Pagination) ([]*entity.Member, int, error) {
 	members, err := m.MemberRepo.GetAll(ctx, pagination)
 	if err != nil {
-		ucErr := MapInfraErrorToUseCaseError(err)
+		ucErr := MapGatewayErrorToUseCaseError(err)
 		return nil, 0, ucErr
 	}
 	total, err := m.MemberRepo.CountAll(ctx)
 	if err != nil {
-		ucErr := MapInfraErrorToUseCaseError(err)
+		ucErr := MapGatewayErrorToUseCaseError(err)
 		return nil, 0, ucErr
 	}
 	return members, total, nil
 }
-func (m *MemberUseCase) UpdateMember(ctx context.Context, patch *input_port.PatchUpdateMemberInput) (*entity.Member, error) {
+func (m *MemberUseCase) UpdateMember(ctx context.Context, patch *input_port.PatchUpdateMemberInputModel) (*entity.Member, error) {
 	member, err := m.MemberRepo.GetByID(ctx, patch.ID)
 	if err != nil {
-		ucErr := MapInfraErrorToUseCaseError(err)
+		ucErr := MapGatewayErrorToUseCaseError(err)
 		return nil, ucErr
 	}
 	if patch.Name != nil {
@@ -84,7 +84,7 @@ func (m *MemberUseCase) UpdateMember(ctx context.Context, patch *input_port.Patc
 	}
 	member, err = m.MemberRepo.Update(ctx, member)
 	if err != nil {
-		ucErr := MapInfraErrorToUseCaseError(err)
+		ucErr := MapGatewayErrorToUseCaseError(err)
 		return nil, ucErr
 	}
 	return member, nil
@@ -93,13 +93,13 @@ func (m *MemberUseCase) UpdateMember(ctx context.Context, patch *input_port.Patc
 func (m *MemberUseCase) DeleteMember(ctx context.Context, id int) (*entity.Member, error) {
 	member, err := m.MemberRepo.GetByID(ctx, id)
 	if err != nil {
-		ucErr := MapInfraErrorToUseCaseError(err)
+		ucErr := MapGatewayErrorToUseCaseError(err)
 		return nil, ucErr
 	}
 
 	err = m.MemberRepo.Delete(ctx, id)
 	if err != nil {
-		ucErr := MapInfraErrorToUseCaseError(err)
+		ucErr := MapGatewayErrorToUseCaseError(err)
 		return nil, ucErr
 	}
 	return member, nil

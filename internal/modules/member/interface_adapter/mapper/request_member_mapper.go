@@ -56,8 +56,8 @@ func ListMemberDTOToPagination(request dto.ListMemberRequestDTO) *pagination.Pag
 		OrderBy: orderBy,
 	}
 }
-func UpdateMemberDTOToInputModel(dto dto.UpdateMemberRequestDTO) *input_port.PatchUpdateMemberInput {
-	return &input_port.PatchUpdateMemberInput{
+func UpdateMemberDTOToInputModel(dto dto.UpdateMemberRequestDTO) *input_port.PatchUpdateMemberInputModel {
+	return &input_port.PatchUpdateMemberInputModel{
 		ID:       dto.ID,
 		Name:     dto.Name,
 		Email:    dto.Email,

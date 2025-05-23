@@ -14,13 +14,13 @@ func MapInfraErrorToGatewayError(err error) error {
 	// 優先比對 CustomError
 	switch {
 	case errors.Is(err, sqlite.ErrDBRecordNotFound):
-		return ErrMemberNotFound
+		return ErrGatewayMemberNotFound
 	case errors.Is(err, sqlite.ErrDBDuplicateKey):
-		return ErrMemberAlreadyExists
+		return ErrGatewayMemberAlreadyExists
 	case errors.Is(err, sqlite.ErrDBUpdateNoEffect):
-		return ErrMemberUpdateFailed
+		return ErrGatewayMemberUpdateFailed
 	case errors.Is(err, sqlite.ErrDBDeleteNoEffect):
-		return ErrMemberDeleteFailed
+		return ErrGatewayMemberDeleteFailed
 	}
 	// 萬一錯誤不是 CustomError instance，要用 As 抓 DBError
 	var dbErr *sqlite.DBError
@@ -30,9 +30,9 @@ func MapInfraErrorToGatewayError(err error) error {
 			errors.Is(dbErr.CustomError, sqlite.ErrDBConnectionClosed) ||
 			errors.Is(dbErr.CustomError, sqlite.ErrDBTransactionDone) ||
 			errors.Is(dbErr.CustomError, sqlite.ErrDBUnknown) {
-			return fmt.Errorf("%w: %w", ErrMemberDBFailure, dbErr.RawError)
+			return fmt.Errorf("%w: %w", ErrGatewayMemberDBFailure, dbErr.RawError)
 		}
 	}
 	// fallback：未知錯誤也包裝
-	return fmt.Errorf("gateway: unexpected member gateway error: %w", err)
+	return fmt.Errorf("gateway: %w: %w", ErrGatewayMemberUnknown, err)
 }

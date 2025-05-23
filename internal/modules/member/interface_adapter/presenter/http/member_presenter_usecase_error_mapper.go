@@ -9,18 +9,18 @@ import (
 
 func MapMemberUseCaseError(err error) (int, string) {
 	switch {
-	case errors.Is(err, usecase.ErrMemberNotFound):
-		return errorcode.ErrMemberNotFound, usecase.ErrMemberNotFound.Error()
-	case errors.Is(err, usecase.ErrMemberAlreadyExists):
-		return errorcode.ErrMemberAlreadyExists, usecase.ErrMemberAlreadyExists.Error()
-	case errors.Is(err, usecase.ErrMemberUpdateFailed):
-		return errorcode.ErrMemberUpdateFailed, usecase.ErrMemberUpdateFailed.Error()
-	case errors.Is(err, usecase.ErrMemberDeleteFailed):
-		return errorcode.ErrMemberDeleteFailed, usecase.ErrMemberDeleteFailed.Error()
-	case errors.Is(err, usecase.ErrUnexpectedMemberUseCaseFail):
-		return errorcode.ErrUnexpectedMemberUseCaseFail, usecase.ErrUnexpectedMemberUseCaseFail.Error()
-	case errors.Is(err, usecase.ErrMemberDBFailure):
-		return errorcode.ErrMemberDBFailure, usecase.ErrMemberDBFailure.Error()
+	case errors.Is(err, usecase.ErrUseCaseMemberNotFound):
+		return errorcode.ErrMemberNotFound, usecase.ErrUseCaseMemberNotFound.Error()
+	case errors.Is(err, usecase.ErrUseCaseMemberAlreadyExists):
+		return errorcode.ErrMemberAlreadyExists, usecase.ErrUseCaseMemberAlreadyExists.Error()
+	case errors.Is(err, usecase.ErrUseCaseMemberUpdateFailed):
+		return errorcode.ErrMemberUpdateFailed, usecase.ErrUseCaseMemberUpdateFailed.Error()
+	case errors.Is(err, usecase.ErrUseCaseMemberDeleteFailed):
+		return errorcode.ErrMemberDeleteFailed, usecase.ErrUseCaseMemberDeleteFailed.Error()
+	case errors.Is(err, usecase.ErrUseCaseMemberUnexpectedFail):
+		return errorcode.ErrUnexpectedMemberUseCaseFail, usecase.ErrUseCaseMemberUnexpectedFail.Error()
+	case errors.Is(err, usecase.ErrUseCaseMemberDBFailure):
+		return errorcode.ErrMemberDBFailure, usecase.ErrUseCaseMemberDBFailure.Error()
 	default:
 		return errorcode.ErrInternalServer, sharederrors.ErrInternalServer.Error()
 	}
