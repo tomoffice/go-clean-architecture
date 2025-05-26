@@ -11,8 +11,8 @@ func MapGatewayErrorToUseCaseError(err error) error {
 		return nil
 	}
 
-	// 優先比對 CustomError
 	switch {
+	// ─── 業務錯誤 ───────────────────────────────────────────
 	case errors.Is(err, gateway.ErrGatewayMemberNotFound):
 		return ErrUseCaseMemberNotFound
 	case errors.Is(err, gateway.ErrGatewayMemberAlreadyExists):
@@ -21,8 +21,12 @@ func MapGatewayErrorToUseCaseError(err error) error {
 		return ErrUseCaseMemberUpdateFailed
 	case errors.Is(err, gateway.ErrGatewayMemberDeleteFailed):
 		return ErrUseCaseMemberDeleteFailed
+
+	// ─── 技術性錯誤：DB 操作異常，歸為非預期 ─────────────
+	case errors.Is(err, gateway.ErrGatewayMemberDBFailure):
+		return ErrUseCaseMemberDBFailure
 	}
 
-	// fallback 落到底了，真的不認得就回 Unexpected
+	// ─── fallback：其他未知錯誤，統一歸為非預期 ────────────
 	return ErrUseCaseMemberUnexpectedFail
 }
