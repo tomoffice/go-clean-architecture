@@ -81,7 +81,7 @@ func (dto *UpdateMemberRequestDTO) Validate() error {
 }
 
 type DeleteMemberRequestDTO struct {
-	ID int `json:"id" validate:"required,numeric"`
+	ID int `uri:"id" validate:"required,numeric"`
 }
 
 func (dto *DeleteMemberRequestDTO) Validate() error {
