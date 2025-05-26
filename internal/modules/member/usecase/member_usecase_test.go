@@ -792,6 +792,82 @@ func TestMemberUseCase_UpdateMember(t *testing.T) {
 					}, repository.ErrGatewayMemberUpdateFailed),
 				)
 			},
+		}, {
+			name: "only email update",
+			fields: fields{
+				MemberRepo: mock.NewMockMemberRepository(ctrl),
+			},
+			args: args{
+				ctx: ctx,
+				patch: &input_port.PatchUpdateMemberInputModel{
+					ID:    1,
+					Email: stringPtr("gg1@gmail.com"),
+				},
+			},
+			want: &entity.Member{
+				ID:        1,
+				Name:      "gg",
+				Email:     "gg1@gmial.com",
+				Password:  "",
+				CreatedAt: testTime,
+			},
+			wantErr: nil,
+			setupRepo: func(r *mock.MockMemberRepository) {
+				gomock.InOrder(
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
+						ID:        1,
+						Name:      "gg",
+						Email:     "gg@gmail.com",
+						Password:  "",
+						CreatedAt: testTime,
+					}, nil),
+					r.EXPECT().Update(ctx, gomock.Any()).Return(&entity.Member{
+						ID:        1,
+						Name:      "gg",
+						Email:     "gg1@gmial.com",
+						Password:  "",
+						CreatedAt: testTime,
+					}, nil),
+				)
+			},
+		}, {
+			name: "only password update",
+			fields: fields{
+				MemberRepo: mock.NewMockMemberRepository(ctrl),
+			},
+			args: args{
+				ctx: ctx,
+				patch: &input_port.PatchUpdateMemberInputModel{
+					ID:       1,
+					Password: stringPtr("newpassword"),
+				},
+			},
+			want: &entity.Member{
+				ID:        1,
+				Name:      "gg",
+				Email:     "gg@gmail.com",
+				Password:  "newpassword",
+				CreatedAt: testTime,
+			},
+			wantErr: nil,
+			setupRepo: func(r *mock.MockMemberRepository) {
+				gomock.InOrder(
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
+						ID:        1,
+						Name:      "gg",
+						Email:     "gg@gmail.com",
+						Password:  "oldpassword",
+						CreatedAt: testTime,
+					}, nil),
+					r.EXPECT().Update(ctx, gomock.Any()).Return(&entity.Member{
+						ID:        1,
+						Name:      "gg",
+						Email:     "gg@gmail.com",
+						Password:  "newpassword",
+						CreatedAt: testTime,
+					}, nil),
+				)
+			},
 		},
 	}
 	for _, tt := range tests {

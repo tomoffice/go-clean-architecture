@@ -8,7 +8,7 @@ import (
 	migrate2 "module-clean/internal/modules/member/driver/persistence/ent/migrate"
 
 	// required by schema hooks.
-	_ "module-clean/internal/member/driver/persistence/ent/runtime"
+	_ "module-clean/internal/modules/member/driver/persistence/ent/runtime"
 
 	"entgo.io/ent/dialect/sql/schema"
 )
