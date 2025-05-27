@@ -3,14 +3,9 @@ package errorcode
 const (
 
 	// Binding 錯誤（來自 Gin 的 ShouldBindXXX）
-	ErrInvalidJSONSyntax   = 1000 // JSON 格式錯誤（語法）
-	ErrInvalidJSONType     = 1001 // JSON 欄位型別錯誤
-	ErrInvalidJSONInput    = 1002 // JSON 綁定失敗（無法解析）
-	ErrInvalidQueryParams  = 1003 // Query 綁定錯誤
-	ErrInvalidFormData     = 1004 // Form 綁定錯誤
-	ErrInvalidURIParams    = 1005 // URI 綁定錯誤
-	ErrInvalidHeaderParams = 1006 // Header 綁定錯誤
-	ErrUnexpectedBinding   = 1009 // Gin Binding 無法分類錯誤
+	ErrInvalidJSONSyntax = 1000 // JSON 格式錯誤（語法）
+	ErrInvalidJSONType   = 1001 // JSON 欄位型別錯誤
+	ErrInvalidParams     = 1002 // 其它所有參數綁定錯誤（Query/Form/URI/Header...通用）
 
 	// Validation 錯誤（使用 validator 驗證）
 	ErrValidationFailed = 2000 // 欄位驗證失敗（如 required、email 等）
