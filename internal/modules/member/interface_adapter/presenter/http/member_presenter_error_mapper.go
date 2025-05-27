@@ -7,9 +7,11 @@ import (
 
 func MapErrorCodeToHTTPStatus(code int) int {
 	switch {
-	// Binding & Validation → 400
+	// Binding
 	case code >= 1000 && code < 2000:
 		return http.StatusBadRequest
+
+	// Validation → 400
 	case code >= 2000 && code < 3000:
 		return http.StatusBadRequest
 

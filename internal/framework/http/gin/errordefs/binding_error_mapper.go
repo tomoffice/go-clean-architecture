@@ -17,27 +17,15 @@ func MapGinBindingError(err error) (int, string) {
 	switch {
 	case errors.As(err, &syntaxErr):
 		return errorcode.ErrInvalidJSONSyntax,
+			//JSON 格式錯誤
 			fmt.Sprintf("%s: %s", ErrInvalidJSONSyntax.Error(), syntaxErr.Error())
 
 	case errors.As(err, &typeErr):
 		return errorcode.ErrInvalidJSONType,
+			//JSON 欄位類型錯誤
 			fmt.Sprintf("%s: field=%s", ErrInvalidJSONType.Error(), typeErr.Field)
 	}
 
-	switch {
-	case errors.Is(err, ErrFromJSON):
-		return errorcode.ErrInvalidJSONInput, ErrFromJSON.Error()
-	case errors.Is(err, ErrFromQuery):
-		return errorcode.ErrInvalidQueryParams, ErrFromQuery.Error()
-	case errors.Is(err, ErrFromURI):
-		return errorcode.ErrInvalidURIParams, ErrFromURI.Error()
-	case errors.Is(err, ErrFromForm):
-		return errorcode.ErrInvalidFormData, ErrFromForm.Error()
-	case errors.Is(err, ErrFromHeader):
-		return errorcode.ErrInvalidHeaderParams, ErrFromHeader.Error()
-
-	}
-
-	// fallback
-	return errorcode.ErrInternalServer, ErrUnexpectedBinding.Error()
+	// fallback: 其它一律回 InternalServer 與通用訊息 "參數格式錯誤"
+	return errorcode.ErrInvalidParams, ErrInvalidParams.Error()
 }
