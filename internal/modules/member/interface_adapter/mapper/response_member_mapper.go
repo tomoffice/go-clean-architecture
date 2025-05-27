@@ -51,8 +51,9 @@ func EntityToUpdateMemberResponseDTO(member *entity.Member) dto.UpdateMemberResp
 }
 func EntityToDeleteMemberResponseDTO(member *entity.Member) dto.DeleteMemberResponseDTO {
 	return dto.DeleteMemberResponseDTO{
-		ID:    member.ID,
-		Name:  &member.Name,
-		Email: &member.Email,
+		ID:        member.ID,
+		Name:      member.Name,
+		Email:     member.Email,
+		CreatedAt: member.CreatedAt.Format("2006-01-02 15:04:05"),
 	}
 }

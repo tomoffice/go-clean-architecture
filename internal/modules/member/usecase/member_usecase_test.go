@@ -6,9 +6,9 @@ import (
 	"github.com/golang/mock/gomock"
 	"module-clean/internal/modules/member/entity"
 	"module-clean/internal/modules/member/interface_adapter/gateway/repository"
-	"module-clean/internal/modules/member/usecase/input_port"
+	"module-clean/internal/modules/member/interface_adapter/inputmodel"
 	"module-clean/internal/modules/member/usecase/mock"
-	"module-clean/internal/modules/member/usecase/output_port"
+	"module-clean/internal/modules/member/usecase/port/output"
 	"module-clean/internal/shared/common/pagination"
 	"reflect"
 	"testing"
@@ -17,7 +17,7 @@ import (
 
 func TestMemberUseCase_DeleteMember(t *testing.T) {
 	type fields struct {
-		MemberRepo output_port.MemberRepository
+		MemberRepo output.MemberRepository
 	}
 	type args struct {
 		ctx context.Context
@@ -137,7 +137,7 @@ func TestMemberUseCase_DeleteMember(t *testing.T) {
 
 func TestMemberUseCase_GetMemberByEmail(t *testing.T) {
 	type fields struct {
-		MemberRepo output_port.MemberRepository
+		MemberRepo output.MemberRepository
 	}
 	type args struct {
 		ctx   context.Context
@@ -234,7 +234,7 @@ func TestMemberUseCase_GetMemberByEmail(t *testing.T) {
 
 func TestMemberUseCase_GetMemberByID(t *testing.T) {
 	type fields struct {
-		MemberRepo output_port.MemberRepository
+		MemberRepo output.MemberRepository
 	}
 	type args struct {
 		ctx context.Context
@@ -317,7 +317,7 @@ func TestMemberUseCase_GetMemberByID(t *testing.T) {
 
 func TestMemberUseCase_ListMembers(t *testing.T) {
 	type fields struct {
-		MemberRepo output_port.MemberRepository
+		MemberRepo output.MemberRepository
 	}
 	type args struct {
 		ctx        context.Context
@@ -472,7 +472,7 @@ func TestMemberUseCase_ListMembers(t *testing.T) {
 
 func TestMemberUseCase_RegisterMember(t *testing.T) {
 	type fields struct {
-		MemberRepo output_port.MemberRepository
+		MemberRepo output.MemberRepository
 	}
 	type args struct {
 		ctx    context.Context
@@ -615,11 +615,11 @@ func TestMemberUseCase_RegisterMember(t *testing.T) {
 
 func TestMemberUseCase_UpdateMember(t *testing.T) {
 	type fields struct {
-		MemberRepo output_port.MemberRepository
+		MemberRepo output.MemberRepository
 	}
 	type args struct {
 		ctx   context.Context
-		patch *input_port.PatchUpdateMemberInputModel
+		patch *inputmodel.PatchUpdateMemberInputModel
 	}
 	ctrl, ctx, testTime := repoHelper(t)
 	stringPtr := func(s string) *string {
@@ -640,7 +640,7 @@ func TestMemberUseCase_UpdateMember(t *testing.T) {
 			},
 			args: args{
 				ctx: ctx,
-				patch: &input_port.PatchUpdateMemberInputModel{
+				patch: &inputmodel.PatchUpdateMemberInputModel{
 					ID:       1,
 					Name:     stringPtr("gg1"),
 					Email:    nil,
@@ -681,7 +681,7 @@ func TestMemberUseCase_UpdateMember(t *testing.T) {
 			},
 			args: args{
 				ctx: ctx,
-				patch: &input_port.PatchUpdateMemberInputModel{
+				patch: &inputmodel.PatchUpdateMemberInputModel{
 					ID:       1,
 					Name:     stringPtr("gg"),
 					Email:    nil,
@@ -701,7 +701,7 @@ func TestMemberUseCase_UpdateMember(t *testing.T) {
 			},
 			args: args{
 				ctx: ctx,
-				patch: &input_port.PatchUpdateMemberInputModel{
+				patch: &inputmodel.PatchUpdateMemberInputModel{
 					ID:       1,
 					Name:     stringPtr("gg1"),
 					Email:    nil,
@@ -730,7 +730,7 @@ func TestMemberUseCase_UpdateMember(t *testing.T) {
 			},
 			args: args{
 				ctx: ctx,
-				patch: &input_port.PatchUpdateMemberInputModel{
+				patch: &inputmodel.PatchUpdateMemberInputModel{
 					ID:       1,
 					Name:     stringPtr("gg1"),
 					Email:    nil,
@@ -750,7 +750,7 @@ func TestMemberUseCase_UpdateMember(t *testing.T) {
 			},
 			args: args{
 				ctx: ctx,
-				patch: &input_port.PatchUpdateMemberInputModel{
+				patch: &inputmodel.PatchUpdateMemberInputModel{
 					ID:       1,
 					Name:     stringPtr("gg1"),
 					Email:    nil,
@@ -770,7 +770,7 @@ func TestMemberUseCase_UpdateMember(t *testing.T) {
 			},
 			args: args{
 				ctx:   ctx,
-				patch: &input_port.PatchUpdateMemberInputModel{},
+				patch: &inputmodel.PatchUpdateMemberInputModel{},
 			},
 			want:    nil,
 			wantErr: MapGatewayErrorToUseCaseError(repository.ErrGatewayMemberUpdateFailed),
@@ -799,7 +799,7 @@ func TestMemberUseCase_UpdateMember(t *testing.T) {
 			},
 			args: args{
 				ctx: ctx,
-				patch: &input_port.PatchUpdateMemberInputModel{
+				patch: &inputmodel.PatchUpdateMemberInputModel{
 					ID:    1,
 					Email: stringPtr("gg1@gmail.com"),
 				},
@@ -837,7 +837,7 @@ func TestMemberUseCase_UpdateMember(t *testing.T) {
 			},
 			args: args{
 				ctx: ctx,
-				patch: &input_port.PatchUpdateMemberInputModel{
+				patch: &inputmodel.PatchUpdateMemberInputModel{
 					ID:       1,
 					Password: stringPtr("newpassword"),
 				},

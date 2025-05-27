@@ -2,21 +2,22 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	"module-clean/internal/framework/http/gin/errordefs"
 	"module-clean/internal/modules/member/interface_adapter/dto"
 	"module-clean/internal/modules/member/interface_adapter/mapper"
-	"module-clean/internal/modules/member/usecase/input_port"
-	"module-clean/internal/modules/member/usecase/output_port"
+	"module-clean/internal/modules/member/usecase/port/input"
+	"module-clean/internal/modules/member/usecase/port/output"
 	"net/http"
 )
 
 type MemberController struct {
-	useCase   input_port.MemberInputPort
-	presenter output_port.MemberPresenter
+	usecase   input.MemberInputPort
+	presenter output.MemberPresenter
 }
 
-func NewMemberController(memberUseCase input_port.MemberInputPort, presenter output_port.MemberPresenter) *MemberController {
+func NewMemberController(memberUseCase input.MemberInputPort, presenter output.MemberPresenter) *MemberController {
 	return &MemberController{
-		useCase:   memberUseCase,
+		usecase:   memberUseCase,
 		presenter: presenter,
 	}
 }
@@ -24,19 +25,23 @@ func NewMemberController(memberUseCase input_port.MemberInputPort, presenter out
 func (c *MemberController) Register(ctx *gin.Context) {
 	var reqDTO dto.CreateMemberRequestDTO
 	if err := ctx.ShouldBindJSON(&reqDTO); err != nil {
-		httpStatus, resp := c.presenter.PresentBindingError(err)
+		errCode, errMsg := errordefs.MapGinBindingError(err)
+		resp := c.presenter.PresentBindingError(errCode, errMsg)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
 	if err := reqDTO.Validate(); err != nil {
-		httpStatus, resp := c.presenter.PresentValidationError(err)
+		errCode, resp := c.presenter.PresentValidationError(err)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
 	entity := mapper.CreateMemberDTOToEntity(reqDTO)
-	member, err := c.useCase.RegisterMember(ctx, entity)
+	member, err := c.usecase.RegisterMember(ctx, entity)
 	if err != nil {
-		httpStatus, resp := c.presenter.PresentUseCaseError(err)
+		errCode, resp := c.presenter.PresentUseCaseError(err)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
@@ -46,41 +51,49 @@ func (c *MemberController) Register(ctx *gin.Context) {
 func (c *MemberController) GetByID(ctx *gin.Context) {
 	var reqDTO dto.GetMemberByIDRequestDTO
 	if err := ctx.ShouldBindUri(&reqDTO); err != nil {
-		httpStatus, resp := c.presenter.PresentBindingError(err)
+		errCode, errMsg := errordefs.MapGinBindingError(err)
+		resp := c.presenter.PresentBindingError(errCode, errMsg)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
 	if err := reqDTO.Validate(); err != nil {
-		httpStatus, resp := c.presenter.PresentValidationError(err)
+		errCode, resp := c.presenter.PresentValidationError(err)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
 	entity := mapper.GetMemberByIDDTOToEntity(reqDTO)
-	member, err := c.useCase.GetMemberByID(ctx, entity.ID)
+	member, err := c.usecase.GetMemberByID(ctx, entity.ID)
 	if err != nil {
-		httpStatus, resp := c.presenter.PresentUseCaseError(err)
+		errCode, resp := c.presenter.PresentUseCaseError(err)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
-	resp := c.presenter.PresentCreateMember(member)
+	resp := c.presenter.PresentGetMemberByID(member)
 	ctx.JSON(http.StatusOK, resp)
 }
 func (c *MemberController) GetByEmail(ctx *gin.Context) {
 	var reqDTO dto.GetMemberByEmailRequestDTO
 	if err := ctx.ShouldBindQuery(&reqDTO); err != nil {
-		httpStatus, resp := c.presenter.PresentBindingError(err)
+		errCode, errMsg := errordefs.MapGinBindingError(err)
+		resp := c.presenter.PresentBindingError(errCode, errMsg)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
 	if err := reqDTO.Validate(); err != nil {
-		httpStatus, resp := c.presenter.PresentValidationError(err)
+		errCode, resp := c.presenter.PresentValidationError(err)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
 	entity := mapper.GetMemberByEmailDTOToEntity(reqDTO)
-	member, err := c.useCase.GetMemberByEmail(ctx, entity.Email)
+	member, err := c.usecase.GetMemberByEmail(ctx, entity.Email)
 	if err != nil {
-		httpStatus, resp := c.presenter.PresentUseCaseError(err)
+		errCode, resp := c.presenter.PresentUseCaseError(err)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
@@ -90,19 +103,23 @@ func (c *MemberController) GetByEmail(ctx *gin.Context) {
 func (c *MemberController) List(ctx *gin.Context) {
 	var reqDTO dto.ListMemberRequestDTO
 	if err := ctx.ShouldBindQuery(&reqDTO); err != nil {
-		httpStatus, resp := c.presenter.PresentBindingError(err)
+		errCode, errMsg := errordefs.MapGinBindingError(err)
+		resp := c.presenter.PresentBindingError(errCode, errMsg)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
 	if err := reqDTO.Validate(); err != nil {
-		httpStatus, resp := c.presenter.PresentValidationError(err)
+		errCode, resp := c.presenter.PresentValidationError(err)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
 	pagination := mapper.ListMemberDTOToPagination(reqDTO)
-	members, total, err := c.useCase.ListMembers(ctx, *pagination)
+	members, total, err := c.usecase.ListMembers(ctx, *pagination)
 	if err != nil {
-		httpStatus, resp := c.presenter.PresentUseCaseError(err)
+		errCode, resp := c.presenter.PresentUseCaseError(err)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
@@ -112,19 +129,23 @@ func (c *MemberController) List(ctx *gin.Context) {
 func (c *MemberController) Update(ctx *gin.Context) {
 	var reqDTO dto.UpdateMemberRequestDTO
 	if err := ctx.ShouldBindJSON(&reqDTO); err != nil {
-		httpStatus, resp := c.presenter.PresentBindingError(err)
+		errCode, errMsg := errordefs.MapGinBindingError(err)
+		resp := c.presenter.PresentBindingError(errCode, errMsg)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
 	if err := reqDTO.Validate(); err != nil {
-		httpStatus, resp := c.presenter.PresentValidationError(err)
+		errCode, resp := c.presenter.PresentValidationError(err)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
 	inputModel := mapper.UpdateMemberDTOToInputModel(reqDTO)
-	member, err := c.useCase.UpdateMember(ctx, inputModel)
+	member, err := c.usecase.UpdateMember(ctx, inputModel)
 	if err != nil {
-		httpStatus, resp := c.presenter.PresentUseCaseError(err)
+		errCode, resp := c.presenter.PresentUseCaseError(err)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
@@ -134,19 +155,23 @@ func (c *MemberController) Update(ctx *gin.Context) {
 func (c *MemberController) Delete(ctx *gin.Context) {
 	var reqDTO dto.DeleteMemberRequestDTO
 	if err := ctx.ShouldBindUri(&reqDTO); err != nil {
-		httpStatus, resp := c.presenter.PresentBindingError(err)
+		errCode, errMsg := errordefs.MapGinBindingError(err)
+		resp := c.presenter.PresentBindingError(errCode, errMsg)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
 	if err := reqDTO.Validate(); err != nil {
-		httpStatus, resp := c.presenter.PresentValidationError(err)
+		errCode, resp := c.presenter.PresentValidationError(err)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
 	entity := mapper.DeleteMemberDTOToEntity(reqDTO)
-	member, err := c.useCase.DeleteMember(ctx, entity.ID)
+	member, err := c.usecase.DeleteMember(ctx, entity.ID)
 	if err != nil {
-		httpStatus, resp := c.presenter.PresentUseCaseError(err)
+		errCode, resp := c.presenter.PresentUseCaseError(err)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}

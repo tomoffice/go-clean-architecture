@@ -11,16 +11,17 @@ package usecase
 import (
 	"context"
 	"module-clean/internal/modules/member/entity"
-	"module-clean/internal/modules/member/usecase/input_port"
-	"module-clean/internal/modules/member/usecase/output_port"
+	"module-clean/internal/modules/member/interface_adapter/inputmodel"
+	"module-clean/internal/modules/member/usecase/port/input"
+	"module-clean/internal/modules/member/usecase/port/output"
 	"module-clean/internal/shared/common/pagination"
 )
 
 type MemberUseCase struct {
-	MemberRepo output_port.MemberRepository
+	MemberRepo output.MemberRepository
 }
 
-func NewMemberUseCase(memberRepo output_port.MemberRepository) input_port.MemberInputPort {
+func NewMemberUseCase(memberRepo output.MemberRepository) input.MemberInputPort {
 	return &MemberUseCase{
 		MemberRepo: memberRepo,
 	}
@@ -67,7 +68,7 @@ func (m *MemberUseCase) ListMembers(ctx context.Context, pagination pagination.P
 	}
 	return members, total, nil
 }
-func (m *MemberUseCase) UpdateMember(ctx context.Context, patch *input_port.PatchUpdateMemberInputModel) (*entity.Member, error) {
+func (m *MemberUseCase) UpdateMember(ctx context.Context, patch *inputmodel.PatchUpdateMemberInputModel) (*entity.Member, error) {
 	member, err := m.MemberRepo.GetByID(ctx, patch.ID)
 	if err != nil {
 		ucErr := MapGatewayErrorToUseCaseError(err)

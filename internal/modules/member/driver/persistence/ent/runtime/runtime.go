@@ -2,7 +2,7 @@
 
 package runtime
 
-// The schema-stitching logic is generated in modules-clean/internal/member/driver/persistence/ent/runtime.go
+// The schema-stitching logic is generated in module-clean/internal/modules/member/driver/persistence/ent/runtime.go
 
 const (
 	Version = "v0.14.4"                                         // Version of ent codegen.

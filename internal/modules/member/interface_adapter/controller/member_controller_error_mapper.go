@@ -1,4 +1,4 @@
-package http
+package controller
 
 import (
 	"module-clean/internal/shared/common/errorcode"

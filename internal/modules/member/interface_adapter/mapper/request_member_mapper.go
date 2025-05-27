@@ -12,7 +12,7 @@ package mapper
 import (
 	"module-clean/internal/modules/member/entity"
 	"module-clean/internal/modules/member/interface_adapter/dto"
-	"module-clean/internal/modules/member/usecase/input_port"
+	"module-clean/internal/modules/member/interface_adapter/inputmodel"
 	"module-clean/internal/shared/common/enum"
 	"module-clean/internal/shared/common/pagination"
 )
@@ -56,8 +56,8 @@ func ListMemberDTOToPagination(request dto.ListMemberRequestDTO) *pagination.Pag
 		OrderBy: orderBy,
 	}
 }
-func UpdateMemberDTOToInputModel(dto dto.UpdateMemberRequestDTO) *input_port.PatchUpdateMemberInputModel {
-	return &input_port.PatchUpdateMemberInputModel{
+func UpdateMemberDTOToInputModel(dto dto.UpdateMemberRequestDTO) *inputmodel.PatchUpdateMemberInputModel {
+	return &inputmodel.PatchUpdateMemberInputModel{
 		ID:       dto.ID,
 		Name:     dto.Name,
 		Email:    dto.Email,

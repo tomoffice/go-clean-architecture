@@ -6,7 +6,7 @@ package mock
 
 import (
 	entity "module-clean/internal/modules/member/entity"
-	output_port "module-clean/internal/modules/member/usecase/output_port"
+	output "module-clean/internal/modules/member/interface_adapter/outputmodel"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -36,11 +36,11 @@ func (m *MockMemberPresenter) EXPECT() *MockMemberPresenterMockRecorder {
 }
 
 // PresentBindingError mocks base method.
-func (m *MockMemberPresenter) PresentBindingError(err error) (int, output_port.AnyResp) {
+func (m *MockMemberPresenter) PresentBindingError(err error) (int, output.ErrorResponse) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PresentBindingError", err)
 	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(output_port.AnyResp)
+	ret1, _ := ret[1].(output.ErrorResponse)
 	return ret0, ret1
 }
 
@@ -51,10 +51,10 @@ func (mr *MockMemberPresenterMockRecorder) PresentBindingError(err interface{}) 
 }
 
 // PresentCreateMember mocks base method.
-func (m *MockMemberPresenter) PresentCreateMember(member *entity.Member) output_port.CreateMemberResp {
+func (m *MockMemberPresenter) PresentCreateMember(member *entity.Member) output.CreateMemberResponse {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PresentCreateMember", member)
-	ret0, _ := ret[0].(output_port.CreateMemberResp)
+	ret0, _ := ret[0].(output.CreateMemberResponse)
 	return ret0
 }
 
@@ -65,10 +65,10 @@ func (mr *MockMemberPresenterMockRecorder) PresentCreateMember(member interface{
 }
 
 // PresentDeleteMember mocks base method.
-func (m *MockMemberPresenter) PresentDeleteMember(member *entity.Member) output_port.DeleteMemberResp {
+func (m *MockMemberPresenter) PresentDeleteMember(member *entity.Member) output.DeleteMemberResponse {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PresentDeleteMember", member)
-	ret0, _ := ret[0].(output_port.DeleteMemberResp)
+	ret0, _ := ret[0].(output.DeleteMemberResponse)
 	return ret0
 }
 
@@ -79,10 +79,10 @@ func (mr *MockMemberPresenterMockRecorder) PresentDeleteMember(member interface{
 }
 
 // PresentGetMemberByEmail mocks base method.
-func (m *MockMemberPresenter) PresentGetMemberByEmail(member *entity.Member) output_port.GetMemberByEmailResp {
+func (m *MockMemberPresenter) PresentGetMemberByEmail(member *entity.Member) output.GetMemberByEmailResponse {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PresentGetMemberByEmail", member)
-	ret0, _ := ret[0].(output_port.GetMemberByEmailResp)
+	ret0, _ := ret[0].(output.GetMemberByEmailResponse)
 	return ret0
 }
 
@@ -93,10 +93,10 @@ func (mr *MockMemberPresenterMockRecorder) PresentGetMemberByEmail(member interf
 }
 
 // PresentGetMemberByID mocks base method.
-func (m *MockMemberPresenter) PresentGetMemberByID(member *entity.Member) output_port.GetMemberByIDResp {
+func (m *MockMemberPresenter) PresentGetMemberByID(member *entity.Member) output.GetMemberByIDResponse {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PresentGetMemberByID", member)
-	ret0, _ := ret[0].(output_port.GetMemberByIDResp)
+	ret0, _ := ret[0].(output.GetMemberByIDResponse)
 	return ret0
 }
 
@@ -107,10 +107,10 @@ func (mr *MockMemberPresenterMockRecorder) PresentGetMemberByID(member interface
 }
 
 // PresentListMembers mocks base method.
-func (m *MockMemberPresenter) PresentListMembers(members []*entity.Member, total int) output_port.ListMemberResp {
+func (m *MockMemberPresenter) PresentListMembers(members []*entity.Member, total int) output.ListMemberResponse {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PresentListMembers", members, total)
-	ret0, _ := ret[0].(output_port.ListMemberResp)
+	ret0, _ := ret[0].(output.ListMemberResponse)
 	return ret0
 }
 
@@ -121,10 +121,10 @@ func (mr *MockMemberPresenterMockRecorder) PresentListMembers(members, total int
 }
 
 // PresentUpdateMember mocks base method.
-func (m *MockMemberPresenter) PresentUpdateMember(member *entity.Member) output_port.UpdateMemberResp {
+func (m *MockMemberPresenter) PresentUpdateMember(member *entity.Member) output.UpdateMemberResponse {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PresentUpdateMember", member)
-	ret0, _ := ret[0].(output_port.UpdateMemberResp)
+	ret0, _ := ret[0].(output.UpdateMemberResponse)
 	return ret0
 }
 
@@ -135,11 +135,11 @@ func (mr *MockMemberPresenterMockRecorder) PresentUpdateMember(member interface{
 }
 
 // PresentUseCaseError mocks base method.
-func (m *MockMemberPresenter) PresentUseCaseError(err error) (int, output_port.AnyResp) {
+func (m *MockMemberPresenter) PresentUseCaseError(err error) (int, output.ErrorResponse) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PresentUseCaseError", err)
 	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(output_port.AnyResp)
+	ret1, _ := ret[1].(output.ErrorResponse)
 	return ret0, ret1
 }
 
@@ -150,11 +150,11 @@ func (mr *MockMemberPresenterMockRecorder) PresentUseCaseError(err interface{}) 
 }
 
 // PresentValidationError mocks base method.
-func (m *MockMemberPresenter) PresentValidationError(err error) (int, output_port.AnyResp) {
+func (m *MockMemberPresenter) PresentValidationError(err error) (int, output.ErrorResponse) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "PresentValidationError", err)
 	ret0, _ := ret[0].(int)
-	ret1, _ := ret[1].(output_port.AnyResp)
+	ret1, _ := ret[1].(output.ErrorResponse)
 	return ret0, ret1
 }
 

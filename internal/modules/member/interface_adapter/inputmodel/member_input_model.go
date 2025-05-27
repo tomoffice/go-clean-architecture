@@ -4,7 +4,7 @@
 //   1. 清楚表達 UseCase 的輸入意圖與範圍（必填、選填、預設值等）
 //   2. 隔離外部傳入資料與核心 Domain Entity，避免直接依賴 Entity 結構
 //   3. 支援部分欄位更新（Patch）等複雜場景，確保欄位修改的明確性
-package input_port
+package inputmodel
 
 // PatchUpdateMemberInputModel 表示「更新會員」UseCase 的輸入參數。
 //   - ID      ：要更新的會員識別碼，必填

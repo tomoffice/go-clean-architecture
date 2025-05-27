@@ -4,11 +4,12 @@ package enttest
 
 import (
 	"context"
-	"module-clean/internal/modules/member/driver/persistence/ent"
-	migrate2 "module-clean/internal/modules/member/driver/persistence/ent/migrate"
 
+	"module-clean/internal/modules/member/driver/persistence/ent"
 	// required by schema hooks.
 	_ "module-clean/internal/modules/member/driver/persistence/ent/runtime"
+
+	"module-clean/internal/modules/member/driver/persistence/ent/migrate"
 
 	"entgo.io/ent/dialect/sql/schema"
 )
@@ -72,12 +73,12 @@ func NewClient(t TestingT, opts ...Option) *ent.Client {
 	return c
 }
 func migrateSchema(t TestingT, c *ent.Client, o *options) {
-	tables, err := schema.CopyTables(migrate2.Tables)
+	tables, err := schema.CopyTables(migrate.Tables)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
 	}
-	if err := migrate2.Create(context.Background(), c.Schema, tables, o.migrateOpts...); err != nil {
+	if err := migrate.Create(context.Background(), c.Schema, tables, o.migrateOpts...); err != nil {
 		t.Error(err)
 		t.FailNow()
 	}
