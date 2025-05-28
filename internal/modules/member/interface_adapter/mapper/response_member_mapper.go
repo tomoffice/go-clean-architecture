@@ -54,6 +54,6 @@ func EntityToDeleteMemberResponseDTO(member *entity.Member) dto.DeleteMemberResp
 		ID:        member.ID,
 		Name:      member.Name,
 		Email:     member.Email,
-		CreatedAt: member.CreatedAt.Format("2006-01-02 15:04:05"),
+		CreatedAt: member.CreatedAt.Format(time.RFC3339),
 	}
 }
