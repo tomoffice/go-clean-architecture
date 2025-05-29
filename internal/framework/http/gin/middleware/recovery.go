@@ -97,7 +97,7 @@ func (m *RecoveryMiddleware) Handle() gin.HandlerFunc {
 					fields := map[string]interface{}{
 						"time":       time.Now(),
 						"error":      err,
-						"request":    strings.Join(headers, "\r\n"),
+						"dto":        strings.Join(headers, "\r\n"),
 						"stack":      stack,
 						"request_id": c.GetString("request_id"),
 					}

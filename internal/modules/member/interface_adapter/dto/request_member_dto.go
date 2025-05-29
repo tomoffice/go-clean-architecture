@@ -27,7 +27,7 @@ func (dto *CreateMemberRequestDTO) Validate() error {
 }
 
 type GetMemberByIDRequestDTO struct {
-	ID int `uri:"id" validate:"required,numeric"`
+	ID int `validate:"required,numeric"`
 }
 
 func (dto *GetMemberByIDRequestDTO) Validate() error {
@@ -39,7 +39,7 @@ func (dto *GetMemberByIDRequestDTO) Validate() error {
 }
 
 type GetMemberByEmailRequestDTO struct {
-	Email string `form:"email" validate:"required,email"`
+	Email string `validate:"required,email"`
 }
 
 func (dto *GetMemberByEmailRequestDTO) Validate() error {
@@ -51,10 +51,10 @@ func (dto *GetMemberByEmailRequestDTO) Validate() error {
 }
 
 type ListMemberRequestDTO struct {
-	Page    int    `form:"page" validate:"required,min=1"`
-	Limit   int    `form:"limit" validate:"required,min=1,max=100"`
-	SortBy  string `form:"sort_by" validate:"omitempty,oneof=id name email created_at"`
-	OrderBy string `form:"order_by" validate:"omitempty,oneof=asc desc"`
+	Page    int    ` validate:"required,min=1"`
+	Limit   int    ` validate:"required,min=1,max=100"`
+	SortBy  string ` validate:"omitempty,oneof=id name email created_at"`
+	OrderBy string ` validate:"omitempty,oneof=asc desc"`
 }
 
 func (dto *ListMemberRequestDTO) Validate() error {
@@ -81,7 +81,7 @@ func (dto *UpdateMemberRequestDTO) Validate() error {
 }
 
 type DeleteMemberRequestDTO struct {
-	ID int `uri:"id" validate:"required,numeric,gte=1"`
+	ID int `validate:"required,numeric,gte=1"`
 }
 
 func (dto *DeleteMemberRequestDTO) Validate() error {

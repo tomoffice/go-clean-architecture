@@ -4,7 +4,7 @@ package errordefs
 import "errors"
 
 var (
-	ErrRequestTimeout  = errors.New("request timeout")
+	ErrRequestTimeout  = errors.New("dto timeout")
 	ErrContextTimeout  = errors.New("context deadline exceeded")
 	ErrContextCanceled = errors.New("context canceled")
 )
