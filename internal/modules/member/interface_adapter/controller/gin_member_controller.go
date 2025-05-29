@@ -2,8 +2,9 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
+	gindto "module-clean/internal/framework/http/gin/dto"
 	"module-clean/internal/framework/http/gin/errordefs"
-	"module-clean/internal/modules/member/interface_adapter/dto"
+	ginmapper "module-clean/internal/framework/http/gin/mapper"
 	"module-clean/internal/modules/member/interface_adapter/mapper"
 	"module-clean/internal/modules/member/usecase/port/input"
 	"module-clean/internal/modules/member/usecase/port/output"
@@ -23,14 +24,15 @@ func NewMemberController(memberUseCase input.MemberInputPort, presenter output.M
 }
 
 func (c *MemberController) Register(ctx *gin.Context) {
-	var reqDTO dto.CreateMemberRequestDTO
-	if err := ctx.ShouldBindJSON(&reqDTO); err != nil {
+	var ginReqDTO gindto.GinCreateMemberRequestDTO
+	if err := ctx.ShouldBindJSON(&ginReqDTO); err != nil {
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
 		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
+	reqDTO := ginmapper.GinDTOToCreateMemberDTO(ginReqDTO)
 	if err := reqDTO.Validate(); err != nil {
 		errCode, resp := c.presenter.PresentValidationError(err)
 		httpStatus := MapErrorCodeToHTTPStatus(errCode)
@@ -49,14 +51,15 @@ func (c *MemberController) Register(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 func (c *MemberController) GetByID(ctx *gin.Context) {
-	var reqDTO dto.GetMemberByIDRequestDTO
-	if err := ctx.ShouldBindUri(&reqDTO); err != nil {
+	var ginReqDTO gindto.GinGetMemberByIDRequestDTO
+	if err := ctx.ShouldBindUri(&ginReqDTO); err != nil {
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
 		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
+	reqDTO := ginmapper.GinDTOToGetMemberByIDDTO(ginReqDTO)
 	if err := reqDTO.Validate(); err != nil {
 		errCode, resp := c.presenter.PresentValidationError(err)
 		httpStatus := MapErrorCodeToHTTPStatus(errCode)
@@ -75,14 +78,15 @@ func (c *MemberController) GetByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 func (c *MemberController) GetByEmail(ctx *gin.Context) {
-	var reqDTO dto.GetMemberByEmailRequestDTO
-	if err := ctx.ShouldBindQuery(&reqDTO); err != nil {
+	var ginReqDTO gindto.GinGetMemberByEmailRequestDTO
+	if err := ctx.ShouldBindQuery(&ginReqDTO); err != nil {
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
 		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
+	reqDTO := ginmapper.GinDTOToGetMemberByEmailDTO(ginReqDTO)
 	if err := reqDTO.Validate(); err != nil {
 		errCode, resp := c.presenter.PresentValidationError(err)
 		httpStatus := MapErrorCodeToHTTPStatus(errCode)
@@ -101,14 +105,15 @@ func (c *MemberController) GetByEmail(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 func (c *MemberController) List(ctx *gin.Context) {
-	var reqDTO dto.ListMemberRequestDTO
-	if err := ctx.ShouldBindQuery(&reqDTO); err != nil {
+	var ginReqDTO gindto.GinListMemberRequestDTO
+	if err := ctx.ShouldBindQuery(&ginReqDTO); err != nil {
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
 		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
+	reqDTO := ginmapper.GinDTOtoListMemberDTO(ginReqDTO)
 	if err := reqDTO.Validate(); err != nil {
 		errCode, resp := c.presenter.PresentValidationError(err)
 		httpStatus := MapErrorCodeToHTTPStatus(errCode)
@@ -127,14 +132,15 @@ func (c *MemberController) List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 func (c *MemberController) Update(ctx *gin.Context) {
-	var reqDTO dto.UpdateMemberRequestDTO
-	if err := ctx.ShouldBindJSON(&reqDTO); err != nil {
+	var ginReqDTO gindto.GinUpdateMemberRequestDTO
+	if err := ctx.ShouldBindJSON(&ginReqDTO); err != nil {
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
 		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
+	reqDTO := ginmapper.GinDTOToUpdateMemberDTO(ginReqDTO)
 	if err := reqDTO.Validate(); err != nil {
 		errCode, resp := c.presenter.PresentValidationError(err)
 		httpStatus := MapErrorCodeToHTTPStatus(errCode)
@@ -153,14 +159,15 @@ func (c *MemberController) Update(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 func (c *MemberController) Delete(ctx *gin.Context) {
-	var reqDTO dto.DeleteMemberRequestDTO
-	if err := ctx.ShouldBindUri(&reqDTO); err != nil {
+	var ginReqDTO gindto.GinDeleteMemberRequestDTO
+	if err := ctx.ShouldBindUri(&ginReqDTO); err != nil {
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
 		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
+	reqDTO := ginmapper.GinDTOToDeleteMemberDTO(ginReqDTO)
 	if err := reqDTO.Validate(); err != nil {
 		errCode, resp := c.presenter.PresentValidationError(err)
 		httpStatus := MapErrorCodeToHTTPStatus(errCode)
