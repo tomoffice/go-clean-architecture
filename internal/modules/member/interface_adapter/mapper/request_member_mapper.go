@@ -17,7 +17,7 @@ import (
 	"module-clean/internal/shared/common/pagination"
 )
 
-func CreateMemberDTOToEntity(request dto.CreateMemberRequestDTO) *entity.Member {
+func RegisterMemberDTOToEntity(request dto.RegisterMemberRequestDTO) *entity.Member {
 	return &entity.Member{
 		Name:     request.Name,
 		Email:    request.Email,

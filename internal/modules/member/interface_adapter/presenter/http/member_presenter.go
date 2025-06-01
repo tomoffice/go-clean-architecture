@@ -15,7 +15,7 @@ func NewMemberPresenter() *MemberPresenter {
 	return &MemberPresenter{}
 }
 
-func (p *MemberPresenter) PresentCreateMember(member *entity.Member) outputmodel.CreateMemberResponse {
+func (p *MemberPresenter) PresentRegisterMember(member *entity.Member) outputmodel.RegisterMemberResponse {
 	respDTO := mapper.EntityToCreateMemberResponseDTO(member)
 	return buildSuccessResponse(respDTO)
 }

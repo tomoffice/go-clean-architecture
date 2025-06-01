@@ -7,7 +7,7 @@ import (
 )
 
 type MemberPresenter interface {
-	PresentCreateMember(member *entity.Member) outputmodel.CreateMemberResponse
+	PresentRegisterMember(member *entity.Member) outputmodel.RegisterMemberResponse
 	PresentGetMemberByID(member *entity.Member) outputmodel.GetMemberByIDResponse
 	PresentGetMemberByEmail(member *entity.Member) outputmodel.GetMemberByEmailResponse
 	PresentListMembers(members []*entity.Member, total int) outputmodel.ListMemberResponse

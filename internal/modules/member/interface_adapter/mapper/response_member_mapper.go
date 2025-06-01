@@ -6,8 +6,8 @@ import (
 	"time"
 )
 
-func EntityToCreateMemberResponseDTO(member *entity.Member) dto.CreateMemberResponseDTO {
-	return dto.CreateMemberResponseDTO{
+func EntityToCreateMemberResponseDTO(member *entity.Member) dto.RegisterMemberResponseDTO {
+	return dto.RegisterMemberResponseDTO{
 		ID:    member.ID,
 		Name:  member.Name,
 		Email: member.Email,

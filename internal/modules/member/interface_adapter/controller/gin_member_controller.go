@@ -24,7 +24,7 @@ func NewMemberController(memberUseCase input.MemberInputPort, presenter output.M
 }
 
 func (c *MemberController) Register(ctx *gin.Context) {
-	var ginReqDTO gindto.GinCreateMemberRequestDTO
+	var ginReqDTO gindto.GinRegisterMemberRequestDTO
 	if err := ctx.ShouldBindJSON(&ginReqDTO); err != nil {
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
@@ -32,14 +32,14 @@ func (c *MemberController) Register(ctx *gin.Context) {
 		ctx.JSON(httpStatus, resp)
 		return
 	}
-	reqDTO := ginmapper.GinDTOToCreateMemberDTO(ginReqDTO)
+	reqDTO := ginmapper.GinDTOToRegisterMemberDTO(ginReqDTO)
 	if err := reqDTO.Validate(); err != nil {
 		errCode, resp := c.presenter.PresentValidationError(err)
 		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
-	entity := mapper.CreateMemberDTOToEntity(reqDTO)
+	entity := mapper.RegisterMemberDTOToEntity(reqDTO)
 	member, err := c.usecase.RegisterMember(ctx, entity)
 	if err != nil {
 		errCode, resp := c.presenter.PresentUseCaseError(err)
@@ -47,7 +47,7 @@ func (c *MemberController) Register(ctx *gin.Context) {
 		ctx.JSON(httpStatus, resp)
 		return
 	}
-	resp := c.presenter.PresentCreateMember(member)
+	resp := c.presenter.PresentRegisterMember(member)
 	ctx.JSON(http.StatusOK, resp)
 }
 func (c *MemberController) GetByID(ctx *gin.Context) {

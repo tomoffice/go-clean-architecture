@@ -49,20 +49,6 @@ func (mr *MockMemberPresenterMockRecorder) PresentBindingError(errCode, message 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PresentBindingError", reflect.TypeOf((*MockMemberPresenter)(nil).PresentBindingError), errCode, message)
 }
 
-// PresentCreateMember mocks base method.
-func (m *MockMemberPresenter) PresentCreateMember(member *entity.Member) outputmodel.CreateMemberResponse {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PresentCreateMember", member)
-	ret0, _ := ret[0].(outputmodel.CreateMemberResponse)
-	return ret0
-}
-
-// PresentCreateMember indicates an expected call of PresentCreateMember.
-func (mr *MockMemberPresenterMockRecorder) PresentCreateMember(member interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PresentCreateMember", reflect.TypeOf((*MockMemberPresenter)(nil).PresentCreateMember), member)
-}
-
 // PresentDeleteMember mocks base method.
 func (m *MockMemberPresenter) PresentDeleteMember(member *entity.Member) outputmodel.DeleteMemberResponse {
 	m.ctrl.T.Helper()
@@ -117,6 +103,20 @@ func (m *MockMemberPresenter) PresentListMembers(members []*entity.Member, total
 func (mr *MockMemberPresenterMockRecorder) PresentListMembers(members, total interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PresentListMembers", reflect.TypeOf((*MockMemberPresenter)(nil).PresentListMembers), members, total)
+}
+
+// PresentRegisterMember mocks base method.
+func (m *MockMemberPresenter) PresentRegisterMember(member *entity.Member) outputmodel.RegisterMemberResponse {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PresentRegisterMember", member)
+	ret0, _ := ret[0].(outputmodel.RegisterMemberResponse)
+	return ret0
+}
+
+// PresentRegisterMember indicates an expected call of PresentRegisterMember.
+func (mr *MockMemberPresenterMockRecorder) PresentRegisterMember(member interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PresentRegisterMember", reflect.TypeOf((*MockMemberPresenter)(nil).PresentRegisterMember), member)
 }
 
 // PresentUpdateMember mocks base method.

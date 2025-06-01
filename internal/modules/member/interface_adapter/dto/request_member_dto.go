@@ -12,13 +12,13 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-type CreateMemberRequestDTO struct {
+type RegisterMemberRequestDTO struct {
 	Name     string `json:"name" validate:"required"`
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required,min=6"`
 }
 
-func (dto *CreateMemberRequestDTO) Validate() error {
+func (dto *RegisterMemberRequestDTO) Validate() error {
 	validate := validator.New()
 	if err := validate.Struct(dto); err != nil {
 		return err
@@ -27,7 +27,7 @@ func (dto *CreateMemberRequestDTO) Validate() error {
 }
 
 type GetMemberByIDRequestDTO struct {
-	ID int `validate:"required,numeric"`
+	ID int `validate:"required,numeric,gte=1"`
 }
 
 func (dto *GetMemberByIDRequestDTO) Validate() error {

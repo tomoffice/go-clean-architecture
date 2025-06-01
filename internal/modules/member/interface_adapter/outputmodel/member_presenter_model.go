@@ -6,7 +6,7 @@ import (
 )
 
 // mockgen 尚未支援泛型，所以用別名展開所有泛型返回類型
-type CreateMemberResponse = sharedviewmodel.HTTPResponse[dto.CreateMemberResponseDTO]
+type RegisterMemberResponse = sharedviewmodel.HTTPResponse[dto.RegisterMemberResponseDTO]
 type GetMemberByIDResponse = sharedviewmodel.HTTPResponse[dto.GetMemberByIDResponseDTO]
 type GetMemberByEmailResponse = sharedviewmodel.HTTPResponse[dto.GetMemberByEmailResponseDTO]
 type ListMemberResponse = sharedviewmodel.HTTPResponse[dto.ListMemberResponseDTO]

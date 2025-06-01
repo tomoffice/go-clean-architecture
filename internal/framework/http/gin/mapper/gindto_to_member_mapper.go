@@ -5,8 +5,8 @@ import (
 	"module-clean/internal/modules/member/interface_adapter/dto"
 )
 
-func GinDTOToCreateMemberDTO(ginDTO gindto.GinCreateMemberRequestDTO) dto.CreateMemberRequestDTO {
-	return dto.CreateMemberRequestDTO{
+func GinDTOToRegisterMemberDTO(ginDTO gindto.GinRegisterMemberRequestDTO) dto.RegisterMemberRequestDTO {
+	return dto.RegisterMemberRequestDTO{
 		Name:     ginDTO.Name,
 		Email:    ginDTO.Email,
 		Password: ginDTO.Password,
