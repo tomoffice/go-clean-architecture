@@ -32,6 +32,8 @@ func (m *MemberUseCase) RegisterMember(ctx context.Context, member *entity.Membe
 		ucErr := MapGatewayErrorToUseCaseError(err)
 		return nil, ucErr
 	}
+	// 為了通用 repository，無論底層是否會 mutate 傳入 entity，
+	// 一律透過唯一欄位查詢回傳完整 entity，減少 infra 依賴。
 	retrieveMember, err := m.MemberRepo.GetByEmail(ctx, member.Email)
 	if err != nil {
 		ucErr := MapGatewayErrorToUseCaseError(err)
