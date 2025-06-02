@@ -18,7 +18,7 @@ func NewMemberRepositoryGateway(infraRepo persistence.MemberRepository) MemberRe
 	}
 }
 func (g MemberRepositoryGateway) Create(ctx context.Context, m *entity.Member) error {
-	repoModel := &persistence.MemberRepoModel{
+	repoModel := &persistence.MemberSQLXModel{
 		Name:      m.Name,
 		Email:     m.Email,
 		Password:  m.Password,
@@ -90,7 +90,7 @@ func (g MemberRepositoryGateway) GetAll(ctx context.Context, pagination paginati
 }
 
 func (g MemberRepositoryGateway) Update(ctx context.Context, m *entity.Member) (*entity.Member, error) {
-	repoModel := &persistence.MemberRepoModel{
+	repoModel := &persistence.MemberSQLXModel{
 		ID:        m.ID,
 		Name:      m.Name,
 		Email:     m.Email,
