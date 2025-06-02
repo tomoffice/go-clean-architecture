@@ -33,7 +33,7 @@ func mapSQLError(err error) error {
 	if strings.Contains(err.Error(), "UNIQUE constraint failed") {
 		return wrap(err, ErrDBDuplicateKey)
 	}
-	return wrap(err, ErrDBUnknown)
+	return wrap(err, ErrDBUnexpectedError)
 }
 func wrap(rawErr, customErr error) *DBError {
 	return &DBError{

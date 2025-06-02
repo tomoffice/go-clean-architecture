@@ -23,10 +23,10 @@ func MapGatewayErrorToUseCaseError(err error) error {
 		return ErrUseCaseMemberDeleteFailed
 
 	// ─── 技術性錯誤：DB 操作異常，歸為非預期 ─────────────
-	case errors.Is(err, gateway.ErrGatewayMemberDBFailure):
-		return ErrUseCaseMemberDBFailure
+	case errors.Is(err, gateway.ErrGatewayMemberDBError):
+		return ErrUseCaseMemberDBError
 	}
 
 	// ─── fallback：其他未知錯誤，統一歸為非預期 ────────────
-	return ErrUseCaseMemberUnexpectedFail
+	return ErrUseCaseUnexpectedError
 }

@@ -14,6 +14,6 @@ var (
 	ErrDBContextCanceled  = errors.New("db: context canceled")
 	ErrDBConnectionClosed = errors.New("db: connection closed")
 	ErrDBTransactionDone  = errors.New("db: transaction done")
-	ErrDBUnknown          = errors.New("db: unknown errordefs")
+	ErrDBUnexpectedError  = errors.New("db: unexpected error")
 	ErrDBLastInsertId     = errors.New("db: failed to get last insert id")
 )

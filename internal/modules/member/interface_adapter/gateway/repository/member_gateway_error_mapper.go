@@ -29,10 +29,10 @@ func MapInfraErrorToGatewayError(err error) error {
 			errors.Is(dbErr.CustomError, sqlite.ErrDBContextCanceled) ||
 			errors.Is(dbErr.CustomError, sqlite.ErrDBConnectionClosed) ||
 			errors.Is(dbErr.CustomError, sqlite.ErrDBTransactionDone) ||
-			errors.Is(dbErr.CustomError, sqlite.ErrDBUnknown) {
-			return fmt.Errorf("%w: %w", ErrGatewayMemberDBFailure, dbErr.RawError)
+			errors.Is(dbErr.CustomError, sqlite.ErrDBUnexpectedError) {
+			return fmt.Errorf("%w: %w", ErrGatewayMemberDBError, dbErr.RawError)
 		}
 	}
 	// fallback：未知錯誤也包裝
-	return fmt.Errorf("gateway: %w: %w", ErrGatewayMemberUnknown, err)
+	return fmt.Errorf("gateway: %w: %w", ErrGatewayMemberUnexpectedError, err)
 }

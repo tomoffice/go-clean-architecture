@@ -17,10 +17,10 @@ func MapMemberUseCaseError(err error) (int, string) {
 		return errorcode.ErrMemberUpdateFailed, usecase.ErrUseCaseMemberUpdateFailed.Error()
 	case errors.Is(err, usecase.ErrUseCaseMemberDeleteFailed):
 		return errorcode.ErrMemberDeleteFailed, usecase.ErrUseCaseMemberDeleteFailed.Error()
-	case errors.Is(err, usecase.ErrUseCaseMemberUnexpectedFail):
-		return errorcode.ErrUnexpectedMemberUseCaseFail, usecase.ErrUseCaseMemberUnexpectedFail.Error()
-	case errors.Is(err, usecase.ErrUseCaseMemberDBFailure):
-		return errorcode.ErrMemberDBFailure, usecase.ErrUseCaseMemberDBFailure.Error()
+	case errors.Is(err, usecase.ErrUseCaseUnexpectedError):
+		return errorcode.ErrUnexpectedMemberUseCaseFail, usecase.ErrUseCaseUnexpectedError.Error()
+	case errors.Is(err, usecase.ErrUseCaseMemberDBError):
+		return errorcode.ErrMemberDBFailure, usecase.ErrUseCaseMemberDBError.Error()
 	default:
 		return errorcode.ErrInternalServer, sharederrors.ErrInternalServer.Error()
 	}

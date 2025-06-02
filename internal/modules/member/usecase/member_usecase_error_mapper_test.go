@@ -47,23 +47,23 @@ func TestMapGatewayErrorToUseCaseError(t *testing.T) {
 			},
 			wantErr: ErrUseCaseMemberDeleteFailed,
 		}, {
-			name: "ErrGatewayMemberDBFailure",
+			name: "ErrGatewayMemberDBError",
 			args: args{
-				err: gateway.ErrGatewayMemberDBFailure,
+				err: gateway.ErrGatewayMemberDBError,
 			},
-			wantErr: ErrUseCaseMemberDBFailure,
+			wantErr: ErrUseCaseMemberDBError,
 		}, {
-			name: "ErrGatewayMemberUnknown",
+			name: "ErrGatewayMemberUnexpectedError",
 			args: args{
-				err: gateway.ErrGatewayMemberUnknown,
+				err: gateway.ErrGatewayMemberUnexpectedError,
 			},
-			wantErr: ErrUseCaseMemberUnexpectedFail,
+			wantErr: ErrUseCaseUnexpectedError,
 		}, {
-			name: "ErrGatewayMemberMappingFailed",
+			name: "ErrGatewayMemberMappingError",
 			args: args{
-				err: gateway.ErrGatewayMemberMappingFailed,
+				err: gateway.ErrGatewayMemberMappingError,
 			},
-			wantErr: ErrUseCaseMemberUnexpectedFail,
+			wantErr: ErrUseCaseUnexpectedError,
 		}, {
 			name: "wrap error",
 			args: args{
