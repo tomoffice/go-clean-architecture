@@ -1,4 +1,4 @@
-package persistence
+package sqlx
 
 type MemberSQLXModel struct {
 	ID        int    `db:"id"`

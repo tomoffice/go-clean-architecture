@@ -21,7 +21,7 @@ func main() {
 	memberRepo := memberrepo.NewSQLXMemberRepo(db)
 
 	// 建立 Gateway（Domain → Inbound Adapter）
-	memberGateway := membergateway.NewMemberRepositoryGateway(memberRepo)
+	memberGateway := membergateway.NewMemberSQLXGateway(memberRepo)
 
 	// 建立 UseCase（Application Layer）
 	memberUseCase := usecase.NewMemberUseCase(memberGateway)

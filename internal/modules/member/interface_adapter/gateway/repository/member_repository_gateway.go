@@ -2,23 +2,23 @@ package repository
 
 import (
 	"context"
-	"module-clean/internal/modules/member/driver/persistence"
+	"module-clean/internal/modules/member/driver/persistence/sqlx"
 	"module-clean/internal/modules/member/entity"
 	"module-clean/internal/shared/common/pagination"
 	"time"
 )
 
-type MemberRepositoryGateway struct {
-	infraRepo persistence.MemberRepository
+type MemberSQLXGateway struct {
+	infraRepo sqlx.MemberSQLXRepository
 }
 
-func NewMemberRepositoryGateway(infraRepo persistence.MemberRepository) MemberRepositoryGateway {
-	return MemberRepositoryGateway{
+func NewMemberSQLXGateway(infraRepo sqlx.MemberSQLXRepository) MemberSQLXGateway {
+	return MemberSQLXGateway{
 		infraRepo: infraRepo,
 	}
 }
-func (g MemberRepositoryGateway) Create(ctx context.Context, m *entity.Member) error {
-	repoModel := &persistence.MemberSQLXModel{
+func (g MemberSQLXGateway) Create(ctx context.Context, m *entity.Member) error {
+	repoModel := &sqlx.MemberSQLXModel{
 		Name:      m.Name,
 		Email:     m.Email,
 		Password:  m.Password,
@@ -31,7 +31,7 @@ func (g MemberRepositoryGateway) Create(ctx context.Context, m *entity.Member) e
 	return nil
 }
 
-func (g MemberRepositoryGateway) GetByID(ctx context.Context, id int) (*entity.Member, error) {
+func (g MemberSQLXGateway) GetByID(ctx context.Context, id int) (*entity.Member, error) {
 	repoModel, err := g.infraRepo.GetByID(ctx, id)
 	if err != nil {
 		return nil, MapInfraErrorToGatewayError(err)
@@ -49,7 +49,7 @@ func (g MemberRepositoryGateway) GetByID(ctx context.Context, id int) (*entity.M
 	}, nil
 }
 
-func (g MemberRepositoryGateway) GetByEmail(ctx context.Context, email string) (*entity.Member, error) {
+func (g MemberSQLXGateway) GetByEmail(ctx context.Context, email string) (*entity.Member, error) {
 	repoModel, err := g.infraRepo.GetByEmail(ctx, email)
 	if err != nil {
 		return nil, MapInfraErrorToGatewayError(err)
@@ -67,7 +67,7 @@ func (g MemberRepositoryGateway) GetByEmail(ctx context.Context, email string) (
 	}, nil
 }
 
-func (g MemberRepositoryGateway) GetAll(ctx context.Context, pagination pagination.Pagination) ([]*entity.Member, error) {
+func (g MemberSQLXGateway) GetAll(ctx context.Context, pagination pagination.Pagination) ([]*entity.Member, error) {
 	repoModels, err := g.infraRepo.GetAll(ctx, pagination)
 	if err != nil {
 		return nil, MapInfraErrorToGatewayError(err)
@@ -89,8 +89,8 @@ func (g MemberRepositoryGateway) GetAll(ctx context.Context, pagination paginati
 	return members, nil
 }
 
-func (g MemberRepositoryGateway) Update(ctx context.Context, m *entity.Member) (*entity.Member, error) {
-	repoModel := &persistence.MemberSQLXModel{
+func (g MemberSQLXGateway) Update(ctx context.Context, m *entity.Member) (*entity.Member, error) {
+	repoModel := &sqlx.MemberSQLXModel{
 		ID:        m.ID,
 		Name:      m.Name,
 		Email:     m.Email,
@@ -105,7 +105,7 @@ func (g MemberRepositoryGateway) Update(ctx context.Context, m *entity.Member) (
 	return m, nil
 }
 
-func (g MemberRepositoryGateway) Delete(ctx context.Context, id int) error {
+func (g MemberSQLXGateway) Delete(ctx context.Context, id int) error {
 	err := g.infraRepo.Delete(ctx, id)
 	if err != nil {
 		return MapInfraErrorToGatewayError(err)
@@ -113,7 +113,7 @@ func (g MemberRepositoryGateway) Delete(ctx context.Context, id int) error {
 	return nil
 }
 
-func (g MemberRepositoryGateway) CountAll(ctx context.Context) (int, error) {
+func (g MemberSQLXGateway) CountAll(ctx context.Context) (int, error) {
 	count, err := g.infraRepo.CountAll(ctx)
 	if err != nil {
 		return 0, MapInfraErrorToGatewayError(err)

@@ -1,11 +1,11 @@
-package persistence
+package sqlx
 
 import (
 	"context"
 	"module-clean/internal/shared/common/pagination"
 )
 
-type MemberRepository interface {
+type MemberSQLXRepository interface {
 	Create(ctx context.Context, m *MemberSQLXModel) error
 	GetByID(ctx context.Context, id int) (*MemberSQLXModel, error)
 	GetByEmail(ctx context.Context, email string) (*MemberSQLXModel, error)
