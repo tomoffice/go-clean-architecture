@@ -30,12 +30,24 @@ func GinDTOtoListMemberDTO(ginDTO gindto.GinListMemberQueryRequestDTO) dto.ListM
 		OrderBy: ginDTO.OrderBy,
 	}
 }
-func GinDTOToUpdateMemberDTO(ginURI gindto.GinUpdateMemberURIRequestDTO, ginBody gindto.GinUpdateMemberBodyRequestDTO) dto.UpdateMemberRequestDTO {
-	return dto.UpdateMemberRequestDTO{
+func GinDTOToUpdateMemberProfileDTO(ginURI gindto.GinUpdateMemberURIRequestDTO, ginBody gindto.GinUpdateMemberProfileBodyRequestDTO) dto.UpdateMemberProfileRequestDTO {
+	return dto.UpdateMemberProfileRequestDTO{
+		ID:   ginURI.ID,
+		Name: ginBody.Name,
+	}
+}
+func GinDTOToUpdateMemberEmailDTO(ginURI gindto.GinUpdateMemberURIRequestDTO, ginBody gindto.GinUpdateMemberEmailBodyRequestDTO) dto.UpdateMemberEmailRequestDTO {
+	return dto.UpdateMemberEmailRequestDTO{
 		ID:       ginURI.ID,
-		Name:     ginBody.Name,
-		Email:    ginBody.Email,
+		NewEmail: ginBody.NewEmail,
 		Password: ginBody.Password,
+	}
+}
+func GinDTOToUpdateMemberPasswordDTO(ginURI gindto.GinUpdateMemberURIRequestDTO, ginBody gindto.GinUpdateMemberPasswordBodyRequestDTO) dto.UpdateMemberPasswordRequestDTO {
+	return dto.UpdateMemberPasswordRequestDTO{
+		ID:          ginURI.ID,
+		OldPassword: ginBody.OldPassword,
+		NewPassword: ginBody.NewPassword,
 	}
 }
 func GinDTOToDeleteMemberDTO(ginDTO gindto.GinDeleteMemberURIRequestDTO) dto.DeleteMemberRequestDTO {

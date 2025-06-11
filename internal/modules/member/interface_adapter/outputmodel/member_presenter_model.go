@@ -10,7 +10,9 @@ type RegisterMemberResponse = sharedviewmodel.HTTPResponse[dto.RegisterMemberRes
 type GetMemberByIDResponse = sharedviewmodel.HTTPResponse[dto.GetMemberByIDResponseDTO]
 type GetMemberByEmailResponse = sharedviewmodel.HTTPResponse[dto.GetMemberByEmailResponseDTO]
 type ListMemberResponse = sharedviewmodel.HTTPResponse[dto.ListMemberResponseDTO]
-type UpdateMemberResponse = sharedviewmodel.HTTPResponse[dto.UpdateMemberResponseDTO]
+type UpdateMemberProfileResponse = sharedviewmodel.HTTPResponse[dto.UpdateMemberProfileResponseDTO]
+type UpdateMemberEmailResponse = sharedviewmodel.HTTPResponse[dto.UpdateMemberEmailResponseDTO]
+type UpdateMemberPasswordResponse = sharedviewmodel.HTTPResponse[dto.UpdateMemberPasswordResponseDTO]
 type DeleteMemberResponse = sharedviewmodel.HTTPResponse[dto.DeleteMemberResponseDTO]
 
 // 為 any 的情況也必須別名化

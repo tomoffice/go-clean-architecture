@@ -25,11 +25,12 @@ type ListMemberItemDTO struct {
 type ListMemberResponseDTO struct {
 	Members []ListMemberItemDTO `json:"members"`
 }
-type UpdateMemberResponseDTO struct {
-	ID    int     `json:"id"`
-	Name  *string `json:"name,omitempty"`
-	Email *string `json:"email,omitempty"`
+type UpdateMemberProfileResponseDTO struct {
+	ID   int     `json:"id"`
+	Name string `json:"name,omitempty"`
 }
+type UpdateMemberEmailResponseDTO struct{}
+type UpdateMemberPasswordResponseDTO struct{}
 type DeleteMemberResponseDTO struct {
 	ID        int    `json:"id"`
 	Name      string `json:"name"`

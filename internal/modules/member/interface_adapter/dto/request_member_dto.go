@@ -64,15 +64,45 @@ func (dto *ListMemberRequestDTO) Validate() error {
 	}
 	return nil
 }
-
-type UpdateMemberRequestDTO struct {
-	ID       int     `json:"id" validate:"required,numeric"`
-	Name     *string `json:"name,omitempty" validate:"omitempty"`
-	Email    *string `json:"email,omitempty" validate:"omitempty,email"`
-	Password *string `json:"password,omitempty" validate:"omitempty,min=6"`
+// UpdateMemberProfileRequestDTO 更新會員個人資料
+type UpdateMemberProfileRequestDTO struct {
+	ID   int     `json:"id" validate:"required,numeric,gte=1"`
+	Name *string `json:"name,omitempty" validate:"omitempty,min=3,max=20"`
 }
 
-func (dto *UpdateMemberRequestDTO) Validate() error {
+func (dto *UpdateMemberProfileRequestDTO) Validate() error {
+	validate := validator.New()
+	if err := validate.Struct(dto); err != nil {
+		return err
+	}
+	return nil
+}
+// UpdateMemberEmailRequestDTO 更新會員電子郵件
+// 	- NewEmail 新的email
+// 	- Password 再次輸入密碼以驗證身份
+type UpdateMemberEmailRequestDTO struct {
+	ID       int    `json:"id" validate:"required,numeric,gte=1"`
+	NewEmail string `json:"new_email" validate:"required,email"`
+	Password string `json:"password" validate:"required,min=6"`
+}
+
+func (dto *UpdateMemberEmailRequestDTO) Validate() error {
+	validate := validator.New()
+	if err := validate.Struct(dto); err != nil {
+		return err
+	}
+	return nil
+}
+// UpdateMemberPasswordRequestDTO 更新會員密碼
+// 	- OldPassword 舊密碼
+//	- NewPassword 新密碼
+type UpdateMemberPasswordRequestDTO struct {
+	ID          int    `json:"id" validate:"required,numeric,gte=1"`
+	OldPassword string `json:"old_password" validate:"required,min=6"`
+	NewPassword string `json:"new_password" validate:"required,min=6"`
+}
+
+func (dto *UpdateMemberPasswordRequestDTO) Validate() error {
 	validate := validator.New()
 	if err := validate.Struct(dto); err != nil {
 		return err

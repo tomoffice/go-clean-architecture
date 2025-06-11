@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
@@ -17,7 +18,6 @@ import (
 	sharedviewmodel "module-clean/internal/shared/interface_adapter/viewmodel/http"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
 	"strconv"
 	"strings"
 	"testing"
@@ -243,13 +243,13 @@ func TestMemberController_Delete(t *testing.T) {
 				ctx: nil,
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
-				uc.EXPECT().DeleteMember(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrUseCaseMemberDeleteFailed)
+				uc.EXPECT().DeleteMember(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrUseCaseMemberNoEffect)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
-					errorcode.ErrMemberDeleteFailed,
+					errorcode.ErrMemberNoEffect,
 					outputmodel.ErrorResponse{
 						Data: nil,
 						Error: &sharedviewmodel.ErrorPayload{
-							Code:    strconv.Itoa(errorcode.ErrMemberDeleteFailed),
+							Code:    strconv.Itoa(errorcode.ErrMemberNoEffect),
 							Message: "",
 						},
 						Meta: nil,
@@ -271,7 +271,7 @@ func TestMemberController_Delete(t *testing.T) {
 			wantErr: &outputmodel.ErrorResponse{
 				Data: nil,
 				Error: &sharedviewmodel.ErrorPayload{
-					Code:    strconv.Itoa(errorcode.ErrMemberDeleteFailed),
+					Code:    strconv.Itoa(errorcode.ErrMemberNoEffect),
 					Message: "",
 				},
 				Meta: nil,
@@ -281,7 +281,7 @@ func TestMemberController_Delete(t *testing.T) {
 					Status:           enum.APIStatusFailed,
 				},
 			},
-			wantStatus: 500,
+			wantStatus: 422,
 		},
 		{
 			name: "usecase error - db error",
@@ -293,13 +293,13 @@ func TestMemberController_Delete(t *testing.T) {
 				ctx: nil,
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
-				uc.EXPECT().DeleteMember(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrUseCaseMemberDBFailure)
+				uc.EXPECT().DeleteMember(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrUseCaseMemberDBError)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
-					errorcode.ErrMemberDBFailure,
+					errorcode.ErrMemberDBError,
 					outputmodel.ErrorResponse{
 						Data: nil,
 						Error: &sharedviewmodel.ErrorPayload{
-							Code:    strconv.Itoa(errorcode.ErrMemberDBFailure),
+							Code:    strconv.Itoa(errorcode.ErrMemberDBError),
 							Message: "",
 						},
 						Meta: nil,
@@ -320,7 +320,7 @@ func TestMemberController_Delete(t *testing.T) {
 			wantErr: &outputmodel.ErrorResponse{
 				Data: nil,
 				Error: &sharedviewmodel.ErrorPayload{
-					Code:    strconv.Itoa(errorcode.ErrMemberDBFailure),
+					Code:    strconv.Itoa(errorcode.ErrMemberDBError),
 					Message: "",
 				},
 				Meta: nil,
@@ -342,13 +342,13 @@ func TestMemberController_Delete(t *testing.T) {
 				ctx: nil,
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
-				uc.EXPECT().DeleteMember(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrUseCaseMemberUnexpectedFail)
+				uc.EXPECT().DeleteMember(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrUseCaseMemberUnexpectedError)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
-					errorcode.ErrUnexpectedMemberUseCaseFail,
+					errorcode.ErrUnexpectedMemberUseCaseError,
 					outputmodel.ErrorResponse{
 						Data: nil,
 						Error: &sharedviewmodel.ErrorPayload{
-							Code:    strconv.Itoa(errorcode.ErrUnexpectedMemberUseCaseFail),
+							Code:    strconv.Itoa(errorcode.ErrUnexpectedMemberUseCaseError),
 							Message: "",
 						},
 						Meta: nil,
@@ -369,7 +369,7 @@ func TestMemberController_Delete(t *testing.T) {
 			wantErr: &outputmodel.ErrorResponse{
 				Data: nil,
 				Error: &sharedviewmodel.ErrorPayload{
-					Code:    strconv.Itoa(errorcode.ErrUnexpectedMemberUseCaseFail),
+					Code:    strconv.Itoa(errorcode.ErrUnexpectedMemberUseCaseError),
 					Message: "",
 				},
 				Meta: nil,
@@ -398,6 +398,9 @@ func TestMemberController_Delete(t *testing.T) {
 			gotStatus := responseWriter.Code
 			t.Logf("\n\tgotStatus:%d,wantStatus:%d", gotStatus, tt.wantStatus)
 			assert.Equal(t, tt.wantStatus, gotStatus)
+			if tt.want == nil && tt.wantErr == nil {
+				t.Fatalf("wantErr should be nil when want is not nil")
+			}
 			if tt.want != nil {
 				var got outputmodel.DeleteMemberResponse
 				err := json.Unmarshal([]byte(response), &got)
@@ -658,13 +661,13 @@ func TestMemberController_GetByEmail(t *testing.T) {
 				)
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
-				uc.EXPECT().GetMemberByEmail(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrUseCaseMemberDBFailure)
+				uc.EXPECT().GetMemberByEmail(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrUseCaseMemberDBError)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
-					errorcode.ErrMemberDBFailure,
+					errorcode.ErrMemberDBError,
 					outputmodel.ErrorResponse{
 						Data: nil,
 						Error: &sharedviewmodel.ErrorPayload{
-							Code:    strconv.Itoa(errorcode.ErrMemberDBFailure),
+							Code:    strconv.Itoa(errorcode.ErrMemberDBError),
 							Message: "",
 						},
 						Meta: nil,
@@ -680,7 +683,7 @@ func TestMemberController_GetByEmail(t *testing.T) {
 			wantErr: &outputmodel.ErrorResponse{
 				Data: nil,
 				Error: &sharedviewmodel.ErrorPayload{
-					Code:    strconv.Itoa(errorcode.ErrMemberDBFailure),
+					Code:    strconv.Itoa(errorcode.ErrMemberDBError),
 					Message: "",
 				},
 				Meta: nil,
@@ -709,6 +712,9 @@ func TestMemberController_GetByEmail(t *testing.T) {
 			gotStatus := responseWriter.Code
 			t.Logf("\n\tgotStatus:%d,wantStatus:%d", gotStatus, tt.wantStatus)
 			assert.Equal(t, tt.wantStatus, gotStatus)
+			if tt.want == nil && tt.wantErr == nil {
+				t.Fatalf("wantErr should be nil when want is not nil")
+			}
 			if tt.want != nil {
 				var got outputmodel.GetMemberByEmailResponse
 				err := json.Unmarshal([]byte(response), &got)
@@ -937,13 +943,13 @@ func TestMemberController_GetByID(t *testing.T) {
 				ctx: nil,
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
-				uc.EXPECT().GetMemberByID(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrUseCaseMemberDBFailure)
+				uc.EXPECT().GetMemberByID(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrUseCaseMemberDBError)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
-					errorcode.ErrMemberDBFailure,
+					errorcode.ErrMemberDBError,
 					outputmodel.ErrorResponse{
 						Data: nil,
 						Error: &sharedviewmodel.ErrorPayload{
-							Code:    strconv.Itoa(errorcode.ErrMemberDBFailure),
+							Code:    strconv.Itoa(errorcode.ErrMemberDBError),
 							Message: "",
 						},
 						Meta:             nil,
@@ -960,7 +966,7 @@ func TestMemberController_GetByID(t *testing.T) {
 			wantErr: &outputmodel.ErrorResponse{
 				Data: nil,
 				Error: &sharedviewmodel.ErrorPayload{
-					Code:    strconv.Itoa(errorcode.ErrMemberDBFailure),
+					Code:    strconv.Itoa(errorcode.ErrMemberDBError),
 					Message: "",
 				},
 				Meta:             nil,
@@ -985,6 +991,9 @@ func TestMemberController_GetByID(t *testing.T) {
 			gotStatus := responseWriter.Code
 			t.Logf("\n\tgotStatus:%d,wantStatus:%d", gotStatus, tt.wantStatus)
 			assert.Equal(t, tt.wantStatus, gotStatus)
+			if tt.want == nil && tt.wantErr == nil {
+				t.Fatalf("wantErr should be nil when want is not nil")
+			}
 			if tt.want != nil {
 				var got outputmodel.GetMemberByIDResponse
 				err := json.Unmarshal([]byte(response), &got)
@@ -1226,13 +1235,13 @@ func TestMemberController_List(t *testing.T) {
 				ginCtx.Request, _ = http.NewRequest("GET", "/api/v1/members?page="+strconv.Itoa(testArgs.Page)+"&limit="+strconv.Itoa(testArgs.Limit), nil)
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, testArgs testPagination) {
-				uc.EXPECT().ListMembers(gomock.Any(), gomock.Any()).Return(nil, 0, usecase.ErrUseCaseMemberDBFailure)
+				uc.EXPECT().ListMembers(gomock.Any(), gomock.Any()).Return(nil, 0, usecase.ErrUseCaseMemberDBError)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
-					errorcode.ErrMemberDBFailure,
+					errorcode.ErrMemberDBError,
 					outputmodel.ErrorResponse{
 						Data: nil,
 						Error: &sharedviewmodel.ErrorPayload{
-							Code:    strconv.Itoa(errorcode.ErrMemberDBFailure),
+							Code:    strconv.Itoa(errorcode.ErrMemberDBError),
 							Message: "",
 						},
 						Meta:             nil,
@@ -1245,7 +1254,7 @@ func TestMemberController_List(t *testing.T) {
 			wantErr: &outputmodel.ErrorResponse{
 				Data: nil,
 				Error: &sharedviewmodel.ErrorPayload{
-					Code:    strconv.Itoa(errorcode.ErrMemberDBFailure),
+					Code:    strconv.Itoa(errorcode.ErrMemberDBError),
 					Message: "",
 				},
 				Meta:             nil,
@@ -1270,6 +1279,9 @@ func TestMemberController_List(t *testing.T) {
 			gotStatus := responseWriter.Code
 			t.Logf("\n\tgotStatus:%d,wantStatus:%d", gotStatus, tt.wantStatus)
 			assert.Equal(t, tt.wantStatus, gotStatus)
+			if tt.want == nil && tt.wantErr == nil {
+				t.Fatalf("wantErr should be nil when want is not nil")
+			}
 			if tt.want != nil {
 				var got outputmodel.ListMemberResponse
 				err := json.Unmarshal([]byte(response), &got)
@@ -1363,6 +1375,228 @@ func TestMemberController_Register(t *testing.T) {
 			wantErr:    nil,
 			wantStatus: 200,
 		},
+		{
+			name: "binding error",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				ginCtx.Request = httptest.NewRequest(
+					"POST",
+					"/api/v1/members",
+					strings.NewReader(`{"name":"test","password":"test123"}`),
+				)
+				ginCtx.Request.Header.Set("Content-Type", "application/json")
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				p.EXPECT().PresentBindingError(gomock.Any(), gomock.Any()).Return(
+					outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrInvalidParams),
+							Message: "invalid email format",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data: nil,
+				Error: &sharedviewmodel.ErrorPayload{
+					Code:    strconv.Itoa(errorcode.ErrInvalidParams),
+					Message: "invalid email format",
+				},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 400,
+		},
+		{
+			name: "validation error",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				ginCtx.Request = httptest.NewRequest(
+					"POST",
+					"/api/v1/members",
+					strings.NewReader(`{"name":"test","email":"invalid-email","password":"test123"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				p.EXPECT().PresentValidationError(gomock.Any()).Return(
+					errorcode.ErrValidationFailed, outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrValidationFailed),
+							Message: "invalid email format",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data: nil,
+				Error: &sharedviewmodel.ErrorPayload{
+					Code:    strconv.Itoa(errorcode.ErrValidationFailed),
+					Message: "invalid email format",
+				},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 400,
+		},
+		{
+			name: "usecase error - member already exists",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				ginCtx.Request = httptest.NewRequest(
+					"POST",
+					"/api/v1/members",
+					strings.NewReader(`{"name":"test","email":"test@gmail.com","password":"test123"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				uc.EXPECT().RegisterMember(gomock.Any(), gomock.Any()).Return(
+					nil,
+					usecase.ErrUseCaseMemberAlreadyExists,
+				)
+				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
+					errorcode.ErrMemberAlreadyExists,
+					outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrMemberAlreadyExists),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data: nil,
+				Error: &sharedviewmodel.ErrorPayload{
+					Code:    strconv.Itoa(errorcode.ErrMemberAlreadyExists),
+					Message: "",
+				},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 409,
+		},
+		{
+			name: "usecase error - db failure",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				ginCtx.Request = httptest.NewRequest(
+					"POST",
+					"/api/v1/members",
+					strings.NewReader(`{"name":"test","email":"test@gmail.com","password":"test123"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				uc.EXPECT().RegisterMember(gomock.Any(), gomock.Any()).Return(
+					nil,
+					usecase.ErrUseCaseMemberDBError,
+				)
+				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
+					errorcode.ErrMemberDBError,
+					outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrMemberDBError),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data: nil,
+				Error: &sharedviewmodel.ErrorPayload{
+					Code:    strconv.Itoa(errorcode.ErrMemberDBError),
+					Message: "",
+				},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 500,
+		},
+		{
+			name: "usecase error - GetByEmail not found",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				ginCtx.Request = httptest.NewRequest(
+					"POST",
+					"/api/v1/members",
+					strings.NewReader(`{"name":"test","email":"test@gmail.com","password":"test123"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				uc.EXPECT().RegisterMember(gomock.Any(), gomock.Any()).Return(
+					nil,
+					usecase.ErrUseCaseMemberNotFound,
+				)
+				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
+					errorcode.ErrMemberNotFound,
+					outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrMemberNotFound),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data: nil,
+				Error: &sharedviewmodel.ErrorPayload{
+					Code:    strconv.Itoa(errorcode.ErrMemberNotFound),
+					Message: "",
+				},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 404,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -1380,6 +1614,9 @@ func TestMemberController_Register(t *testing.T) {
 			gotStatus := responseWriter.Code
 			t.Logf("\n\tgotStatus:%d,wantStatus:%d", gotStatus, tt.wantStatus)
 			assert.Equal(t, tt.wantStatus, gotStatus)
+			if tt.want == nil && tt.wantErr == nil {
+				t.Fatalf("wantErr should be nil when want is not nil")
+			}
 			if tt.want != nil {
 				var got outputmodel.RegisterMemberResponse
 				err := json.Unmarshal([]byte(response), &got)
@@ -1401,7 +1638,7 @@ func TestMemberController_Register(t *testing.T) {
 	}
 }
 
-func TestMemberController_Update(t *testing.T) {
+func TestMemberController_UpdateProfile(t *testing.T) {
 	type fields struct {
 		usecase   input.MemberInputPort
 		presenter output.MemberPresenter
@@ -1409,43 +1646,1625 @@ func TestMemberController_Update(t *testing.T) {
 	type args struct {
 		ctx *gin.Context
 	}
+	ctrl, testTime := portHelper(t)
 	tests := []struct {
-		name   string
-		fields fields
-		args   args
+		name        string
+		fields      fields
+		args        args
+		setupGinCtx func(ginCtx *gin.Context)
+		setupPort   func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter)
+		want        *outputmodel.UpdateMemberProfileResponse
+		wantErr     *outputmodel.ErrorResponse
+		wantStatus  int
 	}{
-		// TODO: Add test cases.
+		{
+			name: "normal case",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id       --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdateProfile-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1",
+					strings.NewReader(`{"name":"new_name"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				uc.EXPECT().UpdateMemberProfile(gomock.Any(), gomock.Any()).Return(
+					&entity.Member{
+						ID:        1,
+						Name:      "updated_name",
+						Email:     "update@gmail.com",
+						CreatedAt: testTime,
+					}, nil)
+				p.EXPECT().PresentUpdateMemberProfile(gomock.Any()).Return(
+					outputmodel.UpdateMemberProfileResponse{
+						Data: dto.UpdateMemberProfileResponseDTO{
+							ID:   0,
+							Name: "updated_name",
+						},
+						Error:            nil,
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: &outputmodel.UpdateMemberProfileResponse{
+				Data: dto.UpdateMemberProfileResponseDTO{
+					ID:   0,
+					Name: "updated_name",
+				},
+				Error:            nil,
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantErr:    nil,
+			wantStatus: 200,
+		},
+		{
+			name: "binding error - invalid URI",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id       --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdateProfile-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "invalid-id"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/invalid-id",
+					strings.NewReader(`{"name":"new_name"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				p.EXPECT().PresentBindingError(gomock.Any(), gomock.Any()).Return(
+					outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrInvalidParams),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data: nil,
+				Error: &sharedviewmodel.ErrorPayload{
+					Code:    strconv.Itoa(errorcode.ErrInvalidParams),
+					Message: "",
+				},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 400,
+		},
+		{
+			name: "binding error - invalid body",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id       --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdateProfile-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1",
+					strings.NewReader(`{"name":123}`), // invalid name type
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				p.EXPECT().PresentBindingError(gomock.Any(), gomock.Any()).Return(
+					outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrInvalidParams),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data: nil,
+				Error: &sharedviewmodel.ErrorPayload{
+					Code:    strconv.Itoa(errorcode.ErrInvalidParams),
+					Message: "",
+				},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 400,
+		},
+		{
+			name: "validation error - uri invalid",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id       --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdateProfile-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "-1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/invalid-id",
+					strings.NewReader(`{"name":"new_name"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				p.EXPECT().PresentValidationError(gomock.Any()).Return(
+					errorcode.ErrInvalidParams, outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrInvalidParams),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data: nil,
+				Error: &sharedviewmodel.ErrorPayload{
+					Code:    strconv.Itoa(errorcode.ErrInvalidParams),
+					Message: "",
+				},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 400,
+		},
+		{
+			name: "validation error - empty name",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id       --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdateProfile-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1",
+					strings.NewReader(`{"name":""}`), // empty name
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				p.EXPECT().PresentValidationError(gomock.Any()).Return(
+					errorcode.ErrValidationFailed, outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrValidationFailed),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data: nil,
+				Error: &sharedviewmodel.ErrorPayload{
+					Code:    strconv.Itoa(errorcode.ErrValidationFailed),
+					Message: "",
+				},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 400,
+		},
+		{
+			name: "usecase error - GetByID member not found",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id       --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdateProfile-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1",
+					strings.NewReader(`{"name":"new_name"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				uc.EXPECT().UpdateMemberProfile(gomock.Any(), gomock.Any()).Return(
+					nil,
+					usecase.ErrUseCaseMemberNotFound,
+				)
+				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
+					errorcode.ErrMemberNotFound,
+					outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrMemberNotFound),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data: nil,
+				Error: &sharedviewmodel.ErrorPayload{
+					Code:    strconv.Itoa(errorcode.ErrMemberNotFound),
+					Message: "",
+				},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 404,
+		},
+		{
+			name: "usecase error - gateway db error",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id       --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdateProfile-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1",
+					strings.NewReader(`{"name":"new_name"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				uc.EXPECT().UpdateMemberProfile(gomock.Any(), gomock.Any()).Return(
+					nil,
+					usecase.ErrUseCaseMemberGatewayError,
+				)
+				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
+					errorcode.ErrMemberDBError,
+					outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrMemberDBError),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data: nil,
+				Error: &sharedviewmodel.ErrorPayload{
+					Code:    strconv.Itoa(errorcode.ErrMemberDBError),
+					Message: "",
+				},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 500,
+		},
+		{
+			name: "usecase error - no effect",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id       --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdateProfile-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1",
+					strings.NewReader(`{"name":"new_name"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				uc.EXPECT().UpdateMemberProfile(gomock.Any(), gomock.Any()).Return(
+					nil,
+					usecase.ErrUseCaseMemberNoEffect,
+				)
+				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
+					errorcode.ErrMemberNoEffect,
+					outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrMemberNoEffect),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data: nil,
+				Error: &sharedviewmodel.ErrorPayload{
+					Code:    strconv.Itoa(errorcode.ErrMemberNoEffect),
+					Message: "",
+				},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 422,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			mockUseCase := mock.NewMockMemberInputPort(ctrl)
+			mockPresenter := mock.NewMockMemberPresenter(ctrl)
 			c := &MemberController{
-				usecase:   tt.fields.usecase,
-				presenter: tt.fields.presenter,
+				usecase:   mockUseCase,
+				presenter: mockPresenter,
 			}
-			c.Update(tt.args.ctx)
+			ginCtx, responseWriter := GinCtxHelper(t)
+			tt.setupGinCtx(ginCtx)
+			tt.setupPort(mockUseCase, mockPresenter)
+			c.UpdateProfile(ginCtx)
+			response := responseWriter.Body.String()
+			gotStatus := responseWriter.Code
+			t.Logf("\n\tgotStatus:%d,wantStatus:%d", gotStatus, tt.wantStatus)
+			assert.Equal(t, tt.wantStatus, gotStatus)
+			if tt.want == nil && tt.wantErr == nil {
+				t.Fatalf("wantErr should be nil when want is not nil")
+			}
+			if tt.want != nil {
+				var got outputmodel.UpdateMemberProfileResponse
+				err := json.Unmarshal([]byte(response), &got)
+				if err != nil {
+					t.Fatalf("failed to unmarshal response: %v", err)
+				}
+				t.Logf("\n\tgot %+v\n\twant %+v", got, *tt.want)
+				assert.Equal(t, tt.want, &got)
+			} else if tt.wantErr != nil {
+				var got outputmodel.ErrorResponse
+				err := json.Unmarshal([]byte(response), &got)
+				if err != nil {
+					t.Fatalf("failed to unmarshal response: %v", err)
+				}
+				t.Logf("\n\tgot %+v\n\twantErr %+v", got, *tt.wantErr)
+				assert.Equal(t, tt.wantErr, &got)
+			}
+		})
+	}
+}
+
+func TestMemberController_UpdateEmail(t *testing.T) {
+	type fields struct {
+		usecase   input.MemberInputPort
+		presenter output.MemberPresenter
+	}
+	type args struct {
+		ctx *gin.Context
+	}
+	ctrl, testTime := portHelper(t)
+	tests := []struct {
+		name        string
+		fields      fields
+		args        args
+		setupGinCtx func(ginCtx *gin.Context)
+		setupPort   func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter)
+		want        *outputmodel.UpdateMemberEmailResponse
+		wantErr     *outputmodel.ErrorResponse
+		wantStatus  int
+	}{
+		{
+			name: "normal case",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id/email --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdateEmail-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1/email",
+					strings.NewReader(`{"new_email":"test@gmail.com","password":"test123"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				uc.EXPECT().UpdateMemberEmail(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
+				p.EXPECT().PresentUpdateMemberEmail().Return(
+					outputmodel.UpdateMemberEmailResponse{
+						Data:  dto.UpdateMemberEmailResponseDTO{},
+						Error: nil,
+						Meta:  nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{
+							UnixTimeStamp:    testTime.Unix(),
+							RFC3339TimeStamp: testTime.Format(time.RFC3339),
+							Status:           enum.APIStatusSuccess,
+						},
+					},
+				)
+			},
+			want: &outputmodel.UpdateMemberEmailResponse{
+				Data:  dto.UpdateMemberEmailResponseDTO{},
+				Error: nil,
+				Meta:  nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{
+					UnixTimeStamp:    testTime.Unix(),
+					RFC3339TimeStamp: testTime.Format(time.RFC3339),
+					Status:           enum.APIStatusSuccess,
+				},
+			},
+			wantErr:    nil,
+			wantStatus: 200,
+		},
+		{
+			name: "binding error - invalid URI",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id/email --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdateEmail-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "invalid-id"},
+				}
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				p.EXPECT().PresentBindingError(gomock.Any(), gomock.Any()).Return(
+					outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrInvalidParams),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data:             nil,
+				Error:            &sharedviewmodel.ErrorPayload{Code: strconv.Itoa(errorcode.ErrInvalidParams), Message: ""},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 400,
+		},
+		{
+			name: "binding error - invalid body",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id/email --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdateEmail-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1/email",
+					strings.NewReader(`{"new_email":"","password":"test123"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				p.EXPECT().PresentBindingError(gomock.Any(), gomock.Any()).Return(
+					outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrInvalidParams),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data:             nil,
+				Error:            &sharedviewmodel.ErrorPayload{Code: strconv.Itoa(errorcode.ErrInvalidParams), Message: ""},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 400,
+		},
+		{
+			name: "validation error - uri invalid",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id/email --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdateEmail-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "-1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1/email",
+					strings.NewReader(`{"new_email":"test@gmail.com","password":"test123"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				p.EXPECT().PresentValidationError(gomock.Any()).Return(
+					errorcode.ErrInvalidParams, outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrInvalidParams),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data:             nil,
+				Error:            &sharedviewmodel.ErrorPayload{Code: strconv.Itoa(errorcode.ErrInvalidParams), Message: ""},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 400,
+		},
+		{
+			name: "validation error - invalid email format",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id/email --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdateEmail-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1/email",
+					strings.NewReader(`{"new_email":"invalid-email","password":"test123"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				p.EXPECT().PresentValidationError(gomock.Any()).Return(
+					errorcode.ErrValidationFailed, outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrValidationFailed),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data:             nil,
+				Error:            &sharedviewmodel.ErrorPayload{Code: strconv.Itoa(errorcode.ErrValidationFailed), Message: ""},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 400,
+		},
+		{
+			name: "validation error - password too short",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id/email --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdateEmail-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1/email",
+					strings.NewReader(`{"new_email":"test@gmail.com","password":"6666"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				p.EXPECT().PresentValidationError(gomock.Any()).Return(
+					errorcode.ErrValidationFailed, outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrValidationFailed),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data:             nil,
+				Error:            &sharedviewmodel.ErrorPayload{Code: strconv.Itoa(errorcode.ErrValidationFailed), Message: ""},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 400,
+		},
+		{
+			name: "usecase error - member not found",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id/email --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdateEmail-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1/email",
+					strings.NewReader(`{"new_email":"testupdate@gmail.com","password":"test123"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				uc.EXPECT().UpdateMemberEmail(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
+					usecase.ErrUseCaseMemberNotFound,
+				)
+				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
+					errorcode.ErrMemberNotFound,
+					outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrMemberNotFound),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data:             nil,
+				Error:            &sharedviewmodel.ErrorPayload{Code: strconv.Itoa(errorcode.ErrMemberNotFound), Message: ""},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 404,
+		},
+		{
+			name: "usecase error - gateway db error",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id/email --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdateEmail-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1/email",
+					strings.NewReader(`{"new_email":"testupdate@gmail.com","password":"test123"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				uc.EXPECT().UpdateMemberEmail(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
+					usecase.ErrUseCaseMemberGatewayError,
+				)
+				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
+					errorcode.ErrMemberDBError,
+					outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrMemberDBError),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data:             nil,
+				Error:            &sharedviewmodel.ErrorPayload{Code: strconv.Itoa(errorcode.ErrMemberDBError), Message: ""},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 500,
+		},
+		{
+			name: "usecase error - email already used",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id/email --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdateEmail-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1/email",
+					strings.NewReader(`{"new_email":"updatetest@gmail.com","password":"test123"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				uc.EXPECT().UpdateMemberEmail(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
+					usecase.ErrUseCaseMemberEmailAlreadyExists,
+				)
+				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
+					errorcode.ErrMemberEmailAlreadyExists,
+					outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrMemberEmailAlreadyExists),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data:             nil,
+				Error:            &sharedviewmodel.ErrorPayload{Code: strconv.Itoa(errorcode.ErrMemberEmailAlreadyExists), Message: ""},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 409,
+		},
+		{
+			name: "usecase error - same email",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id/email --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdateEmail-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1/email",
+					strings.NewReader(`{"new_email":"updateemail@gmail.com","password":"test123"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				uc.EXPECT().UpdateMemberEmail(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
+					usecase.ErrUseCaseMemberUpdateSameEmail,
+				)
+				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
+					errorcode.ErrMemberUpdateSameEmail,
+					outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrMemberUpdateSameEmail),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data:             nil,
+				Error:            &sharedviewmodel.ErrorPayload{Code: strconv.Itoa(errorcode.ErrMemberUpdateSameEmail), Message: ""},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 409,
+		},
+		{
+			name: "usecase error - password incorrect",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1/email",
+					strings.NewReader(`{"new_email":"updatetest@gmail.com","password":"test123"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				uc.EXPECT().UpdateMemberEmail(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
+					usecase.ErrUseCaseMemberPasswordIncorrect,
+				)
+				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
+					errorcode.ErrMemberPasswordIncorrect,
+					outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrMemberPasswordIncorrect),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data:             nil,
+				Error:            &sharedviewmodel.ErrorPayload{Code: strconv.Itoa(errorcode.ErrMemberPasswordIncorrect), Message: ""},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 401,
+		},
+		{
+			name: "usecase error - no effect",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id/email --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdateEmail-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1/email",
+					strings.NewReader(`{"new_email":"updatetest@gmail.com","password":"test123"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				uc.EXPECT().UpdateMemberEmail(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
+					usecase.ErrUseCaseMemberNoEffect,
+				)
+				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
+					errorcode.ErrMemberNoEffect,
+					outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrMemberNoEffect),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data:             nil,
+				Error:            &sharedviewmodel.ErrorPayload{Code: strconv.Itoa(errorcode.ErrMemberNoEffect), Message: ""},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 422,
+		},
+		{
+			name: "usecase error - unknown error",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id/email --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdateEmail-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1/email",
+					strings.NewReader(`{"new_email":"updatetest@gmail.com","password":"test123"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				uc.EXPECT().UpdateMemberEmail(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
+					errors.New("unknown error"),
+				)
+				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
+					errorcode.ErrMemberGatewayError,
+					outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrMemberGatewayError),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data:             nil,
+				Error:            &sharedviewmodel.ErrorPayload{Code: strconv.Itoa(errorcode.ErrMemberGatewayError), Message: ""},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 500,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockUseCase := mock.NewMockMemberInputPort(ctrl)
+			mockPresenter := mock.NewMockMemberPresenter(ctrl)
+			c := &MemberController{
+				usecase:   mockUseCase,
+				presenter: mockPresenter,
+			}
+			ginCtx, responseWriter := GinCtxHelper(t)
+			tt.setupGinCtx(ginCtx)
+			tt.setupPort(mockUseCase, mockPresenter)
+			c.UpdateEmail(ginCtx)
+			response := responseWriter.Body.String()
+			gotStatus := responseWriter.Code
+			t.Logf("\n\tgotStatus:%d,wantStatus:%d", gotStatus, tt.wantStatus)
+			assert.Equal(t, tt.wantStatus, gotStatus)
+			if tt.want == nil && tt.wantErr == nil {
+				t.Fatalf("wantErr should be nil when want is not nil")
+			}
+			if tt.want != nil {
+				var got outputmodel.UpdateMemberEmailResponse
+				err := json.Unmarshal([]byte(response), &got)
+				if err != nil {
+					t.Fatalf("failed to unmarshal response: %v", err)
+				}
+				t.Logf("\n\tgot %+v\n\twant %+v", got, *tt.want)
+				assert.Equal(t, tt.want, &got)
+			} else if tt.wantErr != nil {
+				var got outputmodel.ErrorResponse
+				err := json.Unmarshal([]byte(response), &got)
+				if err != nil {
+					t.Fatalf("failed to unmarshal response: %v", err)
+				}
+				t.Logf("\n\tgot %+v\n\twantErr %+v", got, *tt.wantErr)
+				assert.Equal(t, tt.wantErr, &got)
+			}
+		})
+	}
+}
+
+func TestMemberController_UpdatePassword(t *testing.T) {
+	type fields struct {
+		usecase   input.MemberInputPort
+		presenter output.MemberPresenter
+	}
+	type args struct {
+		ctx *gin.Context
+	}
+	ctrl, testTime := portHelper(t)
+	tests := []struct {
+		name        string
+		fields      fields
+		args        args
+		setupGinCtx func(ginCtx *gin.Context)
+		setupPort   func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter)
+		want        *outputmodel.UpdateMemberPasswordResponse
+		wantErr     *outputmodel.ErrorResponse
+		wantStatus  int
+	}{
+		{
+			name: "normal case",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id/password --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdatePassword-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1/password",
+					strings.NewReader(`{"old_password":"oldpass123","new_password":"newpass123"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				uc.EXPECT().UpdateMemberPassword(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
+				p.EXPECT().PresentUpdateMemberPassword().Return(
+					outputmodel.UpdateMemberPasswordResponse{
+						Data:  dto.UpdateMemberPasswordResponseDTO{},
+						Error: nil,
+						Meta:  nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{
+							UnixTimeStamp:    testTime.Unix(),
+							RFC3339TimeStamp: testTime.Format(time.RFC3339),
+							Status:           enum.APIStatusSuccess,
+						},
+					},
+				)
+			},
+			want: &outputmodel.UpdateMemberPasswordResponse{
+				Data:  dto.UpdateMemberPasswordResponseDTO{},
+				Error: nil,
+				Meta:  nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{
+					UnixTimeStamp:    testTime.Unix(),
+					RFC3339TimeStamp: testTime.Format(time.RFC3339),
+					Status:           enum.APIStatusSuccess,
+				},
+			},
+			wantErr:    nil,
+			wantStatus: 200,
+		},
+		{
+			name: "binding error - invalid URI",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id/password --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdatePassword-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "invalid-id"},
+				}
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				p.EXPECT().PresentBindingError(gomock.Any(), gomock.Any()).Return(
+					outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrInvalidParams),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data:             nil,
+				Error:            &sharedviewmodel.ErrorPayload{Code: strconv.Itoa(errorcode.ErrInvalidParams), Message: ""},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 400,
+		},
+		{
+			name: "validation error - uri invalid",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id/password --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdatePassword-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "-1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1/password",
+					strings.NewReader(`{"old_password":"oldpass123","new_password":"newpass123"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				p.EXPECT().PresentValidationError(gomock.Any()).Return(
+					errorcode.ErrInvalidParams, outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrInvalidParams),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data:             nil,
+				Error:            &sharedviewmodel.ErrorPayload{Code: strconv.Itoa(errorcode.ErrInvalidParams), Message: ""},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 400,
+		},
+		{
+			name: "binding error - invalid body",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id/password --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdatePassword-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1/password",
+					strings.NewReader(`{"old_password":"","new_password":"newpass123"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				p.EXPECT().PresentBindingError(gomock.Any(), gomock.Any()).Return(
+					outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrInvalidParams),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data:             nil,
+				Error:            &sharedviewmodel.ErrorPayload{Code: strconv.Itoa(errorcode.ErrInvalidParams), Message: ""},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 400,
+		},
+		{
+			name: "validation error - old password too short",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id/password --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdatePassword-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1/password",
+					strings.NewReader(`{"old_password":"123","new_password":"newpass123"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				p.EXPECT().PresentValidationError(gomock.Any()).Return(
+					errorcode.ErrValidationFailed, outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrValidationFailed),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data:             nil,
+				Error:            &sharedviewmodel.ErrorPayload{Code: strconv.Itoa(errorcode.ErrValidationFailed), Message: ""},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 400,
+		},
+		{
+			name: "validation error - new password too short",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id/password --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdatePassword-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1/password",
+					strings.NewReader(`{"old_password":"oldpass123","new_password":"123"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				p.EXPECT().PresentValidationError(gomock.Any()).Return(
+					errorcode.ErrValidationFailed, outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrValidationFailed),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data:             nil,
+				Error:            &sharedviewmodel.ErrorPayload{Code: strconv.Itoa(errorcode.ErrValidationFailed), Message: ""},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 400,
+		},
+		{
+			name: "usecase error - same password",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id/password --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdatePassword-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1/password",
+					strings.NewReader(`{"old_password":"oldpass123","new_password":"oldpass123"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				uc.EXPECT().UpdateMemberPassword(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
+					usecase.ErrUseCaseMemberUpdateSamePassword,
+				)
+				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
+					errorcode.ErrMemberUpdateSamePassword,
+					outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrMemberUpdateSamePassword),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data:             nil,
+				Error:            &sharedviewmodel.ErrorPayload{Code: strconv.Itoa(errorcode.ErrMemberUpdateSamePassword), Message: ""},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 409,
+		},
+		{
+			name: "usecase error - member not found",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id/password --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdatePassword-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1/password",
+					strings.NewReader(`{"old_password":"oldpass123","new_password":"newpass123"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				uc.EXPECT().UpdateMemberPassword(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
+					usecase.ErrUseCaseMemberNotFound,
+				)
+				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
+					errorcode.ErrMemberNotFound,
+					outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrMemberNotFound),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data:             nil,
+				Error:            &sharedviewmodel.ErrorPayload{Code: strconv.Itoa(errorcode.ErrMemberNotFound), Message: ""},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 404,
+		},
+		{
+			name: "usecase error - password incorrect",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id/password --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdatePassword-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1/password",
+					strings.NewReader(`{"old_password":"wrongpass123","new_password":"newpass123"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				uc.EXPECT().UpdateMemberPassword(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
+					usecase.ErrUseCaseMemberPasswordIncorrect,
+				)
+				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
+					errorcode.ErrMemberPasswordIncorrect,
+					outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrMemberPasswordIncorrect),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data:             nil,
+				Error:            &sharedviewmodel.ErrorPayload{Code: strconv.Itoa(errorcode.ErrMemberPasswordIncorrect), Message: ""},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 401,
+		},
+		{
+			name: "usecase error - no effect",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id/password --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdatePassword-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1/password",
+					strings.NewReader(`{"old_password":"oldpass123","new_password":"newpass123"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				uc.EXPECT().UpdateMemberPassword(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
+					usecase.ErrUseCaseMemberNoEffect,
+				)
+				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
+					errorcode.ErrMemberNoEffect,
+					outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrMemberNoEffect),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data:             nil,
+				Error:            &sharedviewmodel.ErrorPayload{Code: strconv.Itoa(errorcode.ErrMemberNoEffect), Message: ""},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 422,
+		},
+		{
+			name: "usecase error - gateway db error",
+			fields: fields{
+				usecase:   mock.NewMockMemberInputPort(ctrl),
+				presenter: mock.NewMockMemberPresenter(ctrl),
+			},
+			args: args{
+				ctx: nil,
+			},
+			setupGinCtx: func(ginCtx *gin.Context) {
+				//[GIN-debug] PATCH  /api/v1/members/:id/password --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdatePassword-fm (2 handlers)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1/password",
+					strings.NewReader(`{"old_password":"oldpass123","new_password":"newpass123"}`),
+				)
+			},
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+				uc.EXPECT().UpdateMemberPassword(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
+					usecase.ErrUseCaseMemberGatewayError,
+				)
+				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
+					errorcode.ErrMemberDBError,
+					outputmodel.ErrorResponse{
+						Data: nil,
+						Error: &sharedviewmodel.ErrorPayload{
+							Code:    strconv.Itoa(errorcode.ErrMemberDBError),
+							Message: "",
+						},
+						Meta:             nil,
+						BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+					},
+				)
+			},
+			want: nil,
+			wantErr: &outputmodel.ErrorResponse{
+				Data:             nil,
+				Error:            &sharedviewmodel.ErrorPayload{Code: strconv.Itoa(errorcode.ErrMemberDBError), Message: ""},
+				Meta:             nil,
+				BaseHTTPResponse: sharedviewmodel.BaseHTTPResponse{},
+			},
+			wantStatus: 500,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockUseCase := mock.NewMockMemberInputPort(ctrl)
+			mockPresenter := mock.NewMockMemberPresenter(ctrl)
+			c := &MemberController{
+				usecase:   mockUseCase,
+				presenter: mockPresenter,
+			}
+			ginCtx, responseWriter := GinCtxHelper(t)
+			tt.setupGinCtx(ginCtx)
+			tt.setupPort(mockUseCase, mockPresenter)
+			c.UpdatePassword(ginCtx)
+			response := responseWriter.Body.String()
+			gotStatus := responseWriter.Code
+			t.Logf("\n\tgotStatus:%d,wantStatus:%d", gotStatus, tt.wantStatus)
+			assert.Equal(t, tt.wantStatus, gotStatus)
+			if tt.want == nil && tt.wantErr == nil {
+				t.Fatalf("wantErr should be nil when want is not nil")
+			}
+			if tt.want != nil {
+				var got outputmodel.UpdateMemberPasswordResponse
+				err := json.Unmarshal([]byte(response), &got)
+				if err != nil {
+					t.Fatalf("failed to unmarshal response: %v", err)
+				}
+				t.Logf("\n\tgot %+v\n\twant %+v", got, *tt.want)
+				assert.Equal(t, tt.want, &got)
+			} else if tt.wantErr != nil {
+				var got outputmodel.ErrorResponse
+				err := json.Unmarshal([]byte(response), &got)
+				if err != nil {
+					t.Fatalf("failed to unmarshal response: %v", err)
+				}
+				t.Logf("\n\tgot %+v\n\twantErr %+v", got, *tt.wantErr)
+				assert.Equal(t, tt.wantErr, &got)
+			}
 		})
 	}
 }
 
 func TestNewMemberController(t *testing.T) {
-	type args struct {
-		memberUseCase input.MemberInputPort
-		presenter     output.MemberPresenter
-	}
-	tests := []struct {
-		name string
-		args args
-		want *MemberController
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewMemberController(tt.args.memberUseCase, tt.args.presenter); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewMemberController() = %v, want %v", got, tt.want)
-			}
-		})
-	}
+	ctrl, _ := portHelper(t)
+	usecaseGateway := mock.NewMockMemberInputPort(ctrl)
+	presenterGateway := mock.NewMockMemberPresenter(ctrl)
+	got := NewMemberController(usecaseGateway, presenterGateway)
+	assert.NotNil(t, got)
+	assert.Equal(t, usecaseGateway, got.usecase)
+	assert.Equal(t, presenterGateway, got.presenter)
 }
 func portHelper(t *testing.T) (*gomock.Controller, time.Time) {
 	t.Helper()

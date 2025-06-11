@@ -38,9 +38,20 @@ func (p *MemberPresenter) PresentListMembers(members []*entity.Member, total int
 	return buildSuccessResponseWithMeta(respDTO, meta)
 }
 
-func (p *MemberPresenter) PresentUpdateMember(member *entity.Member) outputmodel.UpdateMemberResponse {
-	respDTO := mapper.EntityToUpdateMemberResponseDTO(member)
+func (p *MemberPresenter) PresentUpdateMemberProfile(member *entity.Member) outputmodel.UpdateMemberProfileResponse {
+	respDTO := mapper.EntityToUpdateMemberProfileResponseDTO(member)
 	return buildSuccessResponse(respDTO)
+}
+
+func (p *MemberPresenter) PresentUpdateMemberEmail() outputmodel.UpdateMemberEmailResponse {
+	respDTO := mapper.EntityToUpdateMemberEmailResponseDTO()
+	return buildSuccessResponse(respDTO)
+}
+
+func (p *MemberPresenter) PresentUpdateMemberPassword() outputmodel.UpdateMemberPasswordResponse {
+	respDTO := mapper.EntityToUpdateMemberPasswordResponseDTO()
+	return buildSuccessResponse(respDTO)
+
 }
 
 func (p *MemberPresenter) PresentDeleteMember(member *entity.Member) outputmodel.DeleteMemberResponse {
@@ -58,7 +69,7 @@ func (p *MemberPresenter) PresentValidationError(err error) (int, outputmodel.Er
 }
 
 func (p *MemberPresenter) PresentUseCaseError(err error) (int, outputmodel.ErrorResponse) {
-	errCode, message := MapMemberUseCaseError(err)
+	errCode, message := MapMemberUseCaseToPresenterError(err)
 	return errCode, buildFailedResponse(errCode, message)
 }
 

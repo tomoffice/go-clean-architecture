@@ -19,6 +19,8 @@ func (r *MemberRouter) RegisterRoutes(router *gin.RouterGroup) {
 	member.GET("/:id", r.controller.GetByID)
 	member.GET("/email/:email", r.controller.GetByEmail)
 	member.GET("", r.controller.List)
-	member.PUT("/:id", r.controller.Update)
+	member.PATCH("/:id", r.controller.UpdateProfile)
+	member.PATCH("/:id/email", r.controller.UpdateEmail)
+	member.PATCH("/:id/password", r.controller.UpdatePassword)
 	member.DELETE("/:id", r.controller.Delete)
 }

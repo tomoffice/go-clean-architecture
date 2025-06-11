@@ -124,17 +124,45 @@ func (mr *MockMemberRepositoryMockRecorder) GetByID(ctx, id interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetByID", reflect.TypeOf((*MockMemberRepository)(nil).GetByID), ctx, id)
 }
 
-// Update mocks base method.
-func (m_2 *MockMemberRepository) Update(ctx context.Context, m *entity.Member) (*entity.Member, error) {
+// UpdateEmail mocks base method.
+func (m *MockMemberRepository) UpdateEmail(ctx context.Context, id int, newEmail string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateEmail", ctx, id, newEmail)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateEmail indicates an expected call of UpdateEmail.
+func (mr *MockMemberRepositoryMockRecorder) UpdateEmail(ctx, id, newEmail interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateEmail", reflect.TypeOf((*MockMemberRepository)(nil).UpdateEmail), ctx, id, newEmail)
+}
+
+// UpdatePassword mocks base method.
+func (m *MockMemberRepository) UpdatePassword(ctx context.Context, id int, newPassword string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdatePassword", ctx, id, newPassword)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdatePassword indicates an expected call of UpdatePassword.
+func (mr *MockMemberRepositoryMockRecorder) UpdatePassword(ctx, id, newPassword interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdatePassword", reflect.TypeOf((*MockMemberRepository)(nil).UpdatePassword), ctx, id, newPassword)
+}
+
+// UpdateProfile mocks base method.
+func (m_2 *MockMemberRepository) UpdateProfile(ctx context.Context, m *entity.Member) (*entity.Member, error) {
 	m_2.ctrl.T.Helper()
-	ret := m_2.ctrl.Call(m_2, "Update", ctx, m)
+	ret := m_2.ctrl.Call(m_2, "UpdateProfile", ctx, m)
 	ret0, _ := ret[0].(*entity.Member)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// Update indicates an expected call of Update.
-func (mr *MockMemberRepositoryMockRecorder) Update(ctx, m interface{}) *gomock.Call {
+// UpdateProfile indicates an expected call of UpdateProfile.
+func (mr *MockMemberRepositoryMockRecorder) UpdateProfile(ctx, m interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockMemberRepository)(nil).Update), ctx, m)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateProfile", reflect.TypeOf((*MockMemberRepository)(nil).UpdateProfile), ctx, m)
 }

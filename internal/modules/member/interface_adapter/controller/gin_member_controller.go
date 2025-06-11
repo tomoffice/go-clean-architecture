@@ -131,7 +131,7 @@ func (c *MemberController) List(ctx *gin.Context) {
 	resp := c.presenter.PresentListMembers(members, total)
 	ctx.JSON(http.StatusOK, resp)
 }
-func (c *MemberController) Update(ctx *gin.Context) {
+func (c *MemberController) UpdateProfile(ctx *gin.Context) {
 	var ginURI gindto.GinUpdateMemberURIRequestDTO
 	if err := ctx.ShouldBindUri(&ginURI); err != nil {
 		errCode, errMsg := errordefs.MapGinBindingError(err)
@@ -140,7 +140,7 @@ func (c *MemberController) Update(ctx *gin.Context) {
 		ctx.JSON(httpStatus, resp)
 		return
 	}
-	var ginBody gindto.GinUpdateMemberBodyRequestDTO
+	var ginBody gindto.GinUpdateMemberProfileBodyRequestDTO
 	if err := ctx.ShouldBindJSON(&ginBody); err != nil {
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
@@ -148,22 +148,91 @@ func (c *MemberController) Update(ctx *gin.Context) {
 		ctx.JSON(httpStatus, resp)
 		return
 	}
-	reqDTO := ginmapper.GinDTOToUpdateMemberDTO(ginURI, ginBody)
+	reqDTO := ginmapper.GinDTOToUpdateMemberProfileDTO(ginURI, ginBody)
 	if err := reqDTO.Validate(); err != nil {
 		errCode, resp := c.presenter.PresentValidationError(err)
 		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
-	inputModel := mapper.UpdateMemberDTOToInputModel(reqDTO)
-	member, err := c.usecase.UpdateMember(ctx, inputModel)
+	inputModel := mapper.UpdateMemberProfileDTOToInputModel(reqDTO)
+	member, err := c.usecase.UpdateMemberProfile(ctx, inputModel)
 	if err != nil {
 		errCode, resp := c.presenter.PresentUseCaseError(err)
 		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
-	resp := c.presenter.PresentUpdateMember(member)
+	resp := c.presenter.PresentUpdateMemberProfile(member)
+	ctx.JSON(http.StatusOK, resp)
+}
+func (c *MemberController) UpdateEmail(ctx *gin.Context) {
+	var ginURI gindto.GinUpdateMemberURIRequestDTO
+	if err := ctx.ShouldBindUri(&ginURI); err != nil {
+		errCode, errMsg := errordefs.MapGinBindingError(err)
+		resp := c.presenter.PresentBindingError(errCode, errMsg)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
+		ctx.JSON(httpStatus, resp)
+		return
+	}
+	var ginBody gindto.GinUpdateMemberEmailBodyRequestDTO
+	if err := ctx.ShouldBindJSON(&ginBody); err != nil {
+		errCode, errMsg := errordefs.MapGinBindingError(err)
+		resp := c.presenter.PresentBindingError(errCode, errMsg)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
+		ctx.JSON(httpStatus, resp)
+		return
+	}
+	reqDTO := ginmapper.GinDTOToUpdateMemberEmailDTO(ginURI, ginBody)
+	if err := reqDTO.Validate(); err != nil {
+		errCode, resp := c.presenter.PresentValidationError(err)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
+		ctx.JSON(httpStatus, resp)
+		return
+	}
+	inputModel := mapper.UpdateMemberEmailDTOToEntity(reqDTO)
+	if err := c.usecase.UpdateMemberEmail(ctx, inputModel.ID, inputModel.Email, inputModel.Password); err != nil {
+		errCode, resp := c.presenter.PresentUseCaseError(err)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
+		ctx.JSON(httpStatus, resp)
+		return
+	}
+	resp := c.presenter.PresentUpdateMemberEmail()
+	ctx.JSON(http.StatusOK, resp)
+
+}
+func (c *MemberController) UpdatePassword(ctx *gin.Context) {
+	var ginURI gindto.GinUpdateMemberURIRequestDTO
+	if err := ctx.ShouldBindUri(&ginURI); err != nil {
+		errCode, errMsg := errordefs.MapGinBindingError(err)
+		resp := c.presenter.PresentBindingError(errCode, errMsg)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
+		ctx.JSON(httpStatus, resp)
+		return
+	}
+	var ginBody gindto.GinUpdateMemberPasswordBodyRequestDTO
+	if err := ctx.ShouldBindJSON(&ginBody); err != nil {
+		errCode, errMsg := errordefs.MapGinBindingError(err)
+		resp := c.presenter.PresentBindingError(errCode, errMsg)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
+		ctx.JSON(httpStatus, resp)
+		return
+	}
+	reqDTO := ginmapper.GinDTOToUpdateMemberPasswordDTO(ginURI, ginBody)
+	if err := reqDTO.Validate(); err != nil {
+		errCode, resp := c.presenter.PresentValidationError(err)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
+		ctx.JSON(httpStatus, resp)
+		return
+	}
+	inputModel := mapper.UpdateMemberPasswordDTOToInputModel(reqDTO)
+	if err := c.usecase.UpdateMemberPassword(ctx, inputModel.ID, inputModel.OldPassword, inputModel.NewPassword); err != nil {
+		errCode, resp := c.presenter.PresentUseCaseError(err)
+		httpStatus := MapErrorCodeToHTTPStatus(errCode)
+		ctx.JSON(httpStatus, resp)
+		return
+	}
+	resp := c.presenter.PresentUpdateMemberPassword()
 	ctx.JSON(http.StatusOK, resp)
 }
 func (c *MemberController) Delete(ctx *gin.Context) {

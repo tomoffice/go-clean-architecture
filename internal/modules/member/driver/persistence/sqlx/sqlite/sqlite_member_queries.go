@@ -5,7 +5,9 @@ const (
 	querySelectByID    = `SELECT * FROM members WHERE id = ?`
 	querySelectByEmail = `SELECT * FROM members WHERE email = ?`
 	querySelectAllBase = `SELECT * FROM members ORDER BY %s %s LIMIT ? OFFSET ?`
-	queryUpdateMember  = `UPDATE members SET name = ?, email = ?, password = ? WHERE id = ?`
+	queryUpdateMemberProfile  = `UPDATE members SET name = ? WHERE id = ?`
+	queryUpdateMemberEmail    = `UPDATE members SET email = ? WHERE id = ?`
+	queryUpdateMemberPassword = `UPDATE members SET password = ? WHERE id = ?`
 	queryDeleteMember  = `DELETE FROM members WHERE id = ?`
 	queryCountMembers  = `SELECT COUNT(*) FROM members`
 )

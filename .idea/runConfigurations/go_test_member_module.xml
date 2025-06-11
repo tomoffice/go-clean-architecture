@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="go test module-clean" type="GoTestRunConfiguration" factoryName="Go Test" nameIsGenerated="true">
+  <configuration default="false" name="go test member module" type="GoTestRunConfiguration" factoryName="Go Test">
     <module name="module-clean" />
     <working_directory value="$PROJECT_DIR$" />
     <EXTENSION ID="net.ashald.envfile">
@@ -14,7 +14,7 @@
     </EXTENSION>
     <kind value="DIRECTORY" />
     <package value="module-clean" />
-    <directory value="$PROJECT_DIR$" />
+    <directory value="$PROJECT_DIR$/internal/modules" />
     <filePath value="$PROJECT_DIR$" />
     <framework value="gotest" />
     <method v="2" />

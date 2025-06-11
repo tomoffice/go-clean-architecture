@@ -13,6 +13,8 @@ type MemberInputPort interface {
 	GetMemberByID(ctx context.Context, id int) (*entity.Member, error)
 	GetMemberByEmail(ctx context.Context, email string) (*entity.Member, error)
 	ListMembers(ctx context.Context, pagination pagination.Pagination) ([]*entity.Member, int, error)
-	UpdateMember(ctx context.Context, patch *inputmodel.PatchUpdateMemberInputModel) (*entity.Member, error)
+	UpdateMemberProfile(ctx context.Context, patch *inputmodel.PatchUpdateMemberProfileInputModel) (*entity.Member, error)
+	UpdateMemberEmail(ctx context.Context, id int, newEmail ,password string) error
+	UpdateMemberPassword(ctx context.Context, id int, oldPassword,newPassword string) error
 	DeleteMember(ctx context.Context, id int) (*entity.Member, error)
 }

@@ -17,10 +17,8 @@ func MapInfraErrorToGatewayError(err error) error {
 		return ErrGatewayMemberNotFound
 	case errors.Is(err, sqlite.ErrDBDuplicateKey):
 		return ErrGatewayMemberAlreadyExists
-	case errors.Is(err, sqlite.ErrDBUpdateNoEffect):
-		return ErrGatewayMemberUpdateFailed
-	case errors.Is(err, sqlite.ErrDBDeleteNoEffect):
-		return ErrGatewayMemberDeleteFailed
+	case errors.Is(err, sqlite.ErrDBNoEffect):
+		return ErrGatewayMemberNoEffect
 	}
 	// 萬一錯誤不是 CustomError instance，要用 As 抓 DBError
 	var dbErr *sqlite.DBError

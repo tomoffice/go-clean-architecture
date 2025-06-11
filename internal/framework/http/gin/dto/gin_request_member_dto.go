@@ -29,10 +29,22 @@ type GinListMemberQueryRequestDTO struct {
 type GinUpdateMemberURIRequestDTO struct {
 	ID int `uri:"id" binding:"required"`
 }
-type GinUpdateMemberBodyRequestDTO struct {
+
+// GinUpdateMemberProfileBodyRequestDTO (PATCH /api/v1/members/:id)
+type GinUpdateMemberProfileBodyRequestDTO struct {
 	Name     *string `json:"name,omitempty" binding:"omitempty"`
-	Email    *string `json:"email,omitempty" binding:"omitempty"`
-	Password *string `json:"password,omitempty" binding:"omitempty"`
+}
+
+// GinUpdateMemberEmailBodyRequestDTO (PATCH /api/v1/members/:id/email)
+type GinUpdateMemberEmailBodyRequestDTO struct {
+	NewEmail string `json:"new_email" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+// GinUpdateMemberPasswordBodyRequestDTO (PATCH /api/v1/members/:id/password)
+type GinUpdateMemberPasswordBodyRequestDTO struct {
+	OldPassword string `json:"old_password" binding:"required"`
+	NewPassword string `json:"new_password" binding:"required"`
 }
 
 // GinDeleteMemberURIRequestDTO (DELETE /api/v1/members/:id)

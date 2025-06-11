@@ -11,7 +11,9 @@ type MemberPresenter interface {
 	PresentGetMemberByID(member *entity.Member) outputmodel.GetMemberByIDResponse
 	PresentGetMemberByEmail(member *entity.Member) outputmodel.GetMemberByEmailResponse
 	PresentListMembers(members []*entity.Member, total int) outputmodel.ListMemberResponse
-	PresentUpdateMember(member *entity.Member) outputmodel.UpdateMemberResponse
+	PresentUpdateMemberProfile(member *entity.Member) outputmodel.UpdateMemberProfileResponse
+	PresentUpdateMemberEmail() outputmodel.UpdateMemberEmailResponse
+	PresentUpdateMemberPassword() outputmodel.UpdateMemberPasswordResponse
 	PresentDeleteMember(member *entity.Member) outputmodel.DeleteMemberResponse
 	// PresentBindingError 處理輸入綁定錯誤
 	PresentBindingError(errCode int, message string) outputmodel.ErrorResponse

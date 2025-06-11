@@ -56,12 +56,24 @@ func ListMemberDTOToPagination(request dto.ListMemberRequestDTO) *pagination.Pag
 		OrderBy: orderBy,
 	}
 }
-func UpdateMemberDTOToInputModel(dto dto.UpdateMemberRequestDTO) *inputmodel.PatchUpdateMemberInputModel {
-	return &inputmodel.PatchUpdateMemberInputModel{
-		ID:       dto.ID,
-		Name:     dto.Name,
-		Email:    dto.Email,
-		Password: dto.Password,
+func UpdateMemberProfileDTOToInputModel(dto dto.UpdateMemberProfileRequestDTO) *inputmodel.PatchUpdateMemberProfileInputModel {
+	return &inputmodel.PatchUpdateMemberProfileInputModel{
+		ID:   dto.ID,
+		Name: dto.Name,
+	}
+}
+func UpdateMemberEmailDTOToEntity(request dto.UpdateMemberEmailRequestDTO) *entity.Member {
+	return &entity.Member{
+		ID:       request.ID,
+		Email:    request.NewEmail,
+		Password: request.Password,
+	}
+}
+func UpdateMemberPasswordDTOToInputModel(request dto.UpdateMemberPasswordRequestDTO) *inputmodel.PatchUpdateMemberPasswordInputModel {
+	return &inputmodel.PatchUpdateMemberPasswordInputModel{
+		ID:          request.ID,
+		OldPassword: request.OldPassword,
+		NewPassword: request.NewPassword,
 	}
 }
 func DeleteMemberDTOToEntity(request dto.DeleteMemberRequestDTO) *entity.Member {

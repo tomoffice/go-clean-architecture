@@ -119,18 +119,46 @@ func (mr *MockMemberPresenterMockRecorder) PresentRegisterMember(member interfac
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PresentRegisterMember", reflect.TypeOf((*MockMemberPresenter)(nil).PresentRegisterMember), member)
 }
 
-// PresentUpdateMember mocks base method.
-func (m *MockMemberPresenter) PresentUpdateMember(member *entity.Member) outputmodel.UpdateMemberResponse {
+// PresentUpdateMemberEmail mocks base method.
+func (m *MockMemberPresenter) PresentUpdateMemberEmail() outputmodel.UpdateMemberEmailResponse {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PresentUpdateMember", member)
-	ret0, _ := ret[0].(outputmodel.UpdateMemberResponse)
+	ret := m.ctrl.Call(m, "PresentUpdateMemberEmail")
+	ret0, _ := ret[0].(outputmodel.UpdateMemberEmailResponse)
 	return ret0
 }
 
-// PresentUpdateMember indicates an expected call of PresentUpdateMember.
-func (mr *MockMemberPresenterMockRecorder) PresentUpdateMember(member interface{}) *gomock.Call {
+// PresentUpdateMemberEmail indicates an expected call of PresentUpdateMemberEmail.
+func (mr *MockMemberPresenterMockRecorder) PresentUpdateMemberEmail() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PresentUpdateMember", reflect.TypeOf((*MockMemberPresenter)(nil).PresentUpdateMember), member)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PresentUpdateMemberEmail", reflect.TypeOf((*MockMemberPresenter)(nil).PresentUpdateMemberEmail))
+}
+
+// PresentUpdateMemberPassword mocks base method.
+func (m *MockMemberPresenter) PresentUpdateMemberPassword() outputmodel.UpdateMemberPasswordResponse {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PresentUpdateMemberPassword")
+	ret0, _ := ret[0].(outputmodel.UpdateMemberPasswordResponse)
+	return ret0
+}
+
+// PresentUpdateMemberPassword indicates an expected call of PresentUpdateMemberPassword.
+func (mr *MockMemberPresenterMockRecorder) PresentUpdateMemberPassword() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PresentUpdateMemberPassword", reflect.TypeOf((*MockMemberPresenter)(nil).PresentUpdateMemberPassword))
+}
+
+// PresentUpdateMemberProfile mocks base method.
+func (m *MockMemberPresenter) PresentUpdateMemberProfile(member *entity.Member) outputmodel.UpdateMemberProfileResponse {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PresentUpdateMemberProfile", member)
+	ret0, _ := ret[0].(outputmodel.UpdateMemberProfileResponse)
+	return ret0
+}
+
+// PresentUpdateMemberProfile indicates an expected call of PresentUpdateMemberProfile.
+func (mr *MockMemberPresenterMockRecorder) PresentUpdateMemberProfile(member interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PresentUpdateMemberProfile", reflect.TypeOf((*MockMemberPresenter)(nil).PresentUpdateMemberProfile), member)
 }
 
 // PresentUseCaseError mocks base method.

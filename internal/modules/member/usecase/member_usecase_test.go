@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/golang/mock/gomock"
+	"github.com/stretchr/testify/assert"
 	"module-clean/internal/modules/member/entity"
 	"module-clean/internal/modules/member/interface_adapter/gateway/repository"
 	"module-clean/internal/modules/member/interface_adapter/inputmodel"
@@ -61,7 +62,8 @@ func TestMemberUseCase_DeleteMember(t *testing.T) {
 				)
 			},
 			wantErr: nil,
-		}, {
+		},
+		{
 			name: "no member found",
 			fields: fields{
 				MemberRepo: mock.NewMockMemberRepository(ctrl),
@@ -75,7 +77,8 @@ func TestMemberUseCase_DeleteMember(t *testing.T) {
 				r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberNotFound)
 			},
 			wantErr: MapGatewayErrorToUseCaseError(repository.ErrGatewayMemberNotFound),
-		}, {
+		},
+		{
 			name: "got member but delete error",
 			fields: fields{
 				MemberRepo: mock.NewMockMemberRepository(ctrl),
@@ -92,7 +95,8 @@ func TestMemberUseCase_DeleteMember(t *testing.T) {
 				)
 			},
 			wantErr: MapGatewayErrorToUseCaseError(repository.ErrGatewayMemberDBError),
-		}, {
+		},
+		{
 			name: "delete no affect",
 			fields: fields{
 				MemberRepo: mock.NewMockMemberRepository(ctrl),
@@ -105,10 +109,10 @@ func TestMemberUseCase_DeleteMember(t *testing.T) {
 			repoSetup: func(r *mock.MockMemberRepository) {
 				gomock.InOrder(
 					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{}, nil),
-					r.EXPECT().Delete(ctx, gomock.Any()).Return(repository.ErrGatewayMemberDeleteFailed),
+					r.EXPECT().Delete(ctx, gomock.Any()).Return(repository.ErrGatewayMemberNoEffect),
 				)
 			},
-			wantErr: MapGatewayErrorToUseCaseError(repository.ErrGatewayMemberDeleteFailed),
+			wantErr: MapGatewayErrorToUseCaseError(repository.ErrGatewayMemberNoEffect),
 		},
 	}
 	for _, tt := range tests {
@@ -118,7 +122,7 @@ func TestMemberUseCase_DeleteMember(t *testing.T) {
 				t.Fatalf("expected *mock.MockMemberRepository, got %T", tt.fields.MemberRepo)
 			}
 			m := &MemberUseCase{
-				MemberRepo: mockRepo,
+				MemberGateway: mockRepo,
 			}
 			tt.repoSetup(mockRepo)
 			got, err := m.DeleteMember(tt.args.ctx, tt.args.id)
@@ -215,7 +219,7 @@ func TestMemberUseCase_GetMemberByEmail(t *testing.T) {
 				t.Fatalf("expected *mock.MockMemberRepository, got %T", tt.fields.MemberRepo)
 			}
 			m := &MemberUseCase{
-				MemberRepo: mockRepo,
+				MemberGateway: mockRepo,
 			}
 			tt.repoSetup(mockRepo)
 			got, err := m.GetMemberByEmail(tt.args.ctx, tt.args.email)
@@ -298,7 +302,7 @@ func TestMemberUseCase_GetMemberByID(t *testing.T) {
 				t.Fatalf("expected *mock.MockMemberRepository, got %T", tt.fields.MemberRepo)
 			}
 			m := &MemberUseCase{
-				MemberRepo: mockRepo,
+				MemberGateway: mockRepo,
 			}
 			tt.repoSetup(mockRepo)
 			got, err := m.GetMemberByID(tt.args.ctx, tt.args.id)
@@ -449,7 +453,7 @@ func TestMemberUseCase_ListMembers(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mockRepo := tt.fields.MemberRepo.(*mock.MockMemberRepository)
 			m := &MemberUseCase{
-				MemberRepo: mockRepo,
+				MemberGateway: mockRepo,
 			}
 			tt.setupRepo(mockRepo)
 			got, gotTotal, err := m.ListMembers(tt.args.ctx, tt.args.pagination)
@@ -595,7 +599,7 @@ func TestMemberUseCase_RegisterMember(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mockRepo := tt.fields.MemberRepo.(*mock.MockMemberRepository)
 			m := &MemberUseCase{
-				MemberRepo: mockRepo,
+				MemberGateway: mockRepo,
 			}
 			tt.setupRepo(mockRepo)
 			got, err := m.RegisterMember(tt.args.ctx, tt.args.member)
@@ -613,13 +617,13 @@ func TestMemberUseCase_RegisterMember(t *testing.T) {
 	}
 }
 
-func TestMemberUseCase_UpdateMember(t *testing.T) {
+func TestMemberUseCase_UpdateMemberProfile(t *testing.T) {
 	type fields struct {
 		MemberRepo output.MemberRepository
 	}
 	type args struct {
 		ctx   context.Context
-		patch *inputmodel.PatchUpdateMemberInputModel
+		patch *inputmodel.PatchUpdateMemberProfileInputModel
 	}
 	ctrl, ctx, testTime := repoHelper(t)
 	stringPtr := func(s string) *string {
@@ -629,9 +633,9 @@ func TestMemberUseCase_UpdateMember(t *testing.T) {
 		name      string
 		fields    fields
 		args      args
+		setupRepo func(*mock.MockMemberRepository)
 		want      *entity.Member
 		wantErr   error
-		setupRepo func(*mock.MockMemberRepository)
 	}{
 		{
 			name: "normal test",
@@ -640,11 +644,9 @@ func TestMemberUseCase_UpdateMember(t *testing.T) {
 			},
 			args: args{
 				ctx: ctx,
-				patch: &inputmodel.PatchUpdateMemberInputModel{
-					ID:       1,
-					Name:     stringPtr("gg1"),
-					Email:    nil,
-					Password: nil,
+				patch: &inputmodel.PatchUpdateMemberProfileInputModel{
+					ID:   1,
+					Name: stringPtr("gg1"),
 				},
 			},
 			want: &entity.Member{
@@ -664,7 +666,7 @@ func TestMemberUseCase_UpdateMember(t *testing.T) {
 						Password:  "",
 						CreatedAt: testTime,
 					}, nil),
-					r.EXPECT().Update(ctx, gomock.Any()).Return(&entity.Member{
+					r.EXPECT().UpdateProfile(ctx, gomock.Any()).Return(&entity.Member{
 						ID:        1,
 						Name:      "gg1",
 						Email:     "gg@gmail.com",
@@ -681,11 +683,9 @@ func TestMemberUseCase_UpdateMember(t *testing.T) {
 			},
 			args: args{
 				ctx: ctx,
-				patch: &inputmodel.PatchUpdateMemberInputModel{
-					ID:       1,
-					Name:     stringPtr("gg"),
-					Email:    nil,
-					Password: nil,
+				patch: &inputmodel.PatchUpdateMemberProfileInputModel{
+					ID:   1,
+					Name: stringPtr("gg"),
 				},
 			},
 			want:    nil,
@@ -701,15 +701,13 @@ func TestMemberUseCase_UpdateMember(t *testing.T) {
 			},
 			args: args{
 				ctx: ctx,
-				patch: &inputmodel.PatchUpdateMemberInputModel{
-					ID:       1,
-					Name:     stringPtr("gg1"),
-					Email:    nil,
-					Password: nil,
+				patch: &inputmodel.PatchUpdateMemberProfileInputModel{
+					ID:   1,
+					Name: stringPtr("gg1"),
 				},
 			},
 			want:    nil,
-			wantErr: MapGatewayErrorToUseCaseError(repository.ErrGatewayMemberUpdateFailed),
+			wantErr: MapGatewayErrorToUseCaseError(repository.ErrGatewayMemberNoEffect),
 			setupRepo: func(r *mock.MockMemberRepository) {
 				gomock.InOrder(
 					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
@@ -719,7 +717,7 @@ func TestMemberUseCase_UpdateMember(t *testing.T) {
 						Password:  "",
 						CreatedAt: testTime,
 					}, nil),
-					r.EXPECT().Update(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberUpdateFailed),
+					r.EXPECT().UpdateProfile(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberNoEffect),
 				)
 			},
 		},
@@ -730,11 +728,9 @@ func TestMemberUseCase_UpdateMember(t *testing.T) {
 			},
 			args: args{
 				ctx: ctx,
-				patch: &inputmodel.PatchUpdateMemberInputModel{
-					ID:       1,
-					Name:     stringPtr("gg1"),
-					Email:    nil,
-					Password: nil,
+				patch: &inputmodel.PatchUpdateMemberProfileInputModel{
+					ID:   1,
+					Name: stringPtr("gg1"),
 				},
 			},
 			want:    nil,
@@ -750,11 +746,9 @@ func TestMemberUseCase_UpdateMember(t *testing.T) {
 			},
 			args: args{
 				ctx: ctx,
-				patch: &inputmodel.PatchUpdateMemberInputModel{
-					ID:       1,
-					Name:     stringPtr("gg1"),
-					Email:    nil,
-					Password: nil,
+				patch: &inputmodel.PatchUpdateMemberProfileInputModel{
+					ID:   1,
+					Name: stringPtr("gg1"),
 				},
 			},
 			want:    nil,
@@ -770,10 +764,10 @@ func TestMemberUseCase_UpdateMember(t *testing.T) {
 			},
 			args: args{
 				ctx:   ctx,
-				patch: &inputmodel.PatchUpdateMemberInputModel{},
+				patch: &inputmodel.PatchUpdateMemberProfileInputModel{},
 			},
 			want:    nil,
-			wantErr: MapGatewayErrorToUseCaseError(repository.ErrGatewayMemberUpdateFailed),
+			wantErr: MapGatewayErrorToUseCaseError(repository.ErrGatewayMemberNoEffect),
 			setupRepo: func(r *mock.MockMemberRepository) {
 				gomock.InOrder(
 					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
@@ -783,89 +777,13 @@ func TestMemberUseCase_UpdateMember(t *testing.T) {
 						Password:  "",
 						CreatedAt: testTime,
 					}, nil),
-					r.EXPECT().Update(ctx, gomock.Any()).Return(&entity.Member{
+					r.EXPECT().UpdateProfile(ctx, gomock.Any()).Return(&entity.Member{
 						ID:        1,
 						Name:      "gg1",
 						Email:     "gg@gmail.com",
 						Password:  "",
 						CreatedAt: testTime,
-					}, repository.ErrGatewayMemberUpdateFailed),
-				)
-			},
-		}, {
-			name: "only email update",
-			fields: fields{
-				MemberRepo: mock.NewMockMemberRepository(ctrl),
-			},
-			args: args{
-				ctx: ctx,
-				patch: &inputmodel.PatchUpdateMemberInputModel{
-					ID:    1,
-					Email: stringPtr("gg1@gmail.com"),
-				},
-			},
-			want: &entity.Member{
-				ID:        1,
-				Name:      "gg",
-				Email:     "gg1@gmial.com",
-				Password:  "",
-				CreatedAt: testTime,
-			},
-			wantErr: nil,
-			setupRepo: func(r *mock.MockMemberRepository) {
-				gomock.InOrder(
-					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
-						ID:        1,
-						Name:      "gg",
-						Email:     "gg@gmail.com",
-						Password:  "",
-						CreatedAt: testTime,
-					}, nil),
-					r.EXPECT().Update(ctx, gomock.Any()).Return(&entity.Member{
-						ID:        1,
-						Name:      "gg",
-						Email:     "gg1@gmial.com",
-						Password:  "",
-						CreatedAt: testTime,
-					}, nil),
-				)
-			},
-		}, {
-			name: "only password update",
-			fields: fields{
-				MemberRepo: mock.NewMockMemberRepository(ctrl),
-			},
-			args: args{
-				ctx: ctx,
-				patch: &inputmodel.PatchUpdateMemberInputModel{
-					ID:       1,
-					Password: stringPtr("newpassword"),
-				},
-			},
-			want: &entity.Member{
-				ID:        1,
-				Name:      "gg",
-				Email:     "gg@gmail.com",
-				Password:  "newpassword",
-				CreatedAt: testTime,
-			},
-			wantErr: nil,
-			setupRepo: func(r *mock.MockMemberRepository) {
-				gomock.InOrder(
-					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
-						ID:        1,
-						Name:      "gg",
-						Email:     "gg@gmail.com",
-						Password:  "oldpassword",
-						CreatedAt: testTime,
-					}, nil),
-					r.EXPECT().Update(ctx, gomock.Any()).Return(&entity.Member{
-						ID:        1,
-						Name:      "gg",
-						Email:     "gg@gmail.com",
-						Password:  "newpassword",
-						CreatedAt: testTime,
-					}, nil),
+					}, repository.ErrGatewayMemberNoEffect),
 				)
 			},
 		},
@@ -874,19 +792,409 @@ func TestMemberUseCase_UpdateMember(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mockRepo := tt.fields.MemberRepo.(*mock.MockMemberRepository)
 			m := &MemberUseCase{
-				MemberRepo: mockRepo,
+				MemberGateway: mockRepo,
 			}
 			tt.setupRepo(mockRepo)
-			got, err := m.UpdateMember(tt.args.ctx, tt.args.patch)
+			got, err := m.UpdateMemberProfile(tt.args.ctx, tt.args.patch)
 			t.Logf("got = %v, want %v", got, tt.want)
 			t.Logf("err = %v, wantErr %v", err, tt.wantErr)
 			if !errors.Is(err, tt.wantErr) {
-				t.Errorf("UpdateMember() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("UpdateMemberProfile() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("UpdateMember() got = %v, want %v", got, tt.want)
+				t.Errorf("UpdateMemberProfile() got = %v, want %v", got, tt.want)
 			}
+		})
+	}
+}
+
+func TestMemberUseCase_UpdateMemberEmail(t *testing.T) {
+	type fields struct {
+		MemberGateway output.MemberRepository
+	}
+	type args struct {
+		ctx      context.Context
+		id       int
+		newEmail string
+		password string
+	}
+	ctrl, ctx, testTime := repoHelper(t)
+	tests := []struct {
+		name      string
+		fields    fields
+		args      args
+		setupRepo func(*mock.MockMemberRepository)
+		wantErr   error
+	}{
+		{
+			name: "normal test",
+			fields: fields{
+				MemberGateway: mock.NewMockMemberRepository(ctrl),
+			},
+			args: args{
+				ctx:      ctx,
+				id:       0,
+				newEmail: "oldemail@gmail.com",
+				password: "testpassword",
+			},
+			setupRepo: func(r *mock.MockMemberRepository) {
+				gomock.InOrder(
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberNotFound),
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
+						ID:        0,
+						Name:      "test",
+						Email:     "test@gmail.com",
+						Password:  "testpassword",
+						CreatedAt: testTime,
+					}, nil),
+					r.EXPECT().UpdateEmail(ctx, gomock.Any(), gomock.Any()).Return(nil),
+				)
+			},
+			wantErr: nil,
+		},
+		{
+			name: "email already used",
+			fields: fields{
+				MemberGateway: mock.NewMockMemberRepository(ctrl),
+			},
+			args: args{
+				ctx:      ctx,
+				id:       1,
+				newEmail: "",
+				password: "",
+			},
+			setupRepo: func(r *mock.MockMemberRepository) {
+				r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(&entity.Member{
+					ID:       2,
+					Name:     "test",
+					Email:    "",
+					Password: "",
+				}, nil)
+			},
+			wantErr: ErrUseCaseMemberEmailAlreadyExists,
+		},
+		{
+			name: "other error",
+			fields: fields{
+				MemberGateway: mock.NewMockMemberRepository(ctrl),
+			},
+			args: args{
+				ctx:      ctx,
+				id:       1,
+				newEmail: "",
+				password: "",
+			},
+			setupRepo: func(r *mock.MockMemberRepository) {
+				gomock.InOrder(
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberDBError),
+				)
+			},
+			wantErr: ErrUseCaseMemberDBError,
+		},
+		{
+			name: "oldEmail is same as newEmail",
+			fields: fields{
+				MemberGateway: mock.NewMockMemberRepository(ctrl),
+			},
+			args: args{
+				ctx:      ctx,
+				id:       1,
+				newEmail: "test@gmail.com",
+				password: "",
+			},
+			setupRepo: func(r *mock.MockMemberRepository) {
+				gomock.InOrder(
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(&entity.Member{
+						ID:    1,
+						Email: "test@gmail.com",
+					}, nil),
+				)
+			},
+			wantErr: ErrUseCaseMemberUpdateSameEmail,
+		},
+		{
+			name: "GetByID error - member not found",
+			fields: fields{
+				MemberGateway: mock.NewMockMemberRepository(ctrl),
+			},
+			args: args{
+				ctx:      ctx,
+				id:       1,
+				newEmail: "",
+				password: "",
+			},
+			setupRepo: func(r *mock.MockMemberRepository) {
+				gomock.InOrder(
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberNotFound),
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberNotFound),
+				)
+			},
+			wantErr: ErrUseCaseMemberNotFound,
+		},
+		{
+			name: "GetByID error - db error",
+			fields: fields{
+				MemberGateway: mock.NewMockMemberRepository(ctrl),
+			},
+			args: args{
+				ctx:      ctx,
+				id:       1,
+				password: "testpassword",
+			},
+			setupRepo: func(r *mock.MockMemberRepository) {
+				gomock.InOrder(
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberNotFound),
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberDBError),
+				)
+			},
+			wantErr: ErrUseCaseMemberDBError,
+		},
+		{
+			name: "password mismatch",
+			fields: fields{
+				MemberGateway: mock.NewMockMemberRepository(ctrl),
+			},
+			args: args{
+				ctx:      ctx,
+				id:       1,
+				password: "wrongpassword",
+			},
+			setupRepo: func(r *mock.MockMemberRepository) {
+				gomock.InOrder(
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberNotFound),
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
+						ID:       1,
+						Password: "rightpassword",
+					}, nil),
+				)
+			},
+			wantErr: ErrUseCaseMemberPasswordIncorrect,
+		},
+		{
+			name: "UpdateEmail error - no effect",
+			fields: fields{
+				MemberGateway: mock.NewMockMemberRepository(ctrl),
+			},
+			args: args{
+				ctx: ctx,
+				id:  0,
+			},
+			setupRepo: func(r *mock.MockMemberRepository) {
+				gomock.InOrder(
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberNotFound),
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{}, nil),
+					r.EXPECT().UpdateEmail(ctx, gomock.Any(), gomock.Any()).Return(repository.ErrGatewayMemberNoEffect),
+				)
+			},
+
+			wantErr: ErrUseCaseMemberNoEffect,
+		},
+		{
+			name: "UpdateEmail error - db error",
+			fields: fields{
+				MemberGateway: mock.NewMockMemberRepository(ctrl),
+			},
+			args: args{
+				ctx: ctx,
+				id:  0,
+			},
+			setupRepo: func(r *mock.MockMemberRepository) {
+				gomock.InOrder(
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberNotFound),
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{}, nil),
+					r.EXPECT().UpdateEmail(ctx, gomock.Any(), gomock.Any()).Return(repository.ErrGatewayMemberDBError),
+				)
+			},
+			wantErr: ErrUseCaseMemberDBError,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			m := &MemberUseCase{
+				MemberGateway: tt.fields.MemberGateway,
+			}
+			tt.setupRepo(tt.fields.MemberGateway.(*mock.MockMemberRepository))
+			got := m.UpdateMemberEmail(tt.args.ctx, tt.args.id, tt.args.newEmail, tt.args.password)
+			if got != nil && tt.wantErr == nil {
+				t.Fatalf("UpdateMemberEmail() got unexpected error: %v", got)
+			}
+			t.Logf("\n\tgot = %v\n\twantErr = %v", got, tt.wantErr)
+			assert.Equal(t, got, tt.wantErr, "UpdateMemberEmail() got = %v, wantErr %v", got, tt.wantErr)
+		})
+	}
+}
+
+func TestMemberUseCase_UpdateMemberPassword(t *testing.T) {
+	type fields struct {
+		MemberGateway output.MemberRepository
+	}
+	type args struct {
+		ctx         context.Context
+		id          int
+		newPassword string
+		oldPassword string
+	}
+	ctrl, ctx, testTime := repoHelper(t)
+	tests := []struct {
+		name      string
+		fields    fields
+		args      args
+		setupRepo func(*mock.MockMemberRepository)
+		wantErr   error
+	}{
+		{
+			name: "normal case",
+			fields: fields{
+				MemberGateway: mock.NewMockMemberRepository(ctrl),
+			},
+			args: args{
+				ctx:         ctx,
+				id:          1,
+				newPassword: "newpassword",
+				oldPassword: "oldpassword",
+			},
+			setupRepo: func(r *mock.MockMemberRepository) {
+				gomock.InOrder(
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
+						ID:        1,
+						Name:      "test",
+						Password:  "oldpassword",
+						CreatedAt: testTime,
+					}, nil),
+					r.EXPECT().UpdatePassword(ctx, gomock.Any(), gomock.Any()).Return(nil),
+				)
+			},
+			wantErr: nil,
+		},
+		{
+			name: "logic error - update same password",
+			fields: fields{
+				MemberGateway: mock.NewMockMemberRepository(ctrl),
+			},
+			args: args{
+				ctx:         ctx,
+				id:          0,
+				newPassword: "password",
+				oldPassword: "password",
+			},
+			setupRepo: func(r *mock.MockMemberRepository) {
+			},
+			wantErr: ErrUseCaseMemberUpdateSamePassword,
+		},
+		{
+			name: "GetByID error - member not found",
+			fields: fields{
+				MemberGateway: mock.NewMockMemberRepository(ctrl),
+			},
+			args: args{
+				ctx:         ctx,
+				id:          0,
+				newPassword: "newpassword",
+				oldPassword: "oldpassword",
+			},
+			setupRepo: func(r *mock.MockMemberRepository) {
+				gomock.InOrder(
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberNotFound),
+				)
+			},
+			wantErr: ErrUseCaseMemberNotFound,
+		},
+		{
+			name: "GetByID error - db error",
+			fields: fields{
+				MemberGateway: mock.NewMockMemberRepository(ctrl),
+			},
+			args: args{
+				ctx:         ctx,
+				id:          0,
+				newPassword: "newpassword",
+				oldPassword: "oldpassword",
+			},
+			setupRepo: func(r *mock.MockMemberRepository) {
+				gomock.InOrder(
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberDBError),
+				)
+			},
+			wantErr: ErrUseCaseMemberDBError,
+		},
+		{
+			name: "logic error - db password not input password",
+			fields: fields{
+				MemberGateway: mock.NewMockMemberRepository(ctrl),
+			},
+			args: args{
+				ctx:         ctx,
+				id:          0,
+				oldPassword: "wrongpassword",
+			},
+			setupRepo: func(r *mock.MockMemberRepository) {
+				gomock.InOrder(
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
+						ID:       0,
+						Password: "oldpassword",
+					}, nil),
+				)
+			},
+			wantErr: ErrUseCaseMemberPasswordIncorrect,
+		},
+		{
+			name: "UpdatePassword error - no effect",
+			fields: fields{
+				MemberGateway: mock.NewMockMemberRepository(ctrl),
+			},
+			args: args{
+				ctx:         ctx,
+				id:          0,
+				newPassword: "newpassword",
+				oldPassword: "oldpassword",
+			},
+			setupRepo: func(r *mock.MockMemberRepository) {
+				gomock.InOrder(
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
+						ID:       0,
+						Password: "oldpassword",
+					}, nil),
+					r.EXPECT().UpdatePassword(ctx, gomock.Any(), gomock.Any()).Return(repository.ErrGatewayMemberNoEffect),
+				)
+			},
+			wantErr: ErrUseCaseMemberNoEffect,
+		},
+		{
+			name: "UpdatePassword error - db error",
+			fields: fields{
+				MemberGateway: mock.NewMockMemberRepository(ctrl),
+			},
+			args: args{
+				ctx:         ctx,
+				id:          0,
+				newPassword: "newpassword",
+				oldPassword: "oldpassword",
+			},
+			setupRepo: func(r *mock.MockMemberRepository) {
+				gomock.InOrder(
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
+						ID:       0,
+						Password: "oldpassword",
+					}, nil),
+					r.EXPECT().UpdatePassword(ctx, gomock.Any(), gomock.Any()).Return(repository.ErrGatewayMemberDBError),
+				)
+			},
+			wantErr: ErrUseCaseMemberDBError,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			m := &MemberUseCase{
+				MemberGateway: tt.fields.MemberGateway,
+			}
+			tt.setupRepo(tt.fields.MemberGateway.(*mock.MockMemberRepository))
+			err := m.UpdateMemberPassword(tt.args.ctx, tt.args.id, tt.args.newPassword, tt.args.oldPassword)
+			if err != nil && tt.wantErr == nil {
+				t.Fatalf("UpdateMemberPassword() got unexpected error: %v", err)
+			}
+			t.Logf("\n\tgot = %v\n\twantErr = %v", err, tt.wantErr)
+			assert.Equal(t, err, tt.wantErr, "UpdateMemberPassword() got = %v, wantErr %v", err, tt.wantErr)
 		})
 	}
 }
@@ -904,8 +1212,8 @@ func TestNewMemberUseCase(t *testing.T) {
 		t.Errorf("NewMemberUseCase() = %v, want %v", got, repo)
 	}
 	// 確認注入
-	if usecase.MemberRepo != repo {
-		t.Errorf("NewMemberUseCase() = %v, want %v", usecase.MemberRepo, repo)
+	if usecase.MemberGateway != repo {
+		t.Errorf("NewMemberUseCase() = %v, want %v", usecase.MemberGateway, repo)
 	}
 }
 

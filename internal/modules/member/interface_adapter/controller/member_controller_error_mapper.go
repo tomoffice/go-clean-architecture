@@ -20,6 +20,16 @@ func MapErrorCodeToHTTPStatus(code int) int {
 		return http.StatusNotFound
 	case code == errorcode.ErrMemberAlreadyExists:
 		return http.StatusConflict
+	case code == errorcode.ErrMemberNoEffect:
+		return http.StatusUnprocessableEntity
+	case code == errorcode.ErrMemberEmailAlreadyExists:
+		return http.StatusConflict
+	case code == errorcode.ErrMemberUpdateSameEmail:
+		return http.StatusConflict
+	case code == errorcode.ErrMemberPasswordIncorrect:
+		return http.StatusUnauthorized
+	case code == errorcode.ErrMemberUpdateSamePassword:
+		return http.StatusConflict
 	case code >= 3000 && code < 4000:
 		return http.StatusInternalServerError
 

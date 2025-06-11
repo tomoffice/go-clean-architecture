@@ -113,17 +113,45 @@ func (mr *MockMemberInputPortMockRecorder) RegisterMember(ctx, member interface{
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterMember", reflect.TypeOf((*MockMemberInputPort)(nil).RegisterMember), ctx, member)
 }
 
-// UpdateMember mocks base method.
-func (m *MockMemberInputPort) UpdateMember(ctx context.Context, patch *inputmodel.PatchUpdateMemberInputModel) (*entity.Member, error) {
+// UpdateMemberEmail mocks base method.
+func (m *MockMemberInputPort) UpdateMemberEmail(ctx context.Context, id int, newEmail, password string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "UpdateMember", ctx, patch)
+	ret := m.ctrl.Call(m, "UpdateMemberEmail", ctx, id, newEmail, password)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateMemberEmail indicates an expected call of UpdateMemberEmail.
+func (mr *MockMemberInputPortMockRecorder) UpdateMemberEmail(ctx, id, newEmail, password interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMemberEmail", reflect.TypeOf((*MockMemberInputPort)(nil).UpdateMemberEmail), ctx, id, newEmail, password)
+}
+
+// UpdateMemberPassword mocks base method.
+func (m *MockMemberInputPort) UpdateMemberPassword(ctx context.Context, id int, oldPassword, newPassword string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateMemberPassword", ctx, id, oldPassword, newPassword)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateMemberPassword indicates an expected call of UpdateMemberPassword.
+func (mr *MockMemberInputPortMockRecorder) UpdateMemberPassword(ctx, id, oldPassword, newPassword interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMemberPassword", reflect.TypeOf((*MockMemberInputPort)(nil).UpdateMemberPassword), ctx, id, oldPassword, newPassword)
+}
+
+// UpdateMemberProfile mocks base method.
+func (m *MockMemberInputPort) UpdateMemberProfile(ctx context.Context, patch *inputmodel.PatchUpdateMemberProfileInputModel) (*entity.Member, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateMemberProfile", ctx, patch)
 	ret0, _ := ret[0].(*entity.Member)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// UpdateMember indicates an expected call of UpdateMember.
-func (mr *MockMemberInputPortMockRecorder) UpdateMember(ctx, patch interface{}) *gomock.Call {
+// UpdateMemberProfile indicates an expected call of UpdateMemberProfile.
+func (mr *MockMemberInputPortMockRecorder) UpdateMemberProfile(ctx, patch interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMember", reflect.TypeOf((*MockMemberInputPort)(nil).UpdateMember), ctx, patch)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateMemberProfile", reflect.TypeOf((*MockMemberInputPort)(nil).UpdateMemberProfile), ctx, patch)
 }

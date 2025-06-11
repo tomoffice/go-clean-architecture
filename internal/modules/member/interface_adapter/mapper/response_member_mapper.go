@@ -42,12 +42,17 @@ func EntityToListMemberResponseDTO(members []*entity.Member) dto.ListMemberRespo
 		Members: items,
 	}
 }
-func EntityToUpdateMemberResponseDTO(member *entity.Member) dto.UpdateMemberResponseDTO {
-	return dto.UpdateMemberResponseDTO{
-		ID:    member.ID,
-		Name:  &member.Name,
-		Email: &member.Email,
+func EntityToUpdateMemberProfileResponseDTO(member *entity.Member) dto.UpdateMemberProfileResponseDTO {
+	return dto.UpdateMemberProfileResponseDTO{
+		ID:   member.ID,
+		Name: member.Name,
 	}
+}
+func EntityToUpdateMemberEmailResponseDTO() dto.UpdateMemberEmailResponseDTO {
+	return dto.UpdateMemberEmailResponseDTO{}
+}
+func EntityToUpdateMemberPasswordResponseDTO() dto.UpdateMemberPasswordResponseDTO {
+	return dto.UpdateMemberPasswordResponseDTO{}
 }
 func EntityToDeleteMemberResponseDTO(member *entity.Member) dto.DeleteMemberResponseDTO {
 	return dto.DeleteMemberResponseDTO{

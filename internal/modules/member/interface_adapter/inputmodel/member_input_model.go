@@ -1,19 +1,25 @@
-// Package input_port 定義應用層（UseCase）所需的輸入模型，
-// 負責將外部資料（例如 HTTP 請求參數、JSON payload）轉換成對 UseCase 友好的結構。
-// 它能：
-//  1. 清楚表達 UseCase 的輸入意圖與範圍（必填、選填、預設值等）
-//  2. 隔離外部傳入資料與核心 Domain Entity，避免直接依賴 Entity 結構
-//  3. 支援部分欄位更新（Patch）等複雜場景，確保欄位修改的明確性
+// Package inputmodel 定義應用層（UseCase）專用的輸入資料模型。
+// 負責將外部請求（如 HTTP URI、JSON、表單等）轉換為 UseCase 可用且語意明確的結構。
+//
+// 職責：
+// 1. 明確描述 UseCase 需要的輸入資料（包含必填、選填、部分更新等需求）
+// 2. 將外部資料來源（如 DTO、表單）與核心 Domain Entity 解耦
+// 3. 支援 PATCH、局部更新等複雜場景，確保欄位變動意圖明確
+// 4. 僅作為 UseCase 的 input，嚴禁混用於 Domain/Entity 層
 package inputmodel
 
-// PatchUpdateMemberInputModel 表示「更新會員」UseCase 的輸入參數。
-//   - ID      ：要更新的會員識別碼，必填
-//   - Name    ：會員名稱，選填（nil 表示不變）
-//   - Email   ：會員信箱，選填（nil 表示不變）
-//   - Password：會員密碼，選填（nil 表示不變）
-type PatchUpdateMemberInputModel struct {
-	ID       int
-	Name     *string
-	Email    *string
-	Password *string
+// PatchUpdateMemberProfileInputModel 為「更新會員資訊」UseCase 的輸入模型。
+//   - 僅用於 UseCase 內部，不對外暴露。
+//   - 支援 PATCH 部分欄位更新，欄位為 nil 表示不更新該欄位。
+//   - 嚴禁直接對應 Domain Entity，需經 Mapper 轉換。
+type PatchUpdateMemberProfileInputModel struct {
+	ID   int
+	Name *string
+	// NickName *string
+	// Avatar   *string
+}
+type PatchUpdateMemberPasswordInputModel struct {
+	ID          int
+	OldPassword string
+	NewPassword string
 }

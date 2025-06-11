@@ -4,6 +4,7 @@ import (
 	"context"
 	"module-clean/internal/modules/member/driver/persistence/sqlx"
 	"module-clean/internal/modules/member/entity"
+	"module-clean/internal/modules/member/usecase/port/output"
 	"module-clean/internal/shared/common/pagination"
 	"time"
 )
@@ -12,7 +13,7 @@ type MemberSQLXGateway struct {
 	infraRepo sqlx.MemberSQLXRepository
 }
 
-func NewMemberSQLXGateway(infraRepo sqlx.MemberSQLXRepository) MemberSQLXGateway {
+func NewMemberSQLXGateway(infraRepo sqlx.MemberSQLXRepository) output.MemberRepository {
 	return MemberSQLXGateway{
 		infraRepo: infraRepo,
 	}
@@ -89,7 +90,7 @@ func (g MemberSQLXGateway) GetAll(ctx context.Context, pagination pagination.Pag
 	return members, nil
 }
 
-func (g MemberSQLXGateway) Update(ctx context.Context, m *entity.Member) (*entity.Member, error) {
+func (g MemberSQLXGateway) UpdateProfile(ctx context.Context, m *entity.Member) (*entity.Member, error) {
 	repoModel := &sqlx.MemberSQLXModel{
 		ID:        m.ID,
 		Name:      m.Name,
@@ -98,11 +99,27 @@ func (g MemberSQLXGateway) Update(ctx context.Context, m *entity.Member) (*entit
 		CreatedAt: m.CreatedAt.Format("2006-01-02 15:04:05"),
 	}
 	//讀已寫所以不用回傳
-	_, err := g.infraRepo.Update(ctx, repoModel)
+	_, err := g.infraRepo.UpdateProfile(ctx, repoModel)
 	if err != nil {
 		return nil, MapInfraErrorToGatewayError(err)
 	}
 	return m, nil
+}
+
+func (g MemberSQLXGateway) UpdateEmail(ctx context.Context, id int, newEmail string) error {
+	err := g.infraRepo.UpdateEmail(ctx, id, newEmail)
+	if err != nil {
+		return MapInfraErrorToGatewayError(err)
+	}
+	return nil
+}
+
+func (g MemberSQLXGateway) UpdatePassword(ctx context.Context, id int, newPassword string) error {
+	err := g.infraRepo.UpdatePassword(ctx, id, newPassword)
+	if err != nil {
+		return MapInfraErrorToGatewayError(err)
+	}
+	return nil
 }
 
 func (g MemberSQLXGateway) Delete(ctx context.Context, id int) error {

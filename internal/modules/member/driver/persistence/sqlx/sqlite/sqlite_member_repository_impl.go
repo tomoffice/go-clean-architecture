@@ -61,20 +61,47 @@ func (s sqlxMemberRepo) CountAll(ctx context.Context) (int, error) {
 	}
 	return count, nil
 }
-func (s sqlxMemberRepo) Update(ctx context.Context, m *sqlx2.MemberSQLXModel) (*sqlx2.MemberSQLXModel, error) {
-	result, err := s.db.ExecContext(ctx, queryUpdateMember, m.Name, m.Email, m.ID)
+func (s sqlxMemberRepo) UpdateProfile(ctx context.Context, m *sqlx2.MemberSQLXModel) (*sqlx2.MemberSQLXModel, error) {
+	result, err := s.db.ExecContext(ctx, queryUpdateMemberProfile, m.Name, m.Email, m.ID)
 	if err != nil {
 		return nil, mapSQLError(err)
 	}
-
 	rowsAffected, err := result.RowsAffected()
 	if err != nil {
 		return nil, err
 	}
 	if rowsAffected == 0 {
-		return nil, ErrDBUpdateNoEffect
+		return nil, ErrDBNoEffect
 	}
 	return m, nil
+}
+func (s sqlxMemberRepo) UpdateEmail(ctx context.Context, id int, email string) error {
+	result, err := s.db.ExecContext(ctx, queryUpdateMemberEmail, email, id)
+	if err != nil {
+		return mapSQLError(err)
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return ErrDBNoEffect
+	}
+	return nil
+}
+func (s sqlxMemberRepo) UpdatePassword(ctx context.Context, id int, password string) error {
+	result, err := s.db.ExecContext(ctx, queryUpdateMemberPassword, password, id)
+	if err != nil {
+		return mapSQLError(err)
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return ErrDBNoEffect
+	}
+	return nil
 }
 func (s sqlxMemberRepo) Delete(ctx context.Context, id int) error {
 	result, err := s.db.ExecContext(ctx, queryDeleteMember, id)
@@ -86,7 +113,7 @@ func (s sqlxMemberRepo) Delete(ctx context.Context, id int) error {
 		return err
 	}
 	if rows != 1 {
-		return ErrDBDeleteNoEffect
+		return ErrDBNoEffect
 	}
 	return nil
 }
