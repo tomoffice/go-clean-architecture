@@ -24,7 +24,7 @@ func NewMemberController(memberUseCase input.MemberInputPort, presenter output.M
 }
 
 func (c *MemberController) Register(ctx *gin.Context) {
-	var ginReqDTO gindto.GinRegisterMemberRequestDTO
+	var ginReqDTO gindto.GinBindingRegisterMemberRequestDTO
 	if err := ctx.ShouldBindJSON(&ginReqDTO); err != nil {
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
@@ -51,7 +51,7 @@ func (c *MemberController) Register(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 func (c *MemberController) GetByID(ctx *gin.Context) {
-	var ginReqDTO gindto.GinGetMemberByIDURIRequestDTO
+	var ginReqDTO gindto.GinBindingGetMemberByIDURIRequestDTO
 	if err := ctx.ShouldBindUri(&ginReqDTO); err != nil {
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
@@ -78,7 +78,7 @@ func (c *MemberController) GetByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 func (c *MemberController) GetByEmail(ctx *gin.Context) {
-	var ginReqDTO gindto.GinGetMemberByEmailQueryRequestDTO
+	var ginReqDTO gindto.GinBindingGetMemberByEmailQueryRequestDTO
 	if err := ctx.ShouldBindQuery(&ginReqDTO); err != nil {
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
@@ -105,7 +105,7 @@ func (c *MemberController) GetByEmail(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 func (c *MemberController) List(ctx *gin.Context) {
-	var ginReqDTO gindto.GinListMemberQueryRequestDTO
+	var ginReqDTO gindto.GinBindingListMemberQueryRequestDTO
 	if err := ctx.ShouldBindQuery(&ginReqDTO); err != nil {
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
@@ -132,7 +132,7 @@ func (c *MemberController) List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 func (c *MemberController) UpdateProfile(ctx *gin.Context) {
-	var ginURI gindto.GinUpdateMemberURIRequestDTO
+	var ginURI gindto.GinBindingUpdateMemberURIRequestDTO
 	if err := ctx.ShouldBindUri(&ginURI); err != nil {
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
@@ -140,7 +140,7 @@ func (c *MemberController) UpdateProfile(ctx *gin.Context) {
 		ctx.JSON(httpStatus, resp)
 		return
 	}
-	var ginBody gindto.GinUpdateMemberProfileBodyRequestDTO
+	var ginBody gindto.GinBindingUpdateMemberProfileBodyRequestDTO
 	if err := ctx.ShouldBindJSON(&ginBody); err != nil {
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
@@ -167,7 +167,7 @@ func (c *MemberController) UpdateProfile(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 func (c *MemberController) UpdateEmail(ctx *gin.Context) {
-	var ginURI gindto.GinUpdateMemberURIRequestDTO
+	var ginURI gindto.GinBindingUpdateMemberURIRequestDTO
 	if err := ctx.ShouldBindUri(&ginURI); err != nil {
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
@@ -175,7 +175,7 @@ func (c *MemberController) UpdateEmail(ctx *gin.Context) {
 		ctx.JSON(httpStatus, resp)
 		return
 	}
-	var ginBody gindto.GinUpdateMemberEmailBodyRequestDTO
+	var ginBody gindto.GinBindingUpdateMemberEmailBodyRequestDTO
 	if err := ctx.ShouldBindJSON(&ginBody); err != nil {
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
@@ -202,7 +202,7 @@ func (c *MemberController) UpdateEmail(ctx *gin.Context) {
 
 }
 func (c *MemberController) UpdatePassword(ctx *gin.Context) {
-	var ginURI gindto.GinUpdateMemberURIRequestDTO
+	var ginURI gindto.GinBindingUpdateMemberURIRequestDTO
 	if err := ctx.ShouldBindUri(&ginURI); err != nil {
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
@@ -210,7 +210,7 @@ func (c *MemberController) UpdatePassword(ctx *gin.Context) {
 		ctx.JSON(httpStatus, resp)
 		return
 	}
-	var ginBody gindto.GinUpdateMemberPasswordBodyRequestDTO
+	var ginBody gindto.GinBindingUpdateMemberPasswordBodyRequestDTO
 	if err := ctx.ShouldBindJSON(&ginBody); err != nil {
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
@@ -236,7 +236,7 @@ func (c *MemberController) UpdatePassword(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 func (c *MemberController) Delete(ctx *gin.Context) {
-	var ginReqDTO gindto.GinDeleteMemberURIRequestDTO
+	var ginReqDTO gindto.GinBindingDeleteMemberURIRequestDTO
 	if err := ctx.ShouldBindUri(&ginReqDTO); err != nil {
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
