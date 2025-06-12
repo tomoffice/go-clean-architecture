@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"module-clean/internal/shared/common/errorcode"
+	"module-clean/internal/shared/errorcode"
 )
 
 // MapGinBindingError 將 binding 時產生的錯誤轉換為 (error code, message)

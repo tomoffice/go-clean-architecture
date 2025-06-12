@@ -4,8 +4,8 @@ import (
 	"module-clean/internal/modules/member/entity"
 	"module-clean/internal/modules/member/interface_adapter/mapper"
 	"module-clean/internal/modules/member/interface_adapter/outputmodel"
-	sharedenum "module-clean/internal/shared/common/enum"
-	sharedviewmodel "module-clean/internal/shared/interface_adapter/viewmodel/http"
+	sharedenum "module-clean/internal/shared/enum"
+	sharedviewmodel "module-clean/internal/shared/viewmodel/http"
 	"strconv"
 )
 

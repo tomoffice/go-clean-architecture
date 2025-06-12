@@ -1,7 +1,7 @@
 package http
 
 import (
-	"module-clean/internal/shared/common/enum"
+	"module-clean/internal/shared/enum"
 	"time"
 )
 

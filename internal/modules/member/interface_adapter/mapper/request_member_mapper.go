@@ -13,8 +13,8 @@ import (
 	"module-clean/internal/modules/member/entity"
 	"module-clean/internal/modules/member/interface_adapter/dto"
 	"module-clean/internal/modules/member/interface_adapter/inputmodel"
-	"module-clean/internal/shared/common/enum"
-	"module-clean/internal/shared/common/pagination"
+	"module-clean/internal/shared/enum"
+	"module-clean/internal/shared/pagination"
 )
 
 func RegisterMemberDTOToEntity(request dto.RegisterMemberRequestDTO) *entity.Member {

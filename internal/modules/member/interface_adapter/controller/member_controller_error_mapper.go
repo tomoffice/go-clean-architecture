@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"module-clean/internal/shared/common/errorcode"
+	"module-clean/internal/shared/errorcode"
 	"net/http"
 )
 

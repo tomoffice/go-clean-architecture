@@ -2,7 +2,7 @@ package sqlx
 
 import (
 	"context"
-	"module-clean/internal/shared/common/pagination"
+	"module-clean/internal/shared/pagination"
 )
 
 type MemberSQLXRepository interface {

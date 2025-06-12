@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	sqlx2 "module-clean/internal/modules/member/driver/persistence/sqlx"
-	"module-clean/internal/shared/common/pagination"
+	"module-clean/internal/shared/pagination"
 )
 
 type sqlxMemberRepo struct {

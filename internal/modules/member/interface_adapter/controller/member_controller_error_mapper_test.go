@@ -2,7 +2,7 @@ package controller
 
 import (
 	"github.com/stretchr/testify/assert"
-	"module-clean/internal/shared/common/errorcode"
+	"module-clean/internal/shared/errorcode"
 	"net/http"
 	"testing"
 )

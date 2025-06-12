@@ -1,7 +1,7 @@
 package pagination
 
 import (
-	"module-clean/internal/shared/common/enum"
+	"module-clean/internal/shared/enum"
 )
 
 // Pagination 分頁結構

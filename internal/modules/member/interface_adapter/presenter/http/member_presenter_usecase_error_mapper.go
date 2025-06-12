@@ -3,8 +3,8 @@ package http
 import (
 	"errors"
 	"module-clean/internal/modules/member/usecase"
-	"module-clean/internal/shared/common/errorcode"
-	sharederrors "module-clean/internal/shared/common/errordefs"
+	"module-clean/internal/shared/errorcode"
+	sharederrors "module-clean/internal/shared/errordefs"
 )
 
 func MapMemberUseCaseToPresenterError(err error) (int, string) {

@@ -4,7 +4,7 @@ package output
 import (
 	"context"
 	"module-clean/internal/modules/member/entity"
-	"module-clean/internal/shared/common/pagination"
+	"module-clean/internal/shared/pagination"
 )
 
 type MemberRepository interface {

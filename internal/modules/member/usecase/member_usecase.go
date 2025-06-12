@@ -16,7 +16,7 @@ import (
 	"module-clean/internal/modules/member/interface_adapter/inputmodel"
 	"module-clean/internal/modules/member/usecase/port/input"
 	"module-clean/internal/modules/member/usecase/port/output"
-	"module-clean/internal/shared/common/pagination"
+	"module-clean/internal/shared/pagination"
 )
 
 type MemberUseCase struct {
