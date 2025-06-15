@@ -1,0 +1,7 @@
+env: dev
+server:
+  http:
+    address: ""
+    port: "8080"
+database:
+  dsn: "file:./identifier.sqlite?cache=shared&mode=memory"

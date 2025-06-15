@@ -13,7 +13,7 @@ type MemberSQLXGateway struct {
 	infraRepo sqlx.MemberSQLXRepository
 }
 
-func NewMemberSQLXGateway(infraRepo sqlx.MemberSQLXRepository) output.MemberRepository {
+func NewMemberSQLXGateway(infraRepo sqlx.MemberSQLXRepository) output.MemberPersistence {
 	return MemberSQLXGateway{
 		infraRepo: infraRepo,
 	}

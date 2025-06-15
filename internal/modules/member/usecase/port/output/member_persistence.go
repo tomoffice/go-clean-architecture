@@ -1,13 +1,13 @@
 package output
 
-//go:generate mockgen -source=member_repository.go -destination=../../mock/mock_member_repository.go -package=mock
+//go:generate mockgen -source=member_persistence.go -destination=../../mock/mock_member_persistence.go -package=mock
 import (
 	"context"
 	"module-clean/internal/modules/member/entity"
 	"module-clean/internal/shared/pagination"
 )
 
-type MemberRepository interface {
+type MemberPersistence interface {
 	Create(ctx context.Context, m *entity.Member) error
 	GetByID(ctx context.Context, id int) (*entity.Member, error)
 	GetByEmail(ctx context.Context, email string) (*entity.Member, error)

@@ -8,7 +8,7 @@ import (
 	context "context"
 	entity "module-clean/internal/modules/member/entity"
 	inputmodel "module-clean/internal/modules/member/interface_adapter/inputmodel"
-	"module-clean/internal/shared/pagination"
+	pagination "module-clean/internal/shared/pagination"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"

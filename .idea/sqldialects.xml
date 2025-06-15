@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$PROJECT_DIR$/cmd/bootstrap.go" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/internal/framework/database/migrations/sqlite_init.sql" dialect="SQLite" />
+    <file url="file://$PROJECT_DIR$/internal/framework/database/migrations/sqlite_seed.sql" dialect="GenericSQL" />
+    <file url="file://$PROJECT_DIR$/migrations/sqlite_init.sql" dialect="SQLite" />
+  </component>
+</project>

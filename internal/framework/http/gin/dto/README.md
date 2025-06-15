@@ -2,62 +2,64 @@
 
 ## **目錄說明**
 
-本目錄**僅用於放置 Gin 專用的 Request/Response DTO**，其唯一用途如下：
+這層只放 Gin 專用的 Request/Response DTO。
 
-- 僅供 Gin Controller 進行參數綁定（binding tag）、資料驗證、JSON 解析（json tag）、URI/Query 綁定（uri、form、query tag）等。
-- **不包含任何業務邏輯，不參與 UseCase、Entity 等核心資料流。**
+用途就兩個：
+
+- Controller 拿來 binding（binding tag）、驗證、JSON/URI/Query 解析。
+- 這邊的 DTO 不做業務、不參與核心流程，用完就轉業務 DTO。
 
 ---
 
 ## **設計原則**
 
-- **僅允許在 Controller 層或 Gin 專用的 Mapper 被引用。**
-- **嚴禁在 UseCase、Entity、Domain、Repository、Presenter 等核心層級出現。**
-- 如需傳遞資料至 UseCase，必須先轉換為 internal/modules/**/interface_adapter/dto 目錄下的業務 DTO。
+- 只能 Controller 或 Gin 的 Mapper 用到，其他地方都別碰。
+- 禁止用在 UseCase、Entity、Domain、Repository、Presenter 等任何業務/核心層。
+- 要給 UseCase，自己轉到 internal/modules/**/interface_adapter/dto 下的 DTO，再丟進去。
 
 ---
 
 ## **命名規範**
 
-- 統一採用 Gin 前綴，明確型別及來源。
+- 統一加 Gin 前綴，看到就知道是哪層來的。
     - 範例：
         - GinCreateMemberRequestDTO
         - GinUpdateMemberRequestDTO
         - GinListMemberRequestDTO
         - GinGetMemberByIDURIRequestDTO
         - GinGetMemberByEmailQueryRequestDTO
-- **請明確標註型別來源**（如 URI / Query / JSON），避免混淆。
+- 來源（URI/Query/JSON）一定要標明，別搞混。
 
 ---
 
 ## **使用範例**
 
-### **1. Controller 層綁定與驗證**
+### **1. Controller 綁定/驗證**
 
 ```
-// 綁定 JSON
+// 綁 JSON
 var req gindto.GinCreateMemberRequestDTO
 if err := ctx.ShouldBindJSON(&req); err != nil {
     // 處理綁定錯誤
 }
 
-// 綁定 URI
+// 綁 URI
 var uriReq gindto.GinGetMemberByIDURIRequestDTO
 if err := ctx.ShouldBindUri(&uriReq); err != nil {
     // 處理綁定錯誤
 }
 
-// 綁定 Query
+// 綁 Query
 var queryReq gindto.GinGetMemberByEmailQueryRequestDTO
 if err := ctx.ShouldBindQuery(&queryReq); err != nil {
     // 處理綁定錯誤
 }
 ```
 
-### **2. DTO 轉換**
+### **2. DTO 轉換給 UseCase**
 
 ```
-// 轉換為業務 DTO
+// 一律轉成業務用 DTO
 businessReq := ginmapper.GinCreateMemberRequestDTOToCreateMemberDTO(req)
 ```
 
@@ -65,27 +67,27 @@ businessReq := ginmapper.GinCreateMemberRequestDTOToCreateMemberDTO(req)
 
 ## **避免事項**
 
-- 請勿將 Gin 專用 DTO 直接傳入 UseCase、Entity 或核心業務流程。
-- 請勿將任何業務 DTO 放入本目錄（如 interface_adapter/dto 之 DTO 不可放這裡）。
+- Gin DTO 不准直接塞進 UseCase、Entity 或其他業務流程。
+- 業務 DTO 也不要亂丟進來（interface_adapter/dto 的東西別放這）。
 
 ---
 
 ## **參考範例**
 
 ```
-// GinCreateMemberRequestDTO - 綁定 JSON
+// GinCreateMemberRequestDTO - 綁 JSON
 type GinCreateMemberRequestDTO struct {
     Name     string `json:"name" binding:"required"`
     Email    string `json:"email" binding:"required,email"`
     Password string `json:"password" binding:"required,min=6"`
 }
 
-// GinGetMemberByIDURIRequestDTO - 綁定 URI
+// GinGetMemberByIDURIRequestDTO - 綁 URI
 type GinGetMemberByIDURIRequestDTO struct {
     ID int `uri:"id" binding:"required,min=1"`
 }
 
-// GinGetMemberByEmailQueryRequestDTO - 綁定 Query
+// GinGetMemberByEmailQueryRequestDTO - 綁 Query
 type GinGetMemberByEmailQueryRequestDTO struct {
     Email string `form:"email" binding:"required,email"`
 }

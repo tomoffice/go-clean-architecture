@@ -20,10 +20,10 @@ import (
 )
 
 type MemberUseCase struct {
-	MemberGateway output.MemberRepository
+	MemberGateway output.MemberPersistence
 }
 
-func NewMemberUseCase(memberRepo output.MemberRepository) input.MemberInputPort {
+func NewMemberUseCase(memberRepo output.MemberPersistence) input.MemberInputPort {
 	return &MemberUseCase{
 		MemberGateway: memberRepo,
 	}
