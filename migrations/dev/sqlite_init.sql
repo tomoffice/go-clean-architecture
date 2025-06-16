@@ -1,3 +1,4 @@
+/*所有測試/開發環境會重建用*/
 CREATE TABLE IF NOT EXISTS members
 (
     id         INTEGER PRIMARY KEY AUTOINCREMENT,

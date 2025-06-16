@@ -1,4 +1,5 @@
-INSERT INTO members (name, email, password)
+/*塞入假資料*/
+INSERT OR IGNORE INTO members (name, email, password)
 VALUES ('王小明', 'xiaoming@example.com', '123456'),
        ('陳美麗', 'meili.chen@example.com', 'abcdef'),
        ('李大仁', 'daren.lee@example.com', 'qwerty'),

@@ -28,7 +28,7 @@ func (a *App) Run() {
 	apiRouterGroup := engine.Group("/api/v1")
 
 	// 組裝 infra
-	db, err := database.InitSQLiteDB(a.Config.Database.DSN, "sqlite_init.sql", "sqlite_seed.sql")
+	db, err := database.InitSQLiteDB(a.Config.Database.DSN)
 	if err != nil {
 		log.Fatalf("DB初始化失敗: %v", err)
 	}
