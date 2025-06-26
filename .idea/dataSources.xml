@@ -11,15 +11,35 @@
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="dev.sqlite" uuid="1a962b71-b26e-46b2-a901-8b8a1a4054fd">
+    <data-source source="LOCAL" name="0@localhost" uuid="e3efc451-f806-4537-b2b3-dac1eb9fb295">
+      <driver-ref>redis</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>jdbc.RedisDriver</jdbc-driver>
+      <jdbc-url>jdbc:redis://localhost:6379/0</jdbc-url>
+      <jdbc-additional-properties>
+        <property name="com.intellij.clouds.kubernetes.db.host.port" />
+        <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
+        <property name="com.intellij.clouds.kubernetes.db.container.port" />
+      </jdbc-additional-properties>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
+    <data-source source="LOCAL" name="local" uuid="e76aa16c-ba68-4ea6-9f3f-37e9767eab2c">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:/private/tmp/dev.sqlite</jdbc-url>
+      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/data/local.sqlite</jdbc-url>
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
       </jdbc-additional-properties>
       <working-dir>$ProjectFileDir$</working-dir>
+      <libraries>
+        <library>
+          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/Xerial SQLiteJDBC/3.45.1/org/xerial/sqlite-jdbc/3.45.1.0/sqlite-jdbc-3.45.1.0.jar</url>
+        </library>
+        <library>
+          <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/Xerial SQLiteJDBC/3.45.1/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar</url>
+        </library>
+      </libraries>
     </data-source>
   </component>
 </project>

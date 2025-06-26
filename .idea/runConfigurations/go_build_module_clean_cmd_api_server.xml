@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="go build module-clean/cmd" type="GoApplicationRunConfiguration" factoryName="Go Application" nameIsGenerated="true">
+  <configuration default="false" name="go build module-clean/cmd/api-server" type="GoApplicationRunConfiguration" factoryName="Go Application" nameIsGenerated="true">
     <module name="module-clean" />
     <working_directory value="$PROJECT_DIR$" />
     <EXTENSION ID="net.ashald.envfile">
@@ -13,7 +13,7 @@
       </ENTRIES>
     </EXTENSION>
     <kind value="PACKAGE" />
-    <package value="module-clean/cmd" />
+    <package value="module-clean/cmd/api-server" />
     <directory value="$PROJECT_DIR$" />
     <filePath value="$PROJECT_DIR$" />
     <method v="2" />

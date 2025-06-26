@@ -6,21 +6,23 @@ import (
 )
 
 type MemberRouter struct {
-	controller *controller.MemberController
+	controller  *controller.MemberController
+	routerGroup *gin.RouterGroup
 }
 
-func NewMemberRouter(controller *controller.MemberController) *MemberRouter {
-	return &MemberRouter{controller: controller}
+func NewMemberRouter(ctrl *controller.MemberController, routerGroup *gin.RouterGroup) *MemberRouter {
+	return &MemberRouter{
+		routerGroup: routerGroup.Group("/members"),
+		controller:  ctrl,
+	}
 }
-
-func (r *MemberRouter) RegisterRoutes(router *gin.RouterGroup) {
-	member := router.Group("/members")
-	member.POST("", r.controller.Register)
-	member.GET("/:id", r.controller.GetByID)
-	member.GET("/email/:email", r.controller.GetByEmail)
-	member.GET("", r.controller.List)
-	member.PATCH("/:id", r.controller.UpdateProfile)
-	member.PATCH("/:id/email", r.controller.UpdateEmail)
-	member.PATCH("/:id/password", r.controller.UpdatePassword)
-	member.DELETE("/:id", r.controller.Delete)
+func (r *MemberRouter) Register() {
+	r.routerGroup.POST("", r.controller.Register)
+	r.routerGroup.GET("/:id", r.controller.GetByID)
+	r.routerGroup.GET("/email/:email", r.controller.GetByEmail)
+	r.routerGroup.GET("", r.controller.List)
+	r.routerGroup.PATCH("/:id", r.controller.UpdateProfile)
+	r.routerGroup.PATCH("/:id/email", r.controller.UpdateEmail)
+	r.routerGroup.PATCH("/:id/password", r.controller.UpdatePassword)
+	r.routerGroup.DELETE("/:id", r.controller.Delete)
 }
