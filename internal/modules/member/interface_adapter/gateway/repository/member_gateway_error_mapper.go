@@ -4,33 +4,28 @@ import (
 	"errors"
 	"fmt"
 	"module-clean/internal/modules/member/driver/persistence/sqlx/sqlite"
+	"module-clean/internal/modules/member/usecase"
 )
 
-// MapInfraErrorToGatewayError 將 infra 錯誤轉換為 gateway 層錯誤（並保留原始 error）
-func MapInfraErrorToGatewayError(err error) error {
+// MapInfraErrorToUsecaseError 將底層 infra 錯誤直接轉為 usecase 定義的 sentinel error
+func MapInfraErrorToUsecaseError(err error) error {
 	if err == nil {
 		return nil
 	}
-	// 優先比對 CustomError
+	// 先比對 CustomError
 	switch {
 	case errors.Is(err, sqlite.ErrDBRecordNotFound):
-		return ErrGatewayMemberNotFound
+		return usecase.ErrUseCaseMemberNotFound
 	case errors.Is(err, sqlite.ErrDBDuplicateKey):
-		return ErrGatewayMemberAlreadyExists
+		return usecase.ErrUseCaseMemberAlreadyExists
 	case errors.Is(err, sqlite.ErrDBNoEffect):
-		return ErrGatewayMemberNoEffect
+		return usecase.ErrUseCaseMemberNoEffect
 	}
-	// 萬一錯誤不是 CustomError instance，要用 As 抓 DBError
+	// 再處理 DBError 類型
 	var dbErr *sqlite.DBError
 	if errors.As(err, &dbErr) {
-		if errors.Is(dbErr.CustomError, sqlite.ErrDBContextTimeout) ||
-			errors.Is(dbErr.CustomError, sqlite.ErrDBContextCanceled) ||
-			errors.Is(dbErr.CustomError, sqlite.ErrDBConnectionClosed) ||
-			errors.Is(dbErr.CustomError, sqlite.ErrDBTransactionDone) ||
-			errors.Is(dbErr.CustomError, sqlite.ErrDBUnexpectedError) {
-			return fmt.Errorf("%w: %w", ErrGatewayMemberDBError, dbErr.RawError)
-		}
+		return fmt.Errorf("%w: %v", usecase.ErrUseCaseMemberDBError, dbErr.RawError)
 	}
-	// fallback：未知錯誤也包裝
-	return fmt.Errorf("gateway: %w: %w", ErrGatewayMemberUnexpectedError, err)
+	// fallback：其他未知錯誤
+	return usecase.ErrUseCaseMemberUnexpectedError
 }

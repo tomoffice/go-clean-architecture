@@ -30,60 +30,52 @@ func NewMemberUseCase(memberRepo output.MemberPersistence) input.MemberInputPort
 func (m *MemberUseCase) RegisterMember(ctx context.Context, member *entity.Member) (*entity.Member, error) {
 	err := m.MemberGateway.Create(ctx, member)
 	if err != nil {
-		ucErr := MapGatewayErrorToUseCaseError(err)
-		return nil, ucErr
+		return nil, err
 	}
 	// 為了通用 repository，無論底層是否會 mutate 傳入 entity，
 	// 一律透過唯一欄位查詢回傳完整 entity，減少 infra 依賴。
 	retrieveMember, err := m.MemberGateway.GetByEmail(ctx, member.Email)
 	if err != nil {
-		ucErr := MapGatewayErrorToUseCaseError(err)
-		return nil, ucErr
+		return nil, err
 	}
 	return retrieveMember, nil
 }
 func (m *MemberUseCase) GetMemberByID(ctx context.Context, id int) (*entity.Member, error) {
 	member, err := m.MemberGateway.GetByID(ctx, id)
 	if err != nil {
-		ucErr := MapGatewayErrorToUseCaseError(err)
-		return nil, ucErr
+		return nil, err
 	}
 	return member, nil
 }
 func (m *MemberUseCase) GetMemberByEmail(ctx context.Context, email string) (*entity.Member, error) {
 	member, err := m.MemberGateway.GetByEmail(ctx, email)
 	if err != nil {
-		ucErr := MapGatewayErrorToUseCaseError(err)
-		return nil, ucErr
+		return nil, err
 	}
 	return member, nil
 }
 func (m *MemberUseCase) ListMembers(ctx context.Context, pagination pagination.Pagination) ([]*entity.Member, int, error) {
 	members, err := m.MemberGateway.GetAll(ctx, pagination)
 	if err != nil {
-		ucErr := MapGatewayErrorToUseCaseError(err)
-		return nil, 0, ucErr
+		return nil, 0, err
 	}
 	total, err := m.MemberGateway.CountAll(ctx)
 	if err != nil {
-		ucErr := MapGatewayErrorToUseCaseError(err)
-		return nil, 0, ucErr
+		return nil, 0, err
 	}
 	return members, total, nil
 }
 func (m *MemberUseCase) UpdateMemberProfile(ctx context.Context, patch *inputmodel.PatchUpdateMemberProfileInputModel) (*entity.Member, error) {
 	member, err := m.MemberGateway.GetByID(ctx, patch.ID)
 	if err != nil {
-		ucErr := MapGatewayErrorToUseCaseError(err)
-		return nil, ucErr
+		return nil, err
 	}
 	if patch.Name != nil {
 		member.Name = *patch.Name
 	}
 	member, err = m.MemberGateway.UpdateProfile(ctx, member)
 	if err != nil {
-		ucErr := MapGatewayErrorToUseCaseError(err)
-		return nil, ucErr
+		return nil, err
 	}
 	return member, nil
 }
@@ -98,7 +90,6 @@ func (m *MemberUseCase) UpdateMemberEmail(ctx context.Context, id int, newEmail,
 		return ErrUseCaseMemberUpdateSameEmail
 	}
 	if err != nil {
-		err = MapGatewayErrorToUseCaseError(err)
 		if errors.Is(err, ErrUseCaseMemberNotFound) {
 			// 正常情境：新 email 不存在，可以繼續檢查密碼與更新
 			// 不 return，繼續往下走
@@ -107,11 +98,12 @@ func (m *MemberUseCase) UpdateMemberEmail(ctx context.Context, id int, newEmail,
 			return err
 		}
 	}
-	// 驗證密碼與更新 email
+	// 驗證是否存在 member
 	member, err := m.MemberGateway.GetByID(ctx, id)
 	if err != nil {
-		return MapGatewayErrorToUseCaseError(err)
+		return err
 	}
+	// 驗證密碼與更新 email
 	// 確認密碼是否正確
 	if member.Password != password {
 		return ErrUseCaseMemberPasswordIncorrect
@@ -119,7 +111,7 @@ func (m *MemberUseCase) UpdateMemberEmail(ctx context.Context, id int, newEmail,
 	// 執行 email 更新
 	err = m.MemberGateway.UpdateEmail(ctx, id, newEmail)
 	if err != nil {
-		return MapGatewayErrorToUseCaseError(err)
+		return err
 	}
 	return nil
 }
@@ -131,7 +123,7 @@ func (m *MemberUseCase) UpdateMemberPassword(ctx context.Context, id int, newPas
 	// 取得目前 member，驗證密碼
 	member, err := m.MemberGateway.GetByID(ctx, id)
 	if err != nil {
-		return MapGatewayErrorToUseCaseError(err)
+		return err
 	}
 	// 確認舊密碼是否正確
 	if member.Password != oldPassword {
@@ -140,21 +132,19 @@ func (m *MemberUseCase) UpdateMemberPassword(ctx context.Context, id int, newPas
 	// 執行密碼更新
 	err = m.MemberGateway.UpdatePassword(ctx, id, newPassword)
 	if err != nil {
-		return MapGatewayErrorToUseCaseError(err)
+		return err
 	}
 	return nil
 }
 func (m *MemberUseCase) DeleteMember(ctx context.Context, id int) (*entity.Member, error) {
 	member, err := m.MemberGateway.GetByID(ctx, id)
 	if err != nil {
-		ucErr := MapGatewayErrorToUseCaseError(err)
-		return nil, ucErr
+		return nil, err
 	}
 
 	err = m.MemberGateway.Delete(ctx, id)
 	if err != nil {
-		ucErr := MapGatewayErrorToUseCaseError(err)
-		return nil, ucErr
+		return nil, err
 	}
 	return member, nil
 }

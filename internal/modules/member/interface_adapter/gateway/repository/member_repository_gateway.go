@@ -27,7 +27,7 @@ func (g MemberSQLXGateway) Create(ctx context.Context, m *entity.Member) error {
 	}
 	err := g.infraRepo.Create(ctx, repoModel)
 	if err != nil {
-		return MapInfraErrorToGatewayError(err)
+		return MapInfraErrorToUsecaseError(err)
 	}
 	return nil
 }
@@ -35,7 +35,7 @@ func (g MemberSQLXGateway) Create(ctx context.Context, m *entity.Member) error {
 func (g MemberSQLXGateway) GetByID(ctx context.Context, id int) (*entity.Member, error) {
 	repoModel, err := g.infraRepo.GetByID(ctx, id)
 	if err != nil {
-		return nil, MapInfraErrorToGatewayError(err)
+		return nil, MapInfraErrorToUsecaseError(err)
 	}
 	createdAt, err := time.Parse("2006-01-02 15:04:05", repoModel.CreatedAt)
 	if err != nil {
@@ -53,7 +53,7 @@ func (g MemberSQLXGateway) GetByID(ctx context.Context, id int) (*entity.Member,
 func (g MemberSQLXGateway) GetByEmail(ctx context.Context, email string) (*entity.Member, error) {
 	repoModel, err := g.infraRepo.GetByEmail(ctx, email)
 	if err != nil {
-		return nil, MapInfraErrorToGatewayError(err)
+		return nil, MapInfraErrorToUsecaseError(err)
 	}
 	createdAt, err := time.Parse("2006-01-02 15:04:05", repoModel.CreatedAt)
 	if err != nil {
@@ -71,7 +71,7 @@ func (g MemberSQLXGateway) GetByEmail(ctx context.Context, email string) (*entit
 func (g MemberSQLXGateway) GetAll(ctx context.Context, pagination pagination.Pagination) ([]*entity.Member, error) {
 	repoModels, err := g.infraRepo.GetAll(ctx, pagination)
 	if err != nil {
-		return nil, MapInfraErrorToGatewayError(err)
+		return nil, MapInfraErrorToUsecaseError(err)
 	}
 	var members []*entity.Member
 	for _, repoModel := range repoModels {
@@ -101,7 +101,7 @@ func (g MemberSQLXGateway) UpdateProfile(ctx context.Context, m *entity.Member) 
 	//讀已寫所以不用回傳
 	_, err := g.infraRepo.UpdateProfile(ctx, repoModel)
 	if err != nil {
-		return nil, MapInfraErrorToGatewayError(err)
+		return nil, MapInfraErrorToUsecaseError(err)
 	}
 	return m, nil
 }
@@ -109,7 +109,7 @@ func (g MemberSQLXGateway) UpdateProfile(ctx context.Context, m *entity.Member) 
 func (g MemberSQLXGateway) UpdateEmail(ctx context.Context, id int, newEmail string) error {
 	err := g.infraRepo.UpdateEmail(ctx, id, newEmail)
 	if err != nil {
-		return MapInfraErrorToGatewayError(err)
+		return MapInfraErrorToUsecaseError(err)
 	}
 	return nil
 }
@@ -117,7 +117,7 @@ func (g MemberSQLXGateway) UpdateEmail(ctx context.Context, id int, newEmail str
 func (g MemberSQLXGateway) UpdatePassword(ctx context.Context, id int, newPassword string) error {
 	err := g.infraRepo.UpdatePassword(ctx, id, newPassword)
 	if err != nil {
-		return MapInfraErrorToGatewayError(err)
+		return MapInfraErrorToUsecaseError(err)
 	}
 	return nil
 }
@@ -125,7 +125,7 @@ func (g MemberSQLXGateway) UpdatePassword(ctx context.Context, id int, newPasswo
 func (g MemberSQLXGateway) Delete(ctx context.Context, id int) error {
 	err := g.infraRepo.Delete(ctx, id)
 	if err != nil {
-		return MapInfraErrorToGatewayError(err)
+		return MapInfraErrorToUsecaseError(err)
 	}
 	return nil
 }
@@ -133,7 +133,7 @@ func (g MemberSQLXGateway) Delete(ctx context.Context, id int) error {
 func (g MemberSQLXGateway) CountAll(ctx context.Context) (int, error) {
 	count, err := g.infraRepo.CountAll(ctx)
 	if err != nil {
-		return 0, MapInfraErrorToGatewayError(err)
+		return 0, MapInfraErrorToUsecaseError(err)
 	}
 	return count, nil
 }
