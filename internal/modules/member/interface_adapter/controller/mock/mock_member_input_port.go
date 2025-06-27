@@ -7,7 +7,7 @@ package mock
 import (
 	context "context"
 	entity "module-clean/internal/modules/member/entity"
-	inputmodel "module-clean/internal/modules/member/interface_adapter/inputmodel"
+	"module-clean/internal/modules/member/usecase/inputmodel"
 	pagination "module-clean/internal/shared/pagination"
 	reflect "reflect"
 

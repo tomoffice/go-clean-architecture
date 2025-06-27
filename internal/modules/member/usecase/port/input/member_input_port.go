@@ -4,7 +4,7 @@ package input
 import (
 	"context"
 	"module-clean/internal/modules/member/entity"
-	"module-clean/internal/modules/member/interface_adapter/inputmodel"
+	"module-clean/internal/modules/member/usecase/inputmodel"
 	"module-clean/internal/shared/pagination"
 )
 

@@ -13,7 +13,7 @@ import (
 	"errors"
 	"module-clean/internal/modules/member/entity"
 	gateway "module-clean/internal/modules/member/interface_adapter/gateway/repository"
-	"module-clean/internal/modules/member/interface_adapter/inputmodel"
+	"module-clean/internal/modules/member/usecase/inputmodel"
 	"module-clean/internal/modules/member/usecase/port/input"
 	"module-clean/internal/modules/member/usecase/port/output"
 	"module-clean/internal/shared/pagination"

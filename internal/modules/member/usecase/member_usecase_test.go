@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"module-clean/internal/modules/member/entity"
 	"module-clean/internal/modules/member/interface_adapter/gateway/repository"
-	"module-clean/internal/modules/member/interface_adapter/inputmodel"
+	"module-clean/internal/modules/member/usecase/inputmodel"
 	"module-clean/internal/modules/member/usecase/mock"
 	"module-clean/internal/modules/member/usecase/port/output"
 	"module-clean/internal/shared/pagination"
