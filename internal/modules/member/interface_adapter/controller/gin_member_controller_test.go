@@ -1940,7 +1940,7 @@ func TestMemberController_UpdateProfile(t *testing.T) {
 			wantStatus: 404,
 		},
 		{
-			name: "usecase error - gateway db error",
+			name: "usecase error - db error",
 			fields: fields{
 				usecase:   mock.NewMockMemberInputPort(ctrl),
 				presenter: mock.NewMockMemberPresenter(ctrl),
@@ -1962,7 +1962,7 @@ func TestMemberController_UpdateProfile(t *testing.T) {
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
 				uc.EXPECT().UpdateMemberProfile(gomock.Any(), gomock.Any()).Return(
 					nil,
-					usecase.ErrUseCaseMemberGatewayError,
+					usecase.ErrMemberDBError,
 				)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberDBError,
@@ -2399,7 +2399,7 @@ func TestMemberController_UpdateEmail(t *testing.T) {
 			wantStatus: 404,
 		},
 		{
-			name: "usecase error - gateway db error",
+			name: "usecase error - db error",
 			fields: fields{
 				usecase:   mock.NewMockMemberInputPort(ctrl),
 				presenter: mock.NewMockMemberPresenter(ctrl),
@@ -2420,7 +2420,7 @@ func TestMemberController_UpdateEmail(t *testing.T) {
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
 				uc.EXPECT().UpdateMemberEmail(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
-					usecase.ErrUseCaseMemberGatewayError,
+					usecase.ErrMemberDBError,
 				)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberDBError,
@@ -3171,7 +3171,7 @@ func TestMemberController_UpdatePassword(t *testing.T) {
 			wantStatus: 422,
 		},
 		{
-			name: "usecase error - gateway db error",
+			name: "usecase error - db error",
 			fields: fields{
 				usecase:   mock.NewMockMemberInputPort(ctrl),
 				presenter: mock.NewMockMemberPresenter(ctrl),
@@ -3192,7 +3192,7 @@ func TestMemberController_UpdatePassword(t *testing.T) {
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
 				uc.EXPECT().UpdateMemberPassword(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
-					usecase.ErrUseCaseMemberGatewayError,
+					usecase.ErrMemberDBError,
 				)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberDBError,

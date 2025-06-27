@@ -19,8 +19,6 @@ func MapMemberUseCaseToPresenterError(err error) (int, string) {
 		return errorcode.ErrMemberDBError, usecase.ErrMemberDBError.Error()
 	case errors.Is(err, usecase.ErrMemberUnexpectedError):
 		return errorcode.ErrUnexpectedMemberUseCaseError, usecase.ErrMemberUnexpectedError.Error()
-	case errors.Is(err, usecase.ErrUseCaseMemberGatewayError):
-		return errorcode.ErrMemberGatewayError, usecase.ErrUseCaseMemberGatewayError.Error()
 	case errors.Is(err, usecase.ErrMemberUpdateSameEmail):
 		return errorcode.ErrMemberUpdateSameEmail, usecase.ErrMemberUpdateSameEmail.Error()
 	case errors.Is(err, usecase.ErrMemberEmailAlreadyExists):
