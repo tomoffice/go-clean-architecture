@@ -2,11 +2,11 @@ package bootstrap
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"log"
 	"module-clean/config"
 	"module-clean/internal/framework/database"
-	"module-clean/internal/framework/http/gin"
-	ginrouter "module-clean/internal/framework/http/gin/router"
+
 	"module-clean/internal/modules"
 	"module-clean/internal/modules/member"
 )
@@ -28,15 +28,19 @@ func (a *App) Run() {
 	if err != nil {
 		log.Fatalf("DB 初始化失敗: %v", err)
 	}
-	engine := ginrouter.NewGinEngine("")
+	engine := gin.New()
+	engine.Use(gin.Logger(), gin.Recovery())
 	apiRouterGroup := engine.Group("/api/v1")
-	// member module
+	// module
 	memberModule := member.NewMemberModule(db, apiRouterGroup)
 	a.Modules = append(a.Modules, memberModule)
 	a.registerALlModules(a.Modules)
+
 	addr := fmt.Sprintf("%s:%s", a.Config.Server.HTTP.Host, a.Config.Server.HTTP.Port)
 	fmt.Printf("Starting server on %s ...\n", addr)
-	gin.StartHTTPServer(addr, engine)
+	if err := engine.Run(addr); err != nil {
+		log.Fatalf("啟動服務失敗: %v", err)
+	}
 }
 func (a *App) registerALlModules(modules []modules.Module) {
 	for _, m := range modules {
