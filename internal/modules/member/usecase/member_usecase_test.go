@@ -6,7 +6,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"module-clean/internal/modules/member/entity"
-	"module-clean/internal/modules/member/interface_adapter/gateway/repository"
 	"module-clean/internal/modules/member/usecase/inputmodel"
 	"module-clean/internal/modules/member/usecase/mock"
 	"module-clean/internal/modules/member/usecase/port/output"
@@ -74,9 +73,9 @@ func TestMemberUseCase_DeleteMember(t *testing.T) {
 			},
 			want: nil,
 			repoSetup: func(r *mock.MockMemberPersistence) {
-				r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberNotFound)
+				r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, ErrMemberNotFound)
 			},
-			wantErr: MapGatewayErrorToUseCaseError(repository.ErrGatewayMemberNotFound),
+			wantErr: ErrMemberNotFound,
 		},
 		{
 			name: "got member but delete error",
@@ -91,10 +90,10 @@ func TestMemberUseCase_DeleteMember(t *testing.T) {
 			repoSetup: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
 					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{}, nil),
-					r.EXPECT().Delete(ctx, gomock.Any()).Return(repository.ErrGatewayMemberDBError),
+					r.EXPECT().Delete(ctx, gomock.Any()).Return(ErrMemberDBError),
 				)
 			},
-			wantErr: MapGatewayErrorToUseCaseError(repository.ErrGatewayMemberDBError),
+			wantErr: ErrMemberDBError,
 		},
 		{
 			name: "delete no affect",
@@ -109,10 +108,10 @@ func TestMemberUseCase_DeleteMember(t *testing.T) {
 			repoSetup: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
 					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{}, nil),
-					r.EXPECT().Delete(ctx, gomock.Any()).Return(repository.ErrGatewayMemberNoEffect),
+					r.EXPECT().Delete(ctx, gomock.Any()).Return(ErrMemberNoEffect),
 				)
 			},
-			wantErr: MapGatewayErrorToUseCaseError(repository.ErrGatewayMemberNoEffect),
+			wantErr: ErrMemberNoEffect,
 		},
 	}
 	for _, tt := range tests {
@@ -182,7 +181,8 @@ func TestMemberUseCase_GetMemberByEmail(t *testing.T) {
 				}, nil)
 			},
 			wantErr: nil,
-		}, {
+		},
+		{
 			name: "no member found",
 			fields: fields{
 				MemberRepo: mock.NewMockMemberPersistence(ctrl),
@@ -193,10 +193,11 @@ func TestMemberUseCase_GetMemberByEmail(t *testing.T) {
 			},
 			want: nil,
 			repoSetup: func(r *mock.MockMemberPersistence) {
-				r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberNotFound)
+				r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, ErrMemberNotFound)
 			},
-			wantErr: MapGatewayErrorToUseCaseError(repository.ErrGatewayMemberNotFound),
-		}, {
+			wantErr: ErrMemberNotFound,
+		},
+		{
 			name: "db error",
 			fields: fields{
 				MemberRepo: mock.NewMockMemberPersistence(ctrl),
@@ -207,9 +208,9 @@ func TestMemberUseCase_GetMemberByEmail(t *testing.T) {
 			},
 			want: nil,
 			repoSetup: func(r *mock.MockMemberPersistence) {
-				r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberDBError)
+				r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, ErrMemberDBError)
 			},
-			wantErr: MapGatewayErrorToUseCaseError(repository.ErrGatewayMemberDBError),
+			wantErr: ErrMemberDBError,
 		},
 	}
 	for _, tt := range tests {
@@ -290,9 +291,9 @@ func TestMemberUseCase_GetMemberByID(t *testing.T) {
 			},
 			want: nil,
 			repoSetup: func(r *mock.MockMemberPersistence) {
-				r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberNotFound)
+				r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, ErrMemberNotFound)
 			},
-			wantErr: MapGatewayErrorToUseCaseError(repository.ErrGatewayMemberNotFound),
+			wantErr: ErrMemberNotFound,
 		},
 	}
 	for _, tt := range tests {
@@ -404,9 +405,9 @@ func TestMemberUseCase_ListMembers(t *testing.T) {
 			want:      nil,
 			wantTotal: 0,
 			setupRepo: func(r *mock.MockMemberPersistence) {
-				r.EXPECT().GetAll(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberNotFound)
+				r.EXPECT().GetAll(ctx, gomock.Any()).Return(nil, ErrMemberNotFound)
 			},
-			wantErr: MapGatewayErrorToUseCaseError(repository.ErrGatewayMemberNotFound),
+			wantErr: ErrMemberNotFound,
 		},
 		{
 			name: "got members but count error",
@@ -443,10 +444,10 @@ func TestMemberUseCase_ListMembers(t *testing.T) {
 							CreatedAt: testTime,
 						},
 					}, nil),
-					r.EXPECT().CountAll(ctx).Return(0, repository.ErrGatewayMemberDBError),
+					r.EXPECT().CountAll(ctx).Return(0, ErrMemberDBError),
 				)
 			},
-			wantErr: MapGatewayErrorToUseCaseError(repository.ErrGatewayMemberDBError),
+			wantErr: ErrMemberDBError,
 		},
 	}
 	for _, tt := range tests {
@@ -534,9 +535,9 @@ func TestMemberUseCase_RegisterMember(t *testing.T) {
 				member: nil,
 			},
 			want:    nil,
-			wantErr: ErrUseCaseMemberAlreadyExists,
+			wantErr: ErrMemberAlreadyExists,
 			setupRepo: func(r *mock.MockMemberPersistence) {
-				r.EXPECT().Create(ctx, gomock.Any()).Return(repository.ErrGatewayMemberAlreadyExists)
+				r.EXPECT().Create(ctx, gomock.Any()).Return(ErrMemberAlreadyExists)
 			},
 		},
 		{
@@ -549,13 +550,13 @@ func TestMemberUseCase_RegisterMember(t *testing.T) {
 				member: &entity.Member{},
 			},
 			want:    nil,
-			wantErr: MapGatewayErrorToUseCaseError(repository.ErrGatewayMemberNotFound),
+			wantErr: ErrMemberNotFound,
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
 					// 第一次註冊不會回應任何資料
 					r.EXPECT().Create(ctx, gomock.Any()).Return(nil),
 					// 第二次利用email取得資料
-					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberNotFound),
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, ErrMemberNotFound),
 				)
 			},
 		},
@@ -569,9 +570,9 @@ func TestMemberUseCase_RegisterMember(t *testing.T) {
 				member: &entity.Member{},
 			},
 			want:    nil,
-			wantErr: MapGatewayErrorToUseCaseError(repository.ErrGatewayMemberDBError),
+			wantErr: ErrMemberDBError,
 			setupRepo: func(r *mock.MockMemberPersistence) {
-				r.EXPECT().Create(ctx, gomock.Any()).Return(repository.ErrGatewayMemberDBError)
+				r.EXPECT().Create(ctx, gomock.Any()).Return(ErrMemberDBError)
 			},
 		},
 		{
@@ -584,13 +585,13 @@ func TestMemberUseCase_RegisterMember(t *testing.T) {
 				member: &entity.Member{},
 			},
 			want:    nil,
-			wantErr: MapGatewayErrorToUseCaseError(repository.ErrGatewayMemberDBError),
+			wantErr: ErrMemberDBError,
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
 					// 第一次註冊不會回應任何資料
 					r.EXPECT().Create(ctx, gomock.Any()).Return(nil),
 					// 第二次利用email取得資料
-					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberDBError),
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, ErrMemberDBError),
 				)
 			},
 		},
@@ -689,9 +690,9 @@ func TestMemberUseCase_UpdateMemberProfile(t *testing.T) {
 				},
 			},
 			want:    nil,
-			wantErr: MapGatewayErrorToUseCaseError(repository.ErrGatewayMemberNotFound),
+			wantErr: ErrMemberNotFound,
 			setupRepo: func(r *mock.MockMemberPersistence) {
-				r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberNotFound)
+				r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, ErrMemberNotFound)
 			},
 		},
 		{
@@ -707,7 +708,7 @@ func TestMemberUseCase_UpdateMemberProfile(t *testing.T) {
 				},
 			},
 			want:    nil,
-			wantErr: MapGatewayErrorToUseCaseError(repository.ErrGatewayMemberNoEffect),
+			wantErr: ErrMemberNoEffect,
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
 					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
@@ -717,7 +718,7 @@ func TestMemberUseCase_UpdateMemberProfile(t *testing.T) {
 						Password:  "",
 						CreatedAt: testTime,
 					}, nil),
-					r.EXPECT().UpdateProfile(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberNoEffect),
+					r.EXPECT().UpdateProfile(ctx, gomock.Any()).Return(nil, ErrMemberNoEffect),
 				)
 			},
 		},
@@ -734,9 +735,9 @@ func TestMemberUseCase_UpdateMemberProfile(t *testing.T) {
 				},
 			},
 			want:    nil,
-			wantErr: MapGatewayErrorToUseCaseError(repository.ErrGatewayMemberDBError),
+			wantErr: ErrMemberDBError,
 			setupRepo: func(r *mock.MockMemberPersistence) {
-				r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberDBError)
+				r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, ErrMemberDBError)
 			},
 		},
 		{
@@ -752,9 +753,9 @@ func TestMemberUseCase_UpdateMemberProfile(t *testing.T) {
 				},
 			},
 			want:    nil,
-			wantErr: MapGatewayErrorToUseCaseError(repository.ErrGatewayMemberMappingError),
+			wantErr: ErrMemberMappingError,
 			setupRepo: func(r *mock.MockMemberPersistence) {
-				r.EXPECT().GetByID(gomock.Any(), gomock.Any()).Return(nil, repository.ErrGatewayMemberMappingError)
+				r.EXPECT().GetByID(gomock.Any(), gomock.Any()).Return(nil, ErrMemberMappingError)
 			},
 		},
 		{
@@ -767,7 +768,7 @@ func TestMemberUseCase_UpdateMemberProfile(t *testing.T) {
 				patch: &inputmodel.PatchUpdateMemberProfileInputModel{},
 			},
 			want:    nil,
-			wantErr: MapGatewayErrorToUseCaseError(repository.ErrGatewayMemberNoEffect),
+			wantErr: ErrMemberNoEffect,
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
 					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
@@ -783,7 +784,7 @@ func TestMemberUseCase_UpdateMemberProfile(t *testing.T) {
 						Email:     "gg@gmail.com",
 						Password:  "",
 						CreatedAt: testTime,
-					}, repository.ErrGatewayMemberNoEffect),
+					}, ErrMemberNoEffect),
 				)
 			},
 		},
@@ -840,7 +841,7 @@ func TestMemberUseCase_UpdateMemberEmail(t *testing.T) {
 			},
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberNotFound),
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, ErrMemberNotFound),
 					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
 						ID:        0,
 						Name:      "test",
@@ -872,7 +873,7 @@ func TestMemberUseCase_UpdateMemberEmail(t *testing.T) {
 					Password: "",
 				}, nil)
 			},
-			wantErr: ErrUseCaseMemberEmailAlreadyExists,
+			wantErr: ErrMemberEmailAlreadyExists,
 		},
 		{
 			name: "other error",
@@ -887,10 +888,10 @@ func TestMemberUseCase_UpdateMemberEmail(t *testing.T) {
 			},
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberDBError),
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, ErrMemberDBError),
 				)
 			},
-			wantErr: ErrUseCaseMemberDBError,
+			wantErr: ErrMemberDBError,
 		},
 		{
 			name: "oldEmail is same as newEmail",
@@ -911,7 +912,7 @@ func TestMemberUseCase_UpdateMemberEmail(t *testing.T) {
 					}, nil),
 				)
 			},
-			wantErr: ErrUseCaseMemberUpdateSameEmail,
+			wantErr: ErrMemberUpdateSameEmail,
 		},
 		{
 			name: "GetByID error - member not found",
@@ -926,11 +927,11 @@ func TestMemberUseCase_UpdateMemberEmail(t *testing.T) {
 			},
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberNotFound),
-					r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberNotFound),
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, ErrMemberNotFound),
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, ErrMemberNotFound),
 				)
 			},
-			wantErr: ErrUseCaseMemberNotFound,
+			wantErr: ErrMemberNotFound,
 		},
 		{
 			name: "GetByID error - db error",
@@ -944,11 +945,11 @@ func TestMemberUseCase_UpdateMemberEmail(t *testing.T) {
 			},
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberNotFound),
-					r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberDBError),
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, ErrMemberNotFound),
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, ErrMemberDBError),
 				)
 			},
-			wantErr: ErrUseCaseMemberDBError,
+			wantErr: ErrMemberDBError,
 		},
 		{
 			name: "password mismatch",
@@ -962,14 +963,14 @@ func TestMemberUseCase_UpdateMemberEmail(t *testing.T) {
 			},
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberNotFound),
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, ErrMemberNotFound),
 					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
 						ID:       1,
 						Password: "rightpassword",
 					}, nil),
 				)
 			},
-			wantErr: ErrUseCaseMemberPasswordIncorrect,
+			wantErr: ErrMemberPasswordIncorrect,
 		},
 		{
 			name: "UpdateEmail error - no effect",
@@ -982,13 +983,13 @@ func TestMemberUseCase_UpdateMemberEmail(t *testing.T) {
 			},
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberNotFound),
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, ErrMemberNotFound),
 					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{}, nil),
-					r.EXPECT().UpdateEmail(ctx, gomock.Any(), gomock.Any()).Return(repository.ErrGatewayMemberNoEffect),
+					r.EXPECT().UpdateEmail(ctx, gomock.Any(), gomock.Any()).Return(ErrMemberNoEffect),
 				)
 			},
 
-			wantErr: ErrUseCaseMemberNoEffect,
+			wantErr: ErrMemberNoEffect,
 		},
 		{
 			name: "UpdateEmail error - db error",
@@ -1001,12 +1002,12 @@ func TestMemberUseCase_UpdateMemberEmail(t *testing.T) {
 			},
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberNotFound),
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, ErrMemberNotFound),
 					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{}, nil),
-					r.EXPECT().UpdateEmail(ctx, gomock.Any(), gomock.Any()).Return(repository.ErrGatewayMemberDBError),
+					r.EXPECT().UpdateEmail(ctx, gomock.Any(), gomock.Any()).Return(ErrMemberDBError),
 				)
 			},
-			wantErr: ErrUseCaseMemberDBError,
+			wantErr: ErrMemberDBError,
 		},
 	}
 	for _, tt := range tests {
@@ -1078,9 +1079,8 @@ func TestMemberUseCase_UpdateMemberPassword(t *testing.T) {
 				newPassword: "password",
 				oldPassword: "password",
 			},
-			setupRepo: func(r *mock.MockMemberPersistence) {
-			},
-			wantErr: ErrUseCaseMemberUpdateSamePassword,
+			setupRepo: func(r *mock.MockMemberPersistence) {},
+			wantErr:   ErrMemberUpdateSamePassword,
 		},
 		{
 			name: "GetByID error - member not found",
@@ -1095,10 +1095,10 @@ func TestMemberUseCase_UpdateMemberPassword(t *testing.T) {
 			},
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberNotFound),
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, ErrMemberNotFound),
 				)
 			},
-			wantErr: ErrUseCaseMemberNotFound,
+			wantErr: ErrMemberNotFound,
 		},
 		{
 			name: "GetByID error - db error",
@@ -1113,10 +1113,10 @@ func TestMemberUseCase_UpdateMemberPassword(t *testing.T) {
 			},
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, repository.ErrGatewayMemberDBError),
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, ErrMemberDBError),
 				)
 			},
-			wantErr: ErrUseCaseMemberDBError,
+			wantErr: ErrMemberDBError,
 		},
 		{
 			name: "logic error - db password not input password",
@@ -1136,7 +1136,7 @@ func TestMemberUseCase_UpdateMemberPassword(t *testing.T) {
 					}, nil),
 				)
 			},
-			wantErr: ErrUseCaseMemberPasswordIncorrect,
+			wantErr: ErrMemberPasswordIncorrect,
 		},
 		{
 			name: "UpdatePassword error - no effect",
@@ -1155,10 +1155,10 @@ func TestMemberUseCase_UpdateMemberPassword(t *testing.T) {
 						ID:       0,
 						Password: "oldpassword",
 					}, nil),
-					r.EXPECT().UpdatePassword(ctx, gomock.Any(), gomock.Any()).Return(repository.ErrGatewayMemberNoEffect),
+					r.EXPECT().UpdatePassword(ctx, gomock.Any(), gomock.Any()).Return(ErrMemberNoEffect),
 				)
 			},
-			wantErr: ErrUseCaseMemberNoEffect,
+			wantErr: ErrMemberNoEffect,
 		},
 		{
 			name: "UpdatePassword error - db error",
@@ -1177,10 +1177,10 @@ func TestMemberUseCase_UpdateMemberPassword(t *testing.T) {
 						ID:       0,
 						Password: "oldpassword",
 					}, nil),
-					r.EXPECT().UpdatePassword(ctx, gomock.Any(), gomock.Any()).Return(repository.ErrGatewayMemberDBError),
+					r.EXPECT().UpdatePassword(ctx, gomock.Any(), gomock.Any()).Return(ErrMemberDBError),
 				)
 			},
-			wantErr: ErrUseCaseMemberDBError,
+			wantErr: ErrMemberDBError,
 		},
 	}
 	for _, tt := range tests {

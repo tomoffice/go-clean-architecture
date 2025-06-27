@@ -84,13 +84,13 @@ func (m *MemberUseCase) UpdateMemberEmail(ctx context.Context, id int, newEmail,
 	existedMember, err := m.MemberGateway.GetByEmail(ctx, newEmail)
 	if err == nil && existedMember.ID != id {
 		// 新 email 已被其他人使用
-		return ErrUseCaseMemberEmailAlreadyExists
+		return ErrMemberEmailAlreadyExists
 	} else if err == nil && existedMember.ID == id {
 		// 新 email 與舊 email 相同，直接返回錯誤
-		return ErrUseCaseMemberUpdateSameEmail
+		return ErrMemberUpdateSameEmail
 	}
 	if err != nil {
-		if errors.Is(err, ErrUseCaseMemberNotFound) {
+		if errors.Is(err, ErrMemberNotFound) {
 			// 正常情境：新 email 不存在，可以繼續檢查密碼與更新
 			// 不 return，繼續往下走
 		} else {
@@ -106,7 +106,7 @@ func (m *MemberUseCase) UpdateMemberEmail(ctx context.Context, id int, newEmail,
 	// 驗證密碼與更新 email
 	// 確認密碼是否正確
 	if member.Password != password {
-		return ErrUseCaseMemberPasswordIncorrect
+		return ErrMemberPasswordIncorrect
 	}
 	// 執行 email 更新
 	err = m.MemberGateway.UpdateEmail(ctx, id, newEmail)
@@ -118,7 +118,7 @@ func (m *MemberUseCase) UpdateMemberEmail(ctx context.Context, id int, newEmail,
 func (m *MemberUseCase) UpdateMemberPassword(ctx context.Context, id int, newPassword, oldPassword string) error {
 	// 先檢查新舊密碼是否一樣
 	if newPassword == oldPassword {
-		return ErrUseCaseMemberUpdateSamePassword
+		return ErrMemberUpdateSamePassword
 	}
 	// 取得目前 member，驗證密碼
 	member, err := m.MemberGateway.GetByID(ctx, id)
@@ -127,7 +127,7 @@ func (m *MemberUseCase) UpdateMemberPassword(ctx context.Context, id int, newPas
 	}
 	// 確認舊密碼是否正確
 	if member.Password != oldPassword {
-		return ErrUseCaseMemberPasswordIncorrect
+		return ErrMemberPasswordIncorrect
 	}
 	// 執行密碼更新
 	err = m.MemberGateway.UpdatePassword(ctx, id, newPassword)

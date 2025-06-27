@@ -194,7 +194,7 @@ func TestMemberController_Delete(t *testing.T) {
 				ctx: nil,
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
-				uc.EXPECT().DeleteMember(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrUseCaseMemberNotFound)
+				uc.EXPECT().DeleteMember(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrMemberNotFound)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberNotFound,
 					outputmodel.ErrorResponse{
@@ -243,7 +243,7 @@ func TestMemberController_Delete(t *testing.T) {
 				ctx: nil,
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
-				uc.EXPECT().DeleteMember(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrUseCaseMemberNoEffect)
+				uc.EXPECT().DeleteMember(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrMemberNoEffect)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberNoEffect,
 					outputmodel.ErrorResponse{
@@ -293,7 +293,7 @@ func TestMemberController_Delete(t *testing.T) {
 				ctx: nil,
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
-				uc.EXPECT().DeleteMember(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrUseCaseMemberDBError)
+				uc.EXPECT().DeleteMember(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrMemberDBError)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberDBError,
 					outputmodel.ErrorResponse{
@@ -342,7 +342,7 @@ func TestMemberController_Delete(t *testing.T) {
 				ctx: nil,
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
-				uc.EXPECT().DeleteMember(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrUseCaseMemberUnexpectedError)
+				uc.EXPECT().DeleteMember(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrMemberUnexpectedError)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrUnexpectedMemberUseCaseError,
 					outputmodel.ErrorResponse{
@@ -610,7 +610,7 @@ func TestMemberController_GetByEmail(t *testing.T) {
 				)
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
-				uc.EXPECT().GetMemberByEmail(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrUseCaseMemberNotFound)
+				uc.EXPECT().GetMemberByEmail(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrMemberNotFound)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberNotFound,
 					outputmodel.ErrorResponse{
@@ -661,7 +661,7 @@ func TestMemberController_GetByEmail(t *testing.T) {
 				)
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
-				uc.EXPECT().GetMemberByEmail(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrUseCaseMemberDBError)
+				uc.EXPECT().GetMemberByEmail(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrMemberDBError)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberDBError,
 					outputmodel.ErrorResponse{
@@ -902,7 +902,7 @@ func TestMemberController_GetByID(t *testing.T) {
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
 				// uc錯誤後傳給presenter輸出錯誤
-				uc.EXPECT().GetMemberByID(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrUseCaseMemberNotFound)
+				uc.EXPECT().GetMemberByID(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrMemberNotFound)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberNotFound,
 					outputmodel.ErrorResponse{
@@ -943,7 +943,7 @@ func TestMemberController_GetByID(t *testing.T) {
 				ctx: nil,
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
-				uc.EXPECT().GetMemberByID(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrUseCaseMemberDBError)
+				uc.EXPECT().GetMemberByID(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrMemberDBError)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberDBError,
 					outputmodel.ErrorResponse{
@@ -1235,7 +1235,7 @@ func TestMemberController_List(t *testing.T) {
 				ginCtx.Request, _ = http.NewRequest("GET", "/api/v1/members?page="+strconv.Itoa(testArgs.Page)+"&limit="+strconv.Itoa(testArgs.Limit), nil)
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, testArgs testPagination) {
-				uc.EXPECT().ListMembers(gomock.Any(), gomock.Any()).Return(nil, 0, usecase.ErrUseCaseMemberDBError)
+				uc.EXPECT().ListMembers(gomock.Any(), gomock.Any()).Return(nil, 0, usecase.ErrMemberDBError)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberDBError,
 					outputmodel.ErrorResponse{
@@ -1477,7 +1477,7 @@ func TestMemberController_Register(t *testing.T) {
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
 				uc.EXPECT().RegisterMember(gomock.Any(), gomock.Any()).Return(
 					nil,
-					usecase.ErrUseCaseMemberAlreadyExists,
+					usecase.ErrMemberAlreadyExists,
 				)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberAlreadyExists,
@@ -1523,7 +1523,7 @@ func TestMemberController_Register(t *testing.T) {
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
 				uc.EXPECT().RegisterMember(gomock.Any(), gomock.Any()).Return(
 					nil,
-					usecase.ErrUseCaseMemberDBError,
+					usecase.ErrMemberDBError,
 				)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberDBError,
@@ -1570,7 +1570,7 @@ func TestMemberController_Register(t *testing.T) {
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
 				uc.EXPECT().RegisterMember(gomock.Any(), gomock.Any()).Return(
 					nil,
-					usecase.ErrUseCaseMemberNotFound,
+					usecase.ErrMemberNotFound,
 				)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberNotFound,
@@ -1912,7 +1912,7 @@ func TestMemberController_UpdateProfile(t *testing.T) {
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
 				uc.EXPECT().UpdateMemberProfile(gomock.Any(), gomock.Any()).Return(
 					nil,
-					usecase.ErrUseCaseMemberNotFound,
+					usecase.ErrMemberNotFound,
 				)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberNotFound,
@@ -2012,7 +2012,7 @@ func TestMemberController_UpdateProfile(t *testing.T) {
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
 				uc.EXPECT().UpdateMemberProfile(gomock.Any(), gomock.Any()).Return(
 					nil,
-					usecase.ErrUseCaseMemberNoEffect,
+					usecase.ErrMemberNoEffect,
 				)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberNoEffect,
@@ -2374,7 +2374,7 @@ func TestMemberController_UpdateEmail(t *testing.T) {
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
 				uc.EXPECT().UpdateMemberEmail(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
-					usecase.ErrUseCaseMemberNotFound,
+					usecase.ErrMemberNotFound,
 				)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberNotFound,
@@ -2466,7 +2466,7 @@ func TestMemberController_UpdateEmail(t *testing.T) {
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
 				uc.EXPECT().UpdateMemberEmail(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
-					usecase.ErrUseCaseMemberEmailAlreadyExists,
+					usecase.ErrMemberEmailAlreadyExists,
 				)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberEmailAlreadyExists,
@@ -2512,7 +2512,7 @@ func TestMemberController_UpdateEmail(t *testing.T) {
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
 				uc.EXPECT().UpdateMemberEmail(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
-					usecase.ErrUseCaseMemberUpdateSameEmail,
+					usecase.ErrMemberUpdateSameEmail,
 				)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberUpdateSameEmail,
@@ -2557,7 +2557,7 @@ func TestMemberController_UpdateEmail(t *testing.T) {
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
 				uc.EXPECT().UpdateMemberEmail(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
-					usecase.ErrUseCaseMemberPasswordIncorrect,
+					usecase.ErrMemberPasswordIncorrect,
 				)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberPasswordIncorrect,
@@ -2603,7 +2603,7 @@ func TestMemberController_UpdateEmail(t *testing.T) {
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
 				uc.EXPECT().UpdateMemberEmail(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
-					usecase.ErrUseCaseMemberNoEffect,
+					usecase.ErrMemberNoEffect,
 				)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberNoEffect,
@@ -3008,7 +3008,7 @@ func TestMemberController_UpdatePassword(t *testing.T) {
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
 				uc.EXPECT().UpdateMemberPassword(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
-					usecase.ErrUseCaseMemberUpdateSamePassword,
+					usecase.ErrMemberUpdateSamePassword,
 				)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberUpdateSamePassword,
@@ -3054,7 +3054,7 @@ func TestMemberController_UpdatePassword(t *testing.T) {
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
 				uc.EXPECT().UpdateMemberPassword(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
-					usecase.ErrUseCaseMemberNotFound,
+					usecase.ErrMemberNotFound,
 				)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberNotFound,
@@ -3100,7 +3100,7 @@ func TestMemberController_UpdatePassword(t *testing.T) {
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
 				uc.EXPECT().UpdateMemberPassword(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
-					usecase.ErrUseCaseMemberPasswordIncorrect,
+					usecase.ErrMemberPasswordIncorrect,
 				)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberPasswordIncorrect,
@@ -3146,7 +3146,7 @@ func TestMemberController_UpdatePassword(t *testing.T) {
 			},
 			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
 				uc.EXPECT().UpdateMemberPassword(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
-					usecase.ErrUseCaseMemberNoEffect,
+					usecase.ErrMemberNoEffect,
 				)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberNoEffect,

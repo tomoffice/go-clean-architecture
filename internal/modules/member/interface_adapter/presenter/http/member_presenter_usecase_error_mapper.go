@@ -9,24 +9,24 @@ import (
 
 func MapMemberUseCaseToPresenterError(err error) (int, string) {
 	switch {
-	case errors.Is(err, usecase.ErrUseCaseMemberNotFound):
-		return errorcode.ErrMemberNotFound, usecase.ErrUseCaseMemberNotFound.Error()
-	case errors.Is(err, usecase.ErrUseCaseMemberAlreadyExists):
-		return errorcode.ErrMemberAlreadyExists, usecase.ErrUseCaseMemberAlreadyExists.Error()
-	case errors.Is(err, usecase.ErrUseCaseMemberNoEffect):
-		return errorcode.ErrMemberNoEffect, usecase.ErrUseCaseMemberNoEffect.Error()
-	case errors.Is(err, usecase.ErrUseCaseMemberDBError):
-		return errorcode.ErrMemberDBError, usecase.ErrUseCaseMemberDBError.Error()
-	case errors.Is(err, usecase.ErrUseCaseMemberUnexpectedError):
-		return errorcode.ErrUnexpectedMemberUseCaseError, usecase.ErrUseCaseMemberUnexpectedError.Error()
+	case errors.Is(err, usecase.ErrMemberNotFound):
+		return errorcode.ErrMemberNotFound, usecase.ErrMemberNotFound.Error()
+	case errors.Is(err, usecase.ErrMemberAlreadyExists):
+		return errorcode.ErrMemberAlreadyExists, usecase.ErrMemberAlreadyExists.Error()
+	case errors.Is(err, usecase.ErrMemberNoEffect):
+		return errorcode.ErrMemberNoEffect, usecase.ErrMemberNoEffect.Error()
+	case errors.Is(err, usecase.ErrMemberDBError):
+		return errorcode.ErrMemberDBError, usecase.ErrMemberDBError.Error()
+	case errors.Is(err, usecase.ErrMemberUnexpectedError):
+		return errorcode.ErrUnexpectedMemberUseCaseError, usecase.ErrMemberUnexpectedError.Error()
 	case errors.Is(err, usecase.ErrUseCaseMemberGatewayError):
 		return errorcode.ErrMemberGatewayError, usecase.ErrUseCaseMemberGatewayError.Error()
-	case errors.Is(err, usecase.ErrUseCaseMemberUpdateSameEmail):
-		return errorcode.ErrMemberUpdateSameEmail, usecase.ErrUseCaseMemberUpdateSameEmail.Error()
-	case errors.Is(err, usecase.ErrUseCaseMemberEmailAlreadyExists):
-		return errorcode.ErrMemberEmailAlreadyExists, usecase.ErrUseCaseMemberEmailAlreadyExists.Error()
-	case errors.Is(err, usecase.ErrUseCaseMemberPasswordIncorrect):
-		return errorcode.ErrMemberPasswordIncorrect, usecase.ErrUseCaseMemberPasswordIncorrect.Error()
+	case errors.Is(err, usecase.ErrMemberUpdateSameEmail):
+		return errorcode.ErrMemberUpdateSameEmail, usecase.ErrMemberUpdateSameEmail.Error()
+	case errors.Is(err, usecase.ErrMemberEmailAlreadyExists):
+		return errorcode.ErrMemberEmailAlreadyExists, usecase.ErrMemberEmailAlreadyExists.Error()
+	case errors.Is(err, usecase.ErrMemberPasswordIncorrect):
+		return errorcode.ErrMemberPasswordIncorrect, usecase.ErrMemberPasswordIncorrect.Error()
 	default:
 		return errorcode.ErrInternalServer, sharederrors.ErrInternalServer.Error()
 	}

@@ -12,20 +12,24 @@ func MapInfraErrorToUsecaseError(err error) error {
 	if err == nil {
 		return nil
 	}
+	// 先處理 gateway 層的業務語意錯誤
+	if errors.Is(err, ErrGatewayMemberMappingError) {
+		return usecase.ErrMemberMappingError
+	}
 	// 先比對 CustomError
 	switch {
 	case errors.Is(err, sqlite.ErrDBRecordNotFound):
-		return usecase.ErrUseCaseMemberNotFound
+		return usecase.ErrMemberNotFound
 	case errors.Is(err, sqlite.ErrDBDuplicateKey):
-		return usecase.ErrUseCaseMemberAlreadyExists
+		return usecase.ErrMemberAlreadyExists
 	case errors.Is(err, sqlite.ErrDBNoEffect):
-		return usecase.ErrUseCaseMemberNoEffect
+		return usecase.ErrMemberNoEffect
 	}
 	// 再處理 DBError 類型
 	var dbErr *sqlite.DBError
 	if errors.As(err, &dbErr) {
-		return fmt.Errorf("%w: %v", usecase.ErrUseCaseMemberDBError, dbErr.RawError)
+		return fmt.Errorf("%w: %v", usecase.ErrMemberDBError, dbErr.RawError)
 	}
 	// fallback：其他未知錯誤
-	return usecase.ErrUseCaseMemberUnexpectedError
+	return usecase.ErrMemberUnexpectedError
 }

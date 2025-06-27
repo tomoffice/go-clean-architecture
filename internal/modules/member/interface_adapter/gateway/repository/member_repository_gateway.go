@@ -39,7 +39,7 @@ func (g MemberSQLXGateway) GetByID(ctx context.Context, id int) (*entity.Member,
 	}
 	createdAt, err := time.Parse("2006-01-02 15:04:05", repoModel.CreatedAt)
 	if err != nil {
-		return nil, ErrGatewayMemberMappingError
+		return nil, MapInfraErrorToUsecaseError(err)
 	}
 	return &entity.Member{
 		ID:        repoModel.ID,
@@ -57,7 +57,7 @@ func (g MemberSQLXGateway) GetByEmail(ctx context.Context, email string) (*entit
 	}
 	createdAt, err := time.Parse("2006-01-02 15:04:05", repoModel.CreatedAt)
 	if err != nil {
-		return nil, ErrGatewayMemberMappingError
+		return nil, MapInfraErrorToUsecaseError(err)
 	}
 	return &entity.Member{
 		ID:        repoModel.ID,
@@ -77,7 +77,7 @@ func (g MemberSQLXGateway) GetAll(ctx context.Context, pagination pagination.Pag
 	for _, repoModel := range repoModels {
 		createdAt, err := time.Parse("2006-01-02 15:04:05", repoModel.CreatedAt)
 		if err != nil {
-			return nil, ErrGatewayMemberMappingError
+			return nil, MapInfraErrorToUsecaseError(err)
 		}
 		members = append(members, &entity.Member{
 			ID:        repoModel.ID,
