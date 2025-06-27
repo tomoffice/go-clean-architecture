@@ -12,7 +12,6 @@ import (
 	"context"
 	"errors"
 	"module-clean/internal/modules/member/entity"
-	gateway "module-clean/internal/modules/member/interface_adapter/gateway/repository"
 	"module-clean/internal/modules/member/usecase/inputmodel"
 	"module-clean/internal/modules/member/usecase/port/input"
 	"module-clean/internal/modules/member/usecase/port/output"
@@ -99,12 +98,13 @@ func (m *MemberUseCase) UpdateMemberEmail(ctx context.Context, id int, newEmail,
 		return ErrUseCaseMemberUpdateSameEmail
 	}
 	if err != nil {
-		if errors.Is(err, gateway.ErrGatewayMemberNotFound) {
+		err = MapGatewayErrorToUseCaseError(err)
+		if errors.Is(err, ErrUseCaseMemberNotFound) {
 			// 正常情境：新 email 不存在，可以繼續檢查密碼與更新
 			// 不 return，繼續往下走
 		} else {
 			// 異常情境：DB 或其它技術錯誤
-			return MapGatewayErrorToUseCaseError(err)
+			return err
 		}
 	}
 	// 驗證密碼與更新 email
