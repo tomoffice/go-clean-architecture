@@ -284,38 +284,3 @@ Content-Type: application/json
 DELETE /members/:id
 ```
 
-## 🤝 貢獻指南
-
-1. Fork 專案
-2. 建立功能分支 (`git checkout -b feature/amazing-feature`)
-3. 提交變更 (`git commit -m 'Add some amazing feature'`)
-4. 推送到分支 (`git push origin feature/amazing-feature`)
-5. 開啟 Pull Request
-
-### 程式碼規範
-
-- 遵循 [Uber Go Style Guide](https://github.com/uber-go/guide/blob/master/style.md)
-- 所有公開的函式和型別都需要註解
-- 使用有意義的變數和函式名稱
-- 保持函式小而專注
-- 優先使用介面而非具體型別
-
-### Commit 訊息規範
-
-請參考 `.github/git-commit-instructions.md` 檔案
-
-## 📄 授權
-
-本專案採用 MIT 授權條款 - 詳見 [LICENSE](LICENSE) 檔案
-
-## 📞 聯絡資訊
-
-如有任何問題或建議，請透過以下方式聯絡：
-
-- 建立 Issue
-- 提交 Pull Request
-- Email: your-email@example.com
-
----
-
-⭐ 如果這個專案對您有幫助，請給我們一個星星！
