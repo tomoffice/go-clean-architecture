@@ -255,6 +255,11 @@ GET /members?page=1&pageSize=10
 GET /members/:id
 ```
 
+#### 透過 Email 取得會員
+```http
+GET /members/email/:email
+```
+
 #### 建立會員
 ```http
 POST /members
@@ -266,14 +271,35 @@ Content-Type: application/json
 }
 ```
 
-#### 更新會員
+#### 更新會員資料
 ```http
-PUT /members/:id
+PATCH /members/:id
 Content-Type: application/json
 
 {
-  "email": "updated@example.com",
-  "name": "Updated Name"
+  "name": "Updated Name",
+  "phone": "+886912345678"
+}
+```
+
+#### 更新會員信箱
+```http
+PATCH /members/:id/email
+Content-Type: application/json
+
+{
+  "email": "newemail@example.com"
+}
+```
+
+#### 更新會員密碼
+```http
+PATCH /members/:id/password
+Content-Type: application/json
+
+{
+  "old_password": "oldPassword123",
+  "new_password": "newPassword456"
 }
 ```
 
