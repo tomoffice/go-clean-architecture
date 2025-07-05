@@ -2,8 +2,8 @@ package repository
 
 import (
 	"context"
-	"module-clean/internal/modules/member/driver/persistence/sqlx"
 	"module-clean/internal/modules/member/entity"
+	"module-clean/internal/modules/member/framework/persistence/sqlx"
 	"module-clean/internal/modules/member/usecase/port/output"
 	"module-clean/internal/shared/pagination"
 	"time"

@@ -168,7 +168,7 @@ module-clean/
 
 1. **建立模組目錄結構**
    ```bash
-   mkdir -p internal/modules/your_module/{entity,usecase,interface_adapter,driver}
+   mkdir -p internal/modules/your_module/{entity,usecase,interface_adapter,framework}
    ```
 
 2. **定義實體**

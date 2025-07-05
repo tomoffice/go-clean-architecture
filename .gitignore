@@ -2,3 +2,6 @@
 /.github/copilot-instructions.md
 /.github/git-commit-instructions.md
 /plain
+.aiignore
+/instructions
+/.junie

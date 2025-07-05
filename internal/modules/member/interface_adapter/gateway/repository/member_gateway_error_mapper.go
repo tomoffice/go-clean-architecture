@@ -3,7 +3,7 @@ package repository
 import (
 	"errors"
 	"fmt"
-	"module-clean/internal/modules/member/driver/persistence/sqlx/sqlite"
+	"module-clean/internal/modules/member/framework/persistence/sqlx/mcsqlite"
 	"module-clean/internal/modules/member/usecase"
 )
 
@@ -18,15 +18,15 @@ func MapInfraErrorToUsecaseError(err error) error {
 	}
 	// 先比對 CustomError
 	switch {
-	case errors.Is(err, sqlite.ErrDBRecordNotFound):
+	case errors.Is(err, mcsqlite.ErrDBRecordNotFound):
 		return usecase.ErrMemberNotFound
-	case errors.Is(err, sqlite.ErrDBDuplicateKey):
+	case errors.Is(err, mcsqlite.ErrDBDuplicateKey):
 		return usecase.ErrMemberAlreadyExists
-	case errors.Is(err, sqlite.ErrDBNoEffect):
+	case errors.Is(err, mcsqlite.ErrDBNoEffect):
 		return usecase.ErrMemberNoEffect
 	}
 	// 再處理 DBError 類型
-	var dbErr *sqlite.DBError
+	var dbErr *mcsqlite.DBError
 	if errors.As(err, &dbErr) {
 		return fmt.Errorf("%w: %v", usecase.ErrMemberDBError, dbErr.RawError)
 	}

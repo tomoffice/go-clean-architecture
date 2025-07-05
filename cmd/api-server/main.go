@@ -4,6 +4,7 @@ import (
 	_ "github.com/mattn/go-sqlite3" // or mysql, pgx, etc.
 	"module-clean/config"
 	"module-clean/internal/bootstrap"
+	"module-clean/internal/framework/http/gin/middleware"
 )
 
 func main() {
@@ -11,6 +12,7 @@ func main() {
 	if err != nil {
 		panic("配置載入失敗: " + err.Error())
 	}
-	app := bootstrap.NewApp(cfg)
+	middlewareContainer := middleware.NewContainer()
+	app := bootstrap.NewApp(cfg, middlewareContainer)
 	app.Run()
 }

@@ -5,3 +5,8 @@ server:
     port: "80"
 database:
   dsn: "file:./data/identifier.sqlite?cache=shared"
+auth:
+  jwt:
+    algorithm: "HS256"
+    secret: "your_jwt_secret"
+    expire: 3600
