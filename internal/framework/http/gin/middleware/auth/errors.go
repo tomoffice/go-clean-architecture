@@ -5,9 +5,8 @@ import "errors"
 // auth error
 var (
 	// 初始化階段
-	ErrMissingSecretKey       = errors.New("config key is required")
-	ErrSecretKeyTooShort      = errors.New("config key must be at least 32 characters")
-	ErrCustomClaimsNotPointer = errors.New("customClaims must be a pointer type")
+	ErrMissingSecretKey  = errors.New("config key is required")
+	ErrSecretKeyTooShort = errors.New("config key must be at least 32 characters")
 
 	// 請求階段
 	ErrAuthRequired        = errors.New("authorization header required")
