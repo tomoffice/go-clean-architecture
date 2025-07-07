@@ -11,12 +11,6 @@ import (
 	"module-clean/config"
 )
 
-type Middleware struct {
-	CORS      gin.HandlerFunc
-	Auth      gin.HandlerFunc
-	RateLimit gin.HandlerFunc
-}
-
 type App struct {
 	Config              *config.Config
 	MiddlewareContainer *middleware.Container
