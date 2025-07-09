@@ -2,12 +2,12 @@ package logger
 
 // Config 結構（供 factory 使用）
 type Config struct {
-	UseConsole bool
-	UseGCP     bool
-	UseSeq     bool
+	ConsoleEnable bool
+	GCPEnable     bool
+	SeqEnable     bool
 
-	Level  string // 共用
-	Format string // 共用：json or console
+	Level  Level  // 共用
+	Format Format // 共用：json or console
 
 	GCP GCPLoggerConfig // 👉 獨立出來，但只在 UseGCP = true 時才用
 	Seq SeqLoggerConfig

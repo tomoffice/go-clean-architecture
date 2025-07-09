@@ -1,22 +1,20 @@
 package logger
 
-import "go.uber.org/zap"
+import (
+	"go.uber.org/zap"
+)
 
-// Field 結構化欄位的抽象型別（由各 adapter 實作轉換）
-type Field interface{}
+// Field 結構化欄位類型
+// 目前基於 zap.Field，如果未來需要支援其他日誌框架可以改為介面
+type Field = zap.Field
 
-func String(key, val string) Field {
-	return zap.String(key, val)
+func NewField[T any](key string, value T) Field {
+	return zap.Any(key, value)
 }
 
-func Int(key string, val int) Field {
-	return zap.Int(key, val)
-}
-
-func Bool(key string, val bool) Field {
-	return zap.Bool(key, val)
-}
-
-func Error(err error) Field {
-	return zap.Error(err)
-}
+// 如果未來需要支援其他日誌框架，可以改為：
+// type Field interface {
+//     // 定義必要的方法
+// }
+//
+// 然後各個 adapter 實作對應的轉換邏輯

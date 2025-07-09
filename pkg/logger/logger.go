@@ -9,3 +9,8 @@ type Logger interface {
 	With(fields ...Field) Logger
 	Sync() error
 }
+type TerminatingLogger interface {
+	Logger
+	Panic(msg string, f ...Field)
+	Fatal(msg string, f ...Field)
+}
