@@ -13,9 +13,9 @@ import (
 
 // Config 定義 Seq Logger 的配置參數
 type Config struct {
-	Endpoint string        // Seq 服務端點，例如：http://seq:5341
-	APIKey   string        // Seq API 金鑰，可選參數
-	Level    zapcore.Level // 日誌最低輸出等級
+	Endpoint string       // Seq 服務端點，例如：http://seq:5341
+	APIKey   string       // Seq API 金鑰，可選參數
+	Level    logger.Level // 日誌最低輸出等級
 }
 
 // NewDefaultConfig 創建預設配置的 Seq Logger

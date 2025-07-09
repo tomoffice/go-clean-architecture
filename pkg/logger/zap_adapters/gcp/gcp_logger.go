@@ -13,9 +13,9 @@ import (
 
 // Config 定義 GCP Logger 的配置參數
 type Config struct {
-	ProjectID string        // GCP 專案 ID
-	LogName   string        // Cloud Logging 的日誌名稱
-	Level     zapcore.Level // 日誌最低輸出等級
+	ProjectID string       // GCP 專案 ID
+	LogName   string       // Cloud Logging 的日誌名稱
+	Level     logger.Level // 日誌最低輸出等級
 }
 
 // NewDefaultConfig 創建預設配置的 GCP Logger
@@ -45,7 +45,7 @@ func NewLogger(cfg Config) (logger.Logger, error) {
 	}
 
 	// 2. 設定 GCP 日誌寫入器
-	gcpWriter := zapcore.AddSync(client.Logger(cfg.LogName).StandardLogger(logging.Info).Writer())
+	gcpWriter := zapcore.AddSync(client.Logger(cfg.LogName).StandardLogger(mapSeverity(cfg.Level)).Writer())
 
 	// 3. 建立統一的編碼器配置（與 Console Logger 保持一致）
 	encCfg := zapcore.EncoderConfig{

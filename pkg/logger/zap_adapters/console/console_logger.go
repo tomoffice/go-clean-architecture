@@ -11,7 +11,7 @@ import (
 
 // Config 定義 ConsoleLogger 的配置參數
 type Config struct {
-	Level  zapcore.Level // 日誌最低輸出等級 (DebugLevel, InfoLevel, WarnLevel, ErrorLevel)
+	Level  logger.Level  // 日誌最低輸出等級 (DebugLevel, InfoLevel, WarnLevel, ErrorLevel)
 	Format logger.Format // 日誌輸出格式，支援 JSONFormat 或 ConsoleFormat
 }
 

@@ -14,8 +14,3 @@ const (
 	PanicLevel = zapcore.PanicLevel
 	FatalLevel = zapcore.FatalLevel
 )
-
-// ParseLevel 解析字串為 Level
-func ParseLevel(s string) (Level, error) {
-	return zapcore.ParseLevel(s)
-}
