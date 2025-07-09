@@ -5,7 +5,7 @@ package seq
 import (
 	"time"
 
-	"github.com/tomoffice/module-clean/pkg/logger"
+	"github.com/tomoffice/go-clean-architecture/pkg/logger"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"

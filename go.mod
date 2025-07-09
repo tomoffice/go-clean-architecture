@@ -1,4 +1,4 @@
-module module-clean
+module github.com/tomoffice/go-clean-architecture
 
 go 1.23.0
 
