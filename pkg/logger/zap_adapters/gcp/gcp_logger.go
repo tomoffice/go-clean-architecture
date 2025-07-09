@@ -20,12 +20,12 @@ type Config struct {
 
 // NewDefaultConfig 創建預設配置的 GCP Logger
 // 預設配置：指定專案 ID + app-logs 日誌名稱 + Info 等級
-func NewDefaultConfig(projectID string) (logger.Logger, error) {
-	return NewLogger(Config{
+func NewDefaultConfig(projectID string) Config {
+	return Config{
 		ProjectID: projectID,
 		LogName:   "app-logs",
 		Level:     zapcore.InfoLevel,
-	})
+	}
 }
 
 // Logger 實現 logger.Logger 介面，將日誌輸出到 Google Cloud Logging
@@ -69,6 +69,9 @@ func NewLogger(cfg Config) (logger.Logger, error) {
 		core:   core,
 		logger: zl,
 	}, nil
+}
+func NewDefaultLogger(projectID string) (logger.Logger, error) {
+	return NewLogger(NewDefaultConfig(projectID))
 }
 
 // Debug 輸出 Debug 等級的日誌訊息

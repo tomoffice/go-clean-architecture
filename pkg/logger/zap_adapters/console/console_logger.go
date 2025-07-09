@@ -17,11 +17,11 @@ type Config struct {
 
 // NewDefaultConfig 創建預設配置的 ConsoleLogger
 // 預設配置：Info 等級 + Console 格式
-func NewDefaultConfig() (logger.Logger, error) {
-	return NewLogger(Config{
+func NewDefaultConfig() Config {
+	return Config{
 		Level:  zapcore.InfoLevel,
 		Format: logger.ConsoleFormat,
-	})
+	}
 }
 
 // Logger 實現 logger.Logger 介面，將日誌輸出到標準輸出 (stdout)
@@ -65,6 +65,9 @@ func NewLogger(cfg Config) (logger.Logger, error) {
 		core:   core,
 		logger: lg,
 	}, nil
+}
+func NewDefaultLogger() (logger.Logger, error) {
+	return NewLogger(NewDefaultConfig())
 }
 
 // Debug 輸出 Debug 等級的日誌訊息

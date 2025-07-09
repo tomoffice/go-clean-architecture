@@ -20,12 +20,12 @@ type Config struct {
 
 // NewDefaultConfig 創建預設配置的 Seq Logger
 // 預設配置：本地端點 localhost:5341 + Info 等級
-func NewDefaultConfig() (logger.Logger, error) {
-	return NewLogger(Config{
+func NewDefaultConfig() Config {
+	return Config{
 		Endpoint: "http://localhost:5341",
 		APIKey:   "",
 		Level:    zapcore.InfoLevel,
-	})
+	}
 }
 
 // Logger 實現 logger.Logger 介面，提供 Seq 日誌輸出功能
@@ -57,6 +57,9 @@ func NewLogger(cfg Config) (logger.Logger, error) {
 	// 4) 建 zap.Logger
 	zl := zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
 	return &Logger{core: core, logger: zl}, nil
+}
+func NewDefaultLogger() (logger.Logger, error) {
+	return NewLogger(NewDefaultConfig())
 }
 
 // Debug 輸出 Debug 等級的日誌訊息
