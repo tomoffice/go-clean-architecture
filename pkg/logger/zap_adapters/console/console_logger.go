@@ -4,7 +4,7 @@ package console
 import (
 	"os"
 
-	"github.com/tomoffice/logger"
+	"github.com/tomoffice/module-clean/pkg/logger"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )

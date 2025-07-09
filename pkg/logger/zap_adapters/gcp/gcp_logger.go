@@ -6,7 +6,7 @@ import (
 	"context"
 
 	"cloud.google.com/go/logging"
-	"github.com/tomoffice/logger"
+	"github.com/tomoffice/module-clean/pkg/logger"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )

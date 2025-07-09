@@ -1,4 +1,4 @@
-module github.com/tomoffice/logger
+module github.com/tomoffice/module-clean/pkg/logger
 
 go 1.22
 
