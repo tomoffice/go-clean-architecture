@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/tomoffice/go-clean-architecture/pkg/logger"
-	"github.com/tomoffice/go-clean-architecture/pkg/logger/zap_adapters/seq"
+	"github.com/tomoffice/go-clean-architecture/pkg/logger/adapters/seq"
 )
 
 func TestSendToSeq(t *testing.T) {
