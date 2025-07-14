@@ -1,8 +1,8 @@
 package outputmodel
 
 import (
-	"module-clean/internal/modules/member/interface_adapter/dto"
-	sharedviewmodel "module-clean/internal/shared/viewmodel/http"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/dto"
+	sharedviewmodel "github.com/tomoffice/go-clean-architecture/internal/shared/viewmodel/http"
 )
 
 // mockgen 尚未支援泛型，所以用別名展開所有泛型返回類型

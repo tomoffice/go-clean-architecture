@@ -10,11 +10,11 @@
 package mapper
 
 import (
-	"module-clean/internal/modules/member/entity"
-	"module-clean/internal/modules/member/interface_adapter/dto"
-	"module-clean/internal/modules/member/usecase/inputmodel"
-	"module-clean/internal/shared/enum"
-	"module-clean/internal/shared/pagination"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/entity"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/dto"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase/inputmodel"
+	"github.com/tomoffice/go-clean-architecture/internal/shared/enum"
+	"github.com/tomoffice/go-clean-architecture/internal/shared/pagination"
 )
 
 func RegisterMemberDTOToEntity(request dto.RegisterMemberRequestDTO) *entity.Member {

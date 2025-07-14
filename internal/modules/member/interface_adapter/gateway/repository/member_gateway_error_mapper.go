@@ -3,8 +3,8 @@ package repository
 import (
 	"errors"
 	"fmt"
-	"module-clean/internal/modules/member/framework/persistence/sqlx/mcsqlite"
-	"module-clean/internal/modules/member/usecase"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/sqlx/mcsqlite"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase"
 )
 
 // MapInfraErrorToUsecaseError 將底層 infra 錯誤直接轉為 usecase 定義的 sentinel error

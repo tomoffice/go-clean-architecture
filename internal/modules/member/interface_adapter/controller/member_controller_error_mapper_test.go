@@ -2,7 +2,7 @@ package controller
 
 import (
 	"github.com/stretchr/testify/assert"
-	"module-clean/internal/shared/errorcode"
+	"github.com/tomoffice/go-clean-architecture/internal/shared/errorcode"
 	"net/http"
 	"testing"
 )

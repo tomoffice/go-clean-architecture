@@ -2,12 +2,12 @@ package controller
 
 import (
 	"github.com/gin-gonic/gin"
-	gindto "module-clean/internal/framework/http/gin/dto"
-	"module-clean/internal/framework/http/gin/errordefs"
-	ginmapper "module-clean/internal/framework/http/gin/mapper"
-	"module-clean/internal/modules/member/interface_adapter/mapper"
-	"module-clean/internal/modules/member/usecase/port/input"
-	"module-clean/internal/modules/member/usecase/port/output"
+	gindto "github.com/tomoffice/go-clean-architecture/internal/framework/http/gin/dto"
+	"github.com/tomoffice/go-clean-architecture/internal/framework/http/gin/errordefs"
+	ginmapper "github.com/tomoffice/go-clean-architecture/internal/framework/http/gin/mapper"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/mapper"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase/port/input"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase/port/output"
 	"net/http"
 )
 

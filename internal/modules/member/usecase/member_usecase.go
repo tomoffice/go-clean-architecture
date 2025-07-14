@@ -11,11 +11,11 @@ package usecase
 import (
 	"context"
 	"errors"
-	"module-clean/internal/modules/member/entity"
-	"module-clean/internal/modules/member/usecase/inputmodel"
-	"module-clean/internal/modules/member/usecase/port/input"
-	"module-clean/internal/modules/member/usecase/port/output"
-	"module-clean/internal/shared/pagination"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/entity"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase/inputmodel"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase/port/input"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase/port/output"
+	"github.com/tomoffice/go-clean-architecture/internal/shared/pagination"
 )
 
 type MemberUseCase struct {

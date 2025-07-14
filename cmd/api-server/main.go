@@ -2,9 +2,9 @@ package main
 
 import (
 	_ "github.com/mattn/go-sqlite3" // or mysql, pgx, etc.
-	"module-clean/config"
-	"module-clean/internal/bootstrap"
-	"module-clean/internal/framework/http/gin/middleware"
+	"github.com/tomoffice/go-clean-architecture/config"
+	"github.com/tomoffice/go-clean-architecture/internal/bootstrap"
+	"github.com/tomoffice/go-clean-architecture/internal/framework/http/gin/middleware"
 )
 
 func main() {

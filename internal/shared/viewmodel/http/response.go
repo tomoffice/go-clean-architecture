@@ -1,7 +1,7 @@
 package http
 
 import (
-	"module-clean/internal/shared/enum"
+	"github.com/tomoffice/go-clean-architecture/internal/shared/enum"
 	"time"
 )
 

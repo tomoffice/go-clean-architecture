@@ -1,11 +1,11 @@
 package http
 
 import (
-	"module-clean/internal/modules/member/entity"
-	"module-clean/internal/modules/member/interface_adapter/mapper"
-	"module-clean/internal/modules/member/interface_adapter/outputmodel"
-	sharedenum "module-clean/internal/shared/enum"
-	sharedviewmodel "module-clean/internal/shared/viewmodel/http"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/entity"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/mapper"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/outputmodel"
+	sharedenum "github.com/tomoffice/go-clean-architecture/internal/shared/enum"
+	sharedviewmodel "github.com/tomoffice/go-clean-architecture/internal/shared/viewmodel/http"
 	"strconv"
 )
 

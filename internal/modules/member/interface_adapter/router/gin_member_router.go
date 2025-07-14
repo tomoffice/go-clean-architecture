@@ -2,8 +2,8 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
-	"module-clean/internal/framework/http/gin/middleware"
-	"module-clean/internal/modules/member/interface_adapter/controller"
+	"github.com/tomoffice/go-clean-architecture/internal/framework/http/gin/middleware"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/controller"
 )
 
 type MemberRouter struct {

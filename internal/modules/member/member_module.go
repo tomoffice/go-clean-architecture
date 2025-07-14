@@ -1,6 +1,6 @@
 package member
 
-import "module-clean/internal/modules/member/interface_adapter/router"
+import "github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/router"
 
 // Module 會員模組 - 具體產品
 type Module struct {

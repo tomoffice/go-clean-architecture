@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"module-clean/internal/framework/http/gin/middleware/cors"
+	"github.com/tomoffice/go-clean-architecture/internal/framework/http/gin/middleware/cors"
 )
 
 // Container 提供所有可用的middleware

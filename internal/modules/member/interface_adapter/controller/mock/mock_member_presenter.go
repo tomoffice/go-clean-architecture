@@ -5,8 +5,8 @@
 package mock
 
 import (
-	entity "module-clean/internal/modules/member/entity"
-	outputmodel "module-clean/internal/modules/member/interface_adapter/outputmodel"
+	entity "github.com/tomoffice/go-clean-architecture/internal/modules/member/entity"
+	outputmodel "github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/outputmodel"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"

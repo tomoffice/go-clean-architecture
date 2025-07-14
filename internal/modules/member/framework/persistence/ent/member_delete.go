@@ -4,8 +4,8 @@ package ent
 
 import (
 	"context"
-	"module-clean/internal/modules/member/framework/persistence/ent/member"
-	"module-clean/internal/modules/member/framework/persistence/ent/predicate"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/member"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"

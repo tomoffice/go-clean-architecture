@@ -2,10 +2,10 @@ package repository
 
 import (
 	"context"
-	"module-clean/internal/modules/member/entity"
-	"module-clean/internal/modules/member/framework/persistence/sqlx"
-	"module-clean/internal/modules/member/usecase/port/output"
-	"module-clean/internal/shared/pagination"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/entity"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/sqlx"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase/port/output"
+	"github.com/tomoffice/go-clean-architecture/internal/shared/pagination"
 	"time"
 )
 

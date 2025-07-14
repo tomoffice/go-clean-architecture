@@ -2,9 +2,9 @@ package http
 
 import (
 	"errors"
-	"module-clean/internal/modules/member/usecase"
-	"module-clean/internal/shared/errorcode"
-	sharederrors "module-clean/internal/shared/errordefs"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase"
+	"github.com/tomoffice/go-clean-architecture/internal/shared/errorcode"
+	sharederrors "github.com/tomoffice/go-clean-architecture/internal/shared/errordefs"
 )
 
 func MapMemberUseCaseToPresenterError(err error) (int, string) {

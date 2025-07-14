@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/jmoiron/sqlx"
-	sqlx2 "module-clean/internal/modules/member/framework/persistence/sqlx"
-	"module-clean/internal/shared/pagination"
+	sqlx2 "github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/sqlx"
+	"github.com/tomoffice/go-clean-architecture/internal/shared/pagination"
 )
 
 type sqlxMemberRepo struct {

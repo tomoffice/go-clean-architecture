@@ -9,9 +9,9 @@ import (
 	"log"
 	"reflect"
 
-	"module-clean/internal/modules/member/framework/persistence/ent/migrate"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/migrate"
 
-	"module-clean/internal/modules/member/framework/persistence/ent/member"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/member"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"

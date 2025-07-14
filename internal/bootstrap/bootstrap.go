@@ -3,12 +3,12 @@ package bootstrap
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"module-clean/internal/framework/database/sqlx/mcsqlite"
-	"module-clean/internal/framework/http/gin/middleware"
-	"module-clean/internal/modules/member"
+	"github.com/tomoffice/go-clean-architecture/internal/framework/database/sqlx/mcsqlite"
+	"github.com/tomoffice/go-clean-architecture/internal/framework/http/gin/middleware"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member"
 
+	"github.com/tomoffice/go-clean-architecture/config"
 	"log"
-	"module-clean/config"
 )
 
 type App struct {

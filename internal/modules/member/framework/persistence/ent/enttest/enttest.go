@@ -5,11 +5,11 @@ package enttest
 import (
 	"context"
 
-	"module-clean/internal/modules/member/framework/persistence/ent"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent"
 	// required by schema hooks.
-	_ "module-clean/internal/modules/member/framework/persistence/ent/runtime"
+	_ "github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/runtime"
 
-	"module-clean/internal/modules/member/framework/persistence/ent/migrate"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/migrate"
 
 	"entgo.io/ent/dialect/sql/schema"
 )

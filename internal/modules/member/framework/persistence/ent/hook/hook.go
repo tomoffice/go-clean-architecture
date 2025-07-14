@@ -5,7 +5,7 @@ package hook
 import (
 	"context"
 	"fmt"
-	"module-clean/internal/modules/member/framework/persistence/ent"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent"
 )
 
 // The MemberFunc type is an adapter to allow the use of ordinary

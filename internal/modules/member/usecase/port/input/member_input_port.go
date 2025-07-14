@@ -3,9 +3,9 @@ package input
 //go:generate mockgen -source=member_input_port.go -destination=../../../interface_adapter/controller/mock/mock_member_input_port.go -package=mock
 import (
 	"context"
-	"module-clean/internal/modules/member/entity"
-	"module-clean/internal/modules/member/usecase/inputmodel"
-	"module-clean/internal/shared/pagination"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/entity"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase/inputmodel"
+	"github.com/tomoffice/go-clean-architecture/internal/shared/pagination"
 )
 
 type MemberInputPort interface {

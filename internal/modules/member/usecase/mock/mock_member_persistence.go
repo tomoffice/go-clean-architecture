@@ -6,8 +6,8 @@ package mock
 
 import (
 	context "context"
-	entity "module-clean/internal/modules/member/entity"
-	pagination "module-clean/internal/shared/pagination"
+	entity "github.com/tomoffice/go-clean-architecture/internal/modules/member/entity"
+	pagination "github.com/tomoffice/go-clean-architecture/internal/shared/pagination"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"

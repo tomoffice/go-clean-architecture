@@ -3,8 +3,8 @@ package output
 //go:generate mockgen -source=member_persistence.go -destination=../../mock/mock_member_persistence.go -package=mock
 import (
 	"context"
-	"module-clean/internal/modules/member/entity"
-	"module-clean/internal/shared/pagination"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/entity"
+	"github.com/tomoffice/go-clean-architecture/internal/shared/pagination"
 )
 
 type MemberPersistence interface {

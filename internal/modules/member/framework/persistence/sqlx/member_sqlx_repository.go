@@ -2,7 +2,7 @@ package sqlx
 
 import (
 	"context"
-	"module-clean/internal/shared/pagination"
+	"github.com/tomoffice/go-clean-architecture/internal/shared/pagination"
 )
 
 type MemberSQLXRepository interface {

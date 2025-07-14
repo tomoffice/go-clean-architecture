@@ -3,8 +3,8 @@
 package ent
 
 import (
-	"module-clean/internal/modules/member/framework/persistence/ent/member"
-	"module-clean/internal/modules/member/framework/persistence/ent/schema"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/member"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/schema"
 	"time"
 )
 

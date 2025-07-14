@@ -2,8 +2,8 @@ package output
 
 //go:generate mockgen -source=member_presenter.go -destination=../../../interface_adapter/controller/mock/mock_member_presenter.go -package=mock
 import (
-	"module-clean/internal/modules/member/entity"
-	"module-clean/internal/modules/member/interface_adapter/outputmodel"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/entity"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/outputmodel"
 )
 
 type MemberPresenter interface {

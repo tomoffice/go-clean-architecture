@@ -4,7 +4,7 @@ package ent
 
 import (
 	"fmt"
-	"module-clean/internal/modules/member/framework/persistence/ent/member"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/member"
 	"strings"
 	"time"
 

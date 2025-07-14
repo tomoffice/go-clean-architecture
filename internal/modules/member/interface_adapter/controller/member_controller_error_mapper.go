@@ -1,7 +1,7 @@
 package controller
 
 import (
-	"module-clean/internal/shared/errorcode"
+	"github.com/tomoffice/go-clean-architecture/internal/shared/errorcode"
 	"net/http"
 )
 

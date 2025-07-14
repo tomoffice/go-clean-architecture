@@ -4,8 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-playground/validator/v10"
-	"module-clean/internal/shared/errorcode"
-	sharederrors "module-clean/internal/shared/errordefs"
+	"github.com/tomoffice/go-clean-architecture/internal/shared/errorcode"
+	sharederrors "github.com/tomoffice/go-clean-architecture/internal/shared/errordefs"
 )
 
 // MapValidationError 將 validator 驗證失敗錯誤，轉換為 error code 與人類可讀訊息

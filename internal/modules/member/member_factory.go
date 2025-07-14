@@ -4,13 +4,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 
-	"module-clean/internal/modules"
-	"module-clean/internal/modules/member/framework/persistence/sqlx/mcsqlite"
-	"module-clean/internal/modules/member/interface_adapter/controller"
-	"module-clean/internal/modules/member/interface_adapter/gateway/repository"
-	"module-clean/internal/modules/member/interface_adapter/presenter/http"
-	"module-clean/internal/modules/member/interface_adapter/router"
-	"module-clean/internal/modules/member/usecase"
+	"github.com/tomoffice/go-clean-architecture/internal/modules"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/sqlx/mcsqlite"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/controller"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/gateway/repository"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/presenter/http"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/router"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase"
 )
 
 // Factory 會員模組工廠

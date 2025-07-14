@@ -1,8 +1,8 @@
 package mapper
 
 import (
-	gindto "module-clean/internal/framework/http/gin/dto"
-	"module-clean/internal/modules/member/interface_adapter/dto"
+	gindto "github.com/tomoffice/go-clean-architecture/internal/framework/http/gin/dto"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/dto"
 )
 
 func GinDTOToRegisterMemberDTO(ginDTO gindto.GinBindingRegisterMemberRequestDTO) dto.RegisterMemberRequestDTO {

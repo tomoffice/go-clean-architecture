@@ -3,7 +3,7 @@
 package member
 
 import (
-	"module-clean/internal/modules/member/framework/persistence/ent/predicate"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/predicate"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
