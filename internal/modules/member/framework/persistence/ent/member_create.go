@@ -6,11 +6,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/member"
 	"time"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/member"
 )
 
 // MemberCreate is the builder for creating a Member entity.

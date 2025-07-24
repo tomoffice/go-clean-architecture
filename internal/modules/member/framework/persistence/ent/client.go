@@ -11,11 +11,10 @@ import (
 
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/migrate"
 
-	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/member"
-
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/member"
 )
 
 // Client is the client that holds all ent builders.
@@ -88,14 +87,14 @@ func Log(fn func(...any)) Option {
 	}
 }
 
-// Driver configures the client framework.
+// Driver configures the client driver.
 func Driver(driver dialect.Driver) Option {
 	return func(c *config) {
 		c.driver = driver
 	}
 }
 
-// Open opens a database/sql.DB specified by the framework name and
+// Open opens a database/sql.DB specified by the driver name and
 // the data source name, and returns a new client attached to it.
 // Optional parameters can be added for configuring the client.
 func Open(driverName, dataSourceName string, options ...Option) (*Client, error) {
@@ -107,7 +106,7 @@ func Open(driverName, dataSourceName string, options ...Option) (*Client, error)
 		}
 		return NewClient(append(options, Driver(drv))...), nil
 	default:
-		return nil, fmt.Errorf("unsupported framework: %q", driverName)
+		return nil, fmt.Errorf("unsupported driver: %q", driverName)
 	}
 }
 

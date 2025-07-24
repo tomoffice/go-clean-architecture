@@ -4,12 +4,12 @@ package ent
 
 import (
 	"fmt"
-	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/member"
 	"strings"
 	"time"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/member"
 )
 
 // Member is the model entity for the Member schema.
@@ -105,7 +105,7 @@ func (m *Member) Update() *MemberUpdateOne {
 }
 
 // Unwrap unwraps the Member entity that was returned from a transaction after it was closed,
-// so that all future queries will be executed through the framework which created the transaction.
+// so that all future queries will be executed through the driver which created the transaction.
 func (m *Member) Unwrap() *Member {
 	_tx, ok := m.config.driver.(*txDriver)
 	if !ok {

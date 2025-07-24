@@ -5,11 +5,11 @@
 package mock
 
 import (
-	entity "github.com/tomoffice/go-clean-architecture/internal/modules/member/entity"
-	outputmodel "github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/outputmodel"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
+	entity "github.com/tomoffice/go-clean-architecture/internal/modules/member/entity"
+	outputmodel "github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/outputmodel"
 )
 
 // MockMemberPresenter is a mock of MemberPresenter interface.

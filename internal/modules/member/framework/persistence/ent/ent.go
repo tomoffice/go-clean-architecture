@@ -6,13 +6,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/member"
 	"reflect"
 	"sync"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/member"
 )
 
 // ent aliases to avoid import conflicts in user's code.

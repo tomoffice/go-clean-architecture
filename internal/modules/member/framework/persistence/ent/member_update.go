@@ -6,13 +6,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/member"
-	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/predicate"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/member"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/predicate"
 )
 
 // MemberUpdate is the builder for updating Member entities.

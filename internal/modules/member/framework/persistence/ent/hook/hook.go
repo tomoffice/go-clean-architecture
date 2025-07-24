@@ -5,6 +5,7 @@ package hook
 import (
 	"context"
 	"fmt"
+
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent"
 )
 

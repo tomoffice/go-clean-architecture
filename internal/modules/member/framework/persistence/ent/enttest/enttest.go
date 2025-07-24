@@ -9,9 +9,8 @@ import (
 	// required by schema hooks.
 	_ "github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/runtime"
 
-	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/migrate"
-
 	"entgo.io/ent/dialect/sql/schema"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/migrate"
 )
 
 type (

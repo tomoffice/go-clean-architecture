@@ -5,14 +5,14 @@ package ent
 import (
 	"context"
 	"fmt"
-	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/member"
-	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/predicate"
 	"math"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/member"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/ent/predicate"
 )
 
 // MemberQuery is the builder for querying Member entities.

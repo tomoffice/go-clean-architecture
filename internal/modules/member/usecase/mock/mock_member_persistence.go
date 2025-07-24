@@ -6,11 +6,11 @@ package mock
 
 import (
 	context "context"
-	entity "github.com/tomoffice/go-clean-architecture/internal/modules/member/entity"
-	pagination "github.com/tomoffice/go-clean-architecture/internal/shared/pagination"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
+	entity "github.com/tomoffice/go-clean-architecture/internal/modules/member/entity"
+	pagination "github.com/tomoffice/go-clean-architecture/internal/shared/pagination"
 )
 
 // MockMemberPersistence is a mock of MemberPersistence interface.
