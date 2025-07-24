@@ -1,3 +1,4 @@
+app_name: "go-clean-architecture"
 env: dev
 server:
   http:
@@ -10,3 +11,17 @@ auth:
     algorithm: "HS256"
     secret: "your_jwt_secret"
     expire: 3600
+logger:
+  console:
+    enabled: true
+    level: "debug"
+    format: "console"
+  gcp:
+    enabled: false
+    project_id: ""
+    level: "info"
+  seq:
+    enabled: false
+    endpoint: "http://localhost:5341"
+    api_key: ""
+    level: "info"
