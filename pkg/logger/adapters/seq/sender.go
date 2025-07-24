@@ -1,5 +1,6 @@
 package seq
 
+//go:generate mockgen -source=sender.go -destination=mock/mock_sender.go -package=mock
 import (
 	"github.com/sirupsen/logrus"
 	"go.uber.org/zap/zapcore"

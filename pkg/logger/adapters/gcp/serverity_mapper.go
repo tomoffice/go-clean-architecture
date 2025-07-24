@@ -2,11 +2,12 @@ package gcp
 
 import (
 	"cloud.google.com/go/logging"
+	"github.com/tomoffice/go-clean-architecture/pkg/logger"
 	"go.uber.org/zap/zapcore"
 )
 
-func mapSeverity(l zapcore.Level) logging.Severity {
-	switch l {
+func mapSeverity(l logger.Level) logging.Severity {
+	switch zapcore.Level(l) {
 	case zapcore.DebugLevel:
 		return logging.Debug
 	case zapcore.InfoLevel:

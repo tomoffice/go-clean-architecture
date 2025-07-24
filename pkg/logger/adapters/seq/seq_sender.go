@@ -6,16 +6,15 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-// NewLogrusSender 建立安裝 SeqHook 的 Logrus Sender
-func NewLogrusSender(cfg Config) Sender {
-	lg := logrus.New()
-	lg.SetFormatter(&logrus.JSONFormatter{})
-	lg.AddHook(logruseq.NewSeqHook(cfg.Endpoint, logruseq.OptionAPIKey(cfg.APIKey)))
-	return &logrusSender{lg: lg}
-}
-
 type logrusSender struct {
 	lg *logrus.Logger
+}
+
+func NewLogrusSender(endPoint, api string) Sender {
+	lg := logrus.New()
+	lg.SetFormatter(&logrus.JSONFormatter{})
+	lg.AddHook(logruseq.NewSeqHook(endPoint, logruseq.OptionAPIKey(api)))
+	return &logrusSender{lg: lg}
 }
 
 func (s *logrusSender) SendLevel(level zapcore.Level, msg string, fields logrus.Fields) error {

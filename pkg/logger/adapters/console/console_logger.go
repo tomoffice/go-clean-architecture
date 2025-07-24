@@ -2,35 +2,37 @@
 package console
 
 import (
-	"os"
-
+	"context"
 	"github.com/tomoffice/go-clean-architecture/pkg/logger"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"os"
 )
 
-// Config 定義 ConsoleLogger 的配置參數
+// Config 定義 Logger 的配置參數
 type Config struct {
-	Level  logger.Level  // 日誌最低輸出等級 (DebugLevel, InfoLevel, WarnLevel, ErrorLevel)
-	Format logger.Format // 日誌輸出格式，支援 JSONFormat 或 ConsoleFormat
+	Level  logger.Level  // 日誌最低輸出等級 ("debug", "info", "warn", "error")
+	Format logger.Format // 日誌輸出格式 ("json", "console")
 }
 
-// NewDefaultConfig 創建預設配置的 ConsoleLogger
+// NewDefaultConfig 創建預設配置的 Logger
 // 預設配置：Info 等級 + Console 格式
 func NewDefaultConfig() Config {
 	return Config{
-		Level:  zapcore.InfoLevel,
-		Format: logger.ConsoleFormat,
+		Level:  logger.InfoLevel,     // 預設 Info 等級
+		Format: logger.ConsoleFormat, // 預設 Console 格式
 	}
 }
 
 // Logger 實現 logger.Logger 介面，將日誌輸出到標準輸出 (stdout)
+// 具體類型，可以被主套件包裝成 logger.Logger 接口
 type Logger struct {
 	core   zapcore.Core
 	logger *zap.Logger
 }
 
-// NewLogger 根據給定配置創建新的 ConsoleLogger 實例
+// NewLogger 根據給定配置創建新的 Logger 實例
 func NewLogger(cfg Config) (logger.Logger, error) {
 	// 1. 建立統一的編碼器配置
 	encCfg := zapcore.EncoderConfig{
@@ -58,7 +60,8 @@ func NewLogger(cfg Config) (logger.Logger, error) {
 
 	// 3. 建立 Core 和 Logger 實例
 	ws := zapcore.AddSync(os.Stdout)
-	core := zapcore.NewCore(encoder, ws, cfg.Level)
+	level := cfg.Level
+	core := zapcore.NewCore(encoder, ws, level)
 	lg := zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
 
 	return &Logger{
@@ -99,6 +102,19 @@ func (l *Logger) With(fields ...logger.Field) logger.Logger {
 	}
 }
 
+// WithContext 從 OpenTelemetry context 中提取 trace 資訊並返回新的 Logger 實例
+func (l *Logger) WithContext(ctx context.Context) logger.Logger {
+	spanCtx := trace.SpanContextFromContext(ctx)
+	if spanCtx.IsValid() {
+		traceInfo := map[string]interface{}{
+			"trace_id": spanCtx.TraceID().String(),
+			"span_id":  spanCtx.SpanID().String(),
+		}
+		return l.With(logger.NewField("trace", traceInfo))
+	}
+	return l
+}
+
 // Sync 強制清空緩衝區，確保所有待輸出的日誌都已寫出
 func (l *Logger) Sync() error {
 	return l.logger.Sync()
@@ -108,3 +124,9 @@ func (l *Logger) Sync() error {
 func (l *Logger) GetCore() zapcore.Core {
 	return l.core
 }
+
+// 確保 Logger 實現 logger.Logger 介面
+var _ logger.Logger = (*Logger)(nil)
+
+// 確保 Logger 實現 logger.Core 介面
+var _ logger.Core = (*Logger)(nil)

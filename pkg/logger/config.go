@@ -1,79 +1,75 @@
 package logger
 
-// Config 結構（供 factory 使用）
+
+// Config 是 logger 套件的配置結構，用於初始化整個日誌系統
+// 包含 OpenTelemetry 和各種 logger adapters 的配置
 type Config struct {
-	ConsoleEnable bool
-	GCPEnable     bool
-	SeqEnable     bool
+	// OpenTelemetry 配置
+	Telemetry TelemetryConfig `yaml:"telemetry" json:"telemetry"`
 
-	Level  Level  // 共用
-	Format Format // 共用：json or console
-
-	GCP GCPLoggerConfig // 👉 獨立出來，但只在 UseGCP = true 時才用
-	Seq SeqLoggerConfig
+	// Logger Adapters 配置
+	Console ConsoleConfig `yaml:"console" json:"console"`
+	GCP     GCPConfig     `yaml:"gcp"     json:"gcp"`
+	Seq     SeqConfig     `yaml:"seq"     json:"seq"`
 }
 
-// GCPLoggerConfig
-// GCPLoggerConfig 用於設定 GCP Cloud Logging 的參數。
-// 此結構會傳入 logger adapter 以建立對應的 GCP logger 實體。
-//
-// ResourceType（必填）：
-//
-//	ResourceType 指定 GCP Logging 中的 Monitored Resource 類型。
-//	這將決定 log 在 GCP 中的分類方式與附加的 metadata 欄位。
-//	常見值如下：
-//	  - "k8s_container"：Kubernetes container（建議，最常用）
-//	  - "k8s_pod"：Kubernetes Pod（Pod 層級記錄）
-//	  - "gce_instance"：GCE instance（虛擬機）
-//	  - "global"：通用資源類型（無關容器/機器，可用於本地測試）
-//
-// ResourceLabels（必填）：
-//
-//	用來補足 ResourceType 所需欄位，例如：
-//	  ResourceType = "k8s_pod" 時，必須提供：
-//	    - cluster_name
-//	    - namespace_name
-//	    - pod_name
-//	    - location（zone 或 region）
-//
-//	範例：
-//	  ResourceLabels: map[string]string{
-//	      "cluster_name":    "my-cluster",
-//	      "namespace_name":  "default",
-//	      "pod_name":        "my-app-pod-xyz",
-//	      "location":        "asia-east1-a",
-//	  }
-//
-// 可選輔助欄位：
-//
-//	若你不想手動填 ResourceLabels，可透過下列欄位由程式補齊：
-//	  - ClusterName   → 自動補 cluster_name
-//	  - NamespaceName → 自動補 namespace_name
-//	  - PodName       → 自動補 pod_name
-//	  - Location      → 自動補 location
-//
-// MinSeverity（選填）：
-//
-//	最小輸出等級，例如 "INFO"、"WARNING"、"ERROR"
-//	可以避免 log 雜訊。
-type GCPLoggerConfig struct {
-	ProjectID string // 必填，用來初始化 GCP Logging Client
-	LogName   string // 必填，對應 GCP Log stream 名稱
-
-	ResourceType string // 必填
-
-	ResourceLabels map[string]string // 必填
-
-	// Optional：協助補充 ResourceLabels
-	ClusterName   string // 建議自動對應 cluster_name
-	Location      string // 建議自動對應 location
-	NamespaceName string // 建議自動對應 namespace_name
-	PodName       string // 建議自動對應 pod_name
-
-	// Optional：可用來過濾最低嚴重性，減少 log noise
-	MinSeverity string // e.g., "INFO", "WARNING", "ERROR"
+// TelemetryConfig 定義 OpenTelemetry 的配置
+type TelemetryConfig struct {
+	Enabled     bool   `yaml:"enabled"      json:"enabled"      default:"true"`
+	ServiceName string `yaml:"service_name" json:"service_name" default:"app"`
+	Version     string `yaml:"version"      json:"version"      default:"1.0.0"`
+	Environment string `yaml:"environment"  json:"environment"  default:"development"`
 }
-type SeqLoggerConfig struct {
-	SeqURL    string
-	SeqAPIKey string // optional
+
+// ConsoleConfig 定義 Console Logger 的配置
+type ConsoleConfig struct {
+	Enabled bool   `yaml:"enabled" json:"enabled" default:"true"`
+	Level   string `yaml:"level"   json:"level"   default:"info"`
+	Format  string `yaml:"format"  json:"format"  default:"console"`
 }
+
+// GCPConfig 定義 GCP Cloud Logging 的配置
+type GCPConfig struct {
+	Enabled   bool   `yaml:"enabled"    json:"enabled"    default:"false"`
+	ProjectID string `yaml:"project_id" json:"project_id"`
+	Level     string `yaml:"level"      json:"level"      default:"info"`
+
+	// 進階配置（可選）
+	LogName      string            `yaml:"log_name"       json:"log_name"       default:"app-log"`
+	ResourceType string            `yaml:"resource_type"  json:"resource_type"  default:"global"`
+	Labels       map[string]string `yaml:"labels"         json:"labels"`
+}
+
+// SeqConfig 定義 Seq Logger 的配置
+type SeqConfig struct {
+	Enabled  bool   `yaml:"enabled"  json:"enabled"  default:"false"`
+	Endpoint string `yaml:"endpoint" json:"endpoint" default:"http://localhost:5341"`
+	APIKey   string `yaml:"api_key"  json:"api_key"`
+	Level    string `yaml:"level"    json:"level"    default:"info"`
+}
+
+
+// NewConfig 創建新的預設配置
+func NewConfig() Config {
+	return Config{
+		Telemetry: TelemetryConfig{
+			Enabled:     false,
+			ServiceName: "app",
+			Version:     "1.0.0",
+			Environment: "development",
+		},
+		Console: ConsoleConfig{
+			Enabled: true,
+			Level:   "info",
+			Format:  "console",
+		},
+		GCP: GCPConfig{
+			Enabled: false,
+		},
+		Seq: SeqConfig{
+			Enabled: false,
+		},
+	}
+}
+
+
