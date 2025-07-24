@@ -16,6 +16,7 @@ import (
 	"github.com/tomoffice/go-clean-architecture/internal/shared/enum"
 	"github.com/tomoffice/go-clean-architecture/internal/shared/errorcode"
 	sharedviewmodel "github.com/tomoffice/go-clean-architecture/internal/shared/viewmodel/http"
+	"github.com/tomoffice/go-clean-architecture/pkg/logger/adapters/console"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -386,7 +387,9 @@ func TestMemberController_Delete(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mockUseCase := tt.fields.usecase.(*mock.MockMemberInputPort)
 			mockPresenter := tt.fields.presenter.(*mock.MockMemberPresenter)
+			testLogger, _ := console.NewDefaultLogger()
 			c := &MemberController{
+				logger:    testLogger,
 				usecase:   mockUseCase,
 				presenter: mockPresenter,
 			}
@@ -700,7 +703,9 @@ func TestMemberController_GetByEmail(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mockUseCase := tt.fields.usecase.(*mock.MockMemberInputPort)
 			mockPresenter := tt.fields.presenter.(*mock.MockMemberPresenter)
+			testLogger, _ := console.NewDefaultLogger()
 			c := &MemberController{
+				logger:    testLogger,
 				usecase:   mockUseCase,
 				presenter: mockPresenter,
 			}
@@ -979,7 +984,9 @@ func TestMemberController_GetByID(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mockUseCase := tt.fields.usecase.(*mock.MockMemberInputPort)
 			mockPresenter := tt.fields.presenter.(*mock.MockMemberPresenter)
+			testLogger, _ := console.NewDefaultLogger()
 			c := &MemberController{
+				logger:    testLogger,
 				usecase:   mockUseCase,
 				presenter: mockPresenter,
 			}
@@ -1267,7 +1274,9 @@ func TestMemberController_List(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mockUseCase := mock.NewMockMemberInputPort(ctrl)
 			mockPresenter := mock.NewMockMemberPresenter(ctrl)
+			testLogger, _ := console.NewDefaultLogger()
 			c := &MemberController{
+				logger:    testLogger,
 				usecase:   mockUseCase,
 				presenter: mockPresenter,
 			}
@@ -1602,7 +1611,9 @@ func TestMemberController_Register(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mockUseCase := mock.NewMockMemberInputPort(ctrl)
 			mockPresenter := mock.NewMockMemberPresenter(ctrl)
+			testLogger, _ := console.NewDefaultLogger()
 			c := &MemberController{
+				logger:    testLogger,
 				usecase:   mockUseCase,
 				presenter: mockPresenter,
 			}
@@ -2044,7 +2055,9 @@ func TestMemberController_UpdateProfile(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mockUseCase := mock.NewMockMemberInputPort(ctrl)
 			mockPresenter := mock.NewMockMemberPresenter(ctrl)
+			testLogger, _ := console.NewDefaultLogger()
 			c := &MemberController{
+				logger:    testLogger,
 				usecase:   mockUseCase,
 				presenter: mockPresenter,
 			}
@@ -2678,7 +2691,9 @@ func TestMemberController_UpdateEmail(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mockUseCase := mock.NewMockMemberInputPort(ctrl)
 			mockPresenter := mock.NewMockMemberPresenter(ctrl)
+			testLogger, _ := console.NewDefaultLogger()
 			c := &MemberController{
+				logger:    testLogger,
 				usecase:   mockUseCase,
 				presenter: mockPresenter,
 			}
@@ -3221,7 +3236,9 @@ func TestMemberController_UpdatePassword(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			mockUseCase := mock.NewMockMemberInputPort(ctrl)
 			mockPresenter := mock.NewMockMemberPresenter(ctrl)
+			testLogger, _ := console.NewDefaultLogger()
 			c := &MemberController{
+				logger:    testLogger,
 				usecase:   mockUseCase,
 				presenter: mockPresenter,
 			}
@@ -3261,7 +3278,9 @@ func TestNewMemberController(t *testing.T) {
 	ctrl, _ := portHelper(t)
 	usecaseGateway := mock.NewMockMemberInputPort(ctrl)
 	presenterGateway := mock.NewMockMemberPresenter(ctrl)
-	got := NewMemberController(usecaseGateway, presenterGateway)
+	// 創建測試用的 logger
+	testLogger, _ := console.NewDefaultLogger()
+	got := NewMemberController(testLogger, usecaseGateway, presenterGateway)
 	assert.NotNil(t, got)
 	assert.Equal(t, usecaseGateway, got.usecase)
 	assert.Equal(t, presenterGateway, got.presenter)
