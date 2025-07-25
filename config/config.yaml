@@ -25,3 +25,4 @@ logger:
     endpoint: "http://localhost:5341"
     api_key: ""
     level: "info"
+    console_output_enabled: false

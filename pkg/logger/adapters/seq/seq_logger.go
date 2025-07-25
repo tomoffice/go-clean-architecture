@@ -14,18 +14,20 @@ import (
 
 // Config 定義 Seq Logger 的配置參數
 type Config struct {
-	Endpoint string       // Seq 服務端點，例如：http://seq:5341
-	APIKey   string       // Seq API 金鑰，可選參數
-	Level    logger.Level // 日誌最低輸出等級
+	Endpoint             string       // Seq 服務端點，例如：http://seq:5341
+	APIKey               string       // Seq API 金鑰，可選參數
+	Level                logger.Level // 日誌最低輸出等級
+	ConsoleOutputEnabled bool         // 是否啟用控制台輸出
 }
 
 // NewDefaultConfig 創建預設配置的 Seq Logger
 // 預設配置：本地端點 localhost:5341 + Info 等級
 func NewDefaultConfig() Config {
 	return Config{
-		Endpoint: "http://localhost:5341",
-		APIKey:   "",
-		Level:    logger.InfoLevel,
+		Endpoint:             "http://localhost:5341",
+		APIKey:               "",
+		Level:                logger.InfoLevel,
+		ConsoleOutputEnabled: false, // 預設啟用控制台輸出
 	}
 }
 
@@ -38,7 +40,7 @@ type Logger struct {
 // NewLogger 創建新的 Seq Logger 實例
 func NewLogger(cfg Config) (logger.Logger, error) {
 	// 建立使用Logrus 的 Seq Sender
-	sender := NewLogrusSender(cfg.Endpoint, cfg.APIKey)
+	sender := NewLogrusSender(cfg.Endpoint, cfg.APIKey, cfg.ConsoleOutputEnabled)
 
 	encCfg := zapcore.EncoderConfig{
 		TimeKey:        "@t",  // Seq 時間戳欄位

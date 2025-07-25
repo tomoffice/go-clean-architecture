@@ -60,9 +60,10 @@ func NewLogger(cfg config.LoggerConfig) (logger.Logger, func() error, error) {
 	// Seq Logger
 	if cfg.Seq.Enabled {
 		seqLogger, err := seq.NewLogger(seq.Config{
-			Endpoint: cfg.Seq.Endpoint,
-			APIKey:   cfg.Seq.APIKey,
-			Level:    logger.ParseLevel(cfg.Seq.Level),
+			Endpoint:             cfg.Seq.Endpoint,
+			APIKey:               cfg.Seq.APIKey,
+			Level:                logger.ParseLevel(cfg.Seq.Level),
+			ConsoleOutputEnabled: cfg.Seq.ConsoleOutputEnabled,
 		})
 		if err != nil {
 			return nil, cleanup, fmt.Errorf("創建 Seq Logger 失敗: %w", err)

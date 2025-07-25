@@ -55,8 +55,9 @@ type GCPLoggerConfig struct {
 
 // SeqLoggerConfig 定義 Seq Logger 配置
 type SeqLoggerConfig struct {
-	Enabled  bool   `envconfig:"LOGGER_SEQ_ENABLED"  yaml:"enabled"  default:"false"`
-	Endpoint string `envconfig:"LOGGER_SEQ_ENDPOINT" yaml:"endpoint" default:"http://localhost:5341"`
-	APIKey   string `envconfig:"LOGGER_SEQ_API_KEY"  yaml:"api_key"`
-	Level    string `envconfig:"LOGGER_SEQ_LEVEL"    yaml:"level"    default:"info"`
+	Enabled              bool   `envconfig:"LOGGER_SEQ_ENABLED"  yaml:"enabled"  default:"false"`
+	Endpoint             string `envconfig:"LOGGER_SEQ_ENDPOINT" yaml:"endpoint" default:"http://localhost:5341"`
+	APIKey               string `envconfig:"LOGGER_SEQ_API_KEY"  yaml:"api_key"`
+	Level                string `envconfig:"LOGGER_SEQ_LEVEL"    yaml:"level"    default:"info"`
+	ConsoleOutputEnabled bool   `envconfig:"LOGGER_SEQ_CONSOLE_OUTPUT_ENABLED" yaml:"console_output_enabled" default:"false"`
 }
