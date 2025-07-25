@@ -36,31 +36,36 @@ func (a *App) Run() {
 	// 設置 Gin 引擎
 	engine := gin.New()
 	engine.Use(gin.Logger(), gin.Recovery())
-	
+
 	// middleware - logging middleware should be early in the chain
 	engine.Use(a.MiddlewareContainer.Logging())
 	engine.Use(a.MiddlewareContainer.CORS())
-	
+
 	// 設置 API 路由組
 	apiRouterGroup := engine.Group("/api/v1")
-	
+
 	// 創建會員模組
 	memberModuleFactory := member.NewModuleFactory(a.Logger)
 	memberModule, err := memberModuleFactory.CreateModule(db, apiRouterGroup)
 	if err != nil {
-		log.Fatalf("創建會員模組失敗: %v", err)
+		//log.Fatalf("創建會員模組失敗: %v", err)
+		a.Logger.Error("創建會員模組失敗", logger.NewField("error", err))
 	}
-	
+
 	// 初始化會員模組
 	if err := memberModule.Setup(); err != nil {
-		log.Fatalf("初始化會員模組失敗: %v", err)
+		//log.Fatalf("初始化會員模組失敗: %v", err)
+		a.Logger.Error("初始化會員模組失敗", logger.NewField("error", err))
 	}
-	log.Printf("模組 %s 初始化成功", memberModule.Name())
+	//log.Printf("模組 %s 初始化成功", memberModule.Name())
+	a.Logger.Info("模組初始化成功", logger.NewField("module", memberModule.Name()))
 
 	// 啟動服務器
 	addr := fmt.Sprintf("%s:%s", a.Config.Server.HTTP.Host, a.Config.Server.HTTP.Port)
-	fmt.Printf("Starting server on %s ...\n", addr)
+	//fmt.Printf("Starting server on %s ...\n", addr)
+	a.Logger.Info("啟動服務器", logger.NewField("address", addr))
 	if err := engine.Run(addr); err != nil {
-		log.Fatalf("啟動服務失敗: %v", err)
+		//log.Fatalf("啟動服務失敗: %v", err)
+		a.Logger.Error("啟動服務失敗", logger.NewField("error", err))
 	}
 }
