@@ -36,7 +36,7 @@ type Logger struct {
 }
 
 // NewLogger 創建新的 GCP Logger 實例
-func NewLogger(cfg Config) (logger.Logger, error) {
+func NewLogger(cfg Config) (*Logger, error) {
 	ctx := context.Background()
 
 	// 1. 建立 Cloud Logging 客戶端

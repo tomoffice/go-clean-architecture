@@ -33,7 +33,7 @@ type Logger struct {
 }
 
 // NewLogger 根據給定配置創建新的 Logger 實例
-func NewLogger(cfg Config) (logger.Logger, error) {
+func NewLogger(cfg Config) (*Logger, error) {
 	// 1. 建立統一的編碼器配置
 	encCfg := zapcore.EncoderConfig{
 		TimeKey:       "timestamp",
