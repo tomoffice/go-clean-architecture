@@ -19,10 +19,10 @@ logger:
   gcp:
     enabled: false
     project_id: ""
-    level: "info"
+    level: "debug"
   seq:
     enabled: false
     endpoint: "http://localhost:5341"
     api_key: ""
-    level: "info"
+    level: "debug"
     console_output_enabled: false

@@ -40,7 +40,7 @@ type Logger struct {
 // NewLogger 創建新的 Seq Logger 實例
 func NewLogger(cfg Config) (logger.Logger, error) {
 	// 建立使用Logrus 的 Seq Sender
-	sender := NewLogrusSender(cfg.Endpoint, cfg.APIKey, cfg.ConsoleOutputEnabled)
+	sender := NewLogrusSender(cfg.Endpoint, cfg.APIKey, cfg.Level, cfg.ConsoleOutputEnabled)
 
 	encCfg := zapcore.EncoderConfig{
 		TimeKey:        "@t",  // Seq 時間戳欄位
