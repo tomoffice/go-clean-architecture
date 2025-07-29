@@ -11,29 +11,24 @@ import (
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/presenter/http"
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/router"
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase"
-	"github.com/tomoffice/go-clean-architecture/pkg/logger"
 )
 
 // Factory 會員模組工廠
-type Factory struct {
-	logger logger.Logger
-}
+type Factory struct{}
 
 // NewModuleFactory 創建會員模組工廠
-func NewModuleFactory(logger logger.Logger) modules.ModuleFactory {
-	return &Factory{
-		logger: logger,
-	}
+func NewModuleFactory() modules.ModuleFactory {
+	return &Factory{}
 }
 
 // CreateModule 創建會員模組
 func (f *Factory) CreateModule(db *sqlx.DB, rg *gin.RouterGroup) (modules.Module, error) {
-	// 組裝所有組件，並注入 logger
+	// 組裝所有組件
 	repo := mcsqlite.NewSQLXMemberRepo(db)
 	gateway := repository.NewMemberSQLXGateway(repo)
-	useCase := usecase.NewMemberUseCase(f.logger, gateway)
+	useCase := usecase.NewMemberUseCase(gateway)
 	presenter := http.NewMemberPresenter()
-	controller := controller.NewMemberController(f.logger, useCase, presenter)
+	controller := controller.NewMemberController(useCase, presenter)
 	router := router.NewMemberRouter(controller, rg)
 
 	// 創建並返回模組實例

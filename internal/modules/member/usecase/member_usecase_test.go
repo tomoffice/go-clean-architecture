@@ -10,7 +10,6 @@ import (
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase/mock"
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase/port/output"
 	"github.com/tomoffice/go-clean-architecture/internal/shared/pagination"
-	"github.com/tomoffice/go-clean-architecture/pkg/logger/adapters/console"
 	"reflect"
 	"testing"
 	"time"
@@ -51,14 +50,14 @@ func TestMemberUseCase_DeleteMember(t *testing.T) {
 			},
 			repoSetup: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByID(gomock.Any(), gomock.Any()).Return(&entity.Member{
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
 						ID:        0,
 						Name:      "gg",
 						Email:     "gg@gmail.com",
 						Password:  "",
 						CreatedAt: testTime,
 					}, nil),
-					r.EXPECT().Delete(gomock.Any(), gomock.Any()).Return(nil),
+					r.EXPECT().Delete(ctx, gomock.Any()).Return(nil),
 				)
 			},
 			wantErr: nil,
@@ -74,7 +73,7 @@ func TestMemberUseCase_DeleteMember(t *testing.T) {
 			},
 			want: nil,
 			repoSetup: func(r *mock.MockMemberPersistence) {
-				r.EXPECT().GetByID(gomock.Any(), gomock.Any()).Return(nil, ErrMemberNotFound)
+				r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, ErrMemberNotFound)
 			},
 			wantErr: ErrMemberNotFound,
 		},
@@ -90,8 +89,8 @@ func TestMemberUseCase_DeleteMember(t *testing.T) {
 			want: nil,
 			repoSetup: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByID(gomock.Any(), gomock.Any()).Return(&entity.Member{}, nil),
-					r.EXPECT().Delete(gomock.Any(), gomock.Any()).Return(ErrMemberDBError),
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{}, nil),
+					r.EXPECT().Delete(ctx, gomock.Any()).Return(ErrMemberDBError),
 				)
 			},
 			wantErr: ErrMemberDBError,
@@ -108,8 +107,8 @@ func TestMemberUseCase_DeleteMember(t *testing.T) {
 			want: nil,
 			repoSetup: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByID(gomock.Any(), gomock.Any()).Return(&entity.Member{}, nil),
-					r.EXPECT().Delete(gomock.Any(), gomock.Any()).Return(ErrMemberNoEffect),
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{}, nil),
+					r.EXPECT().Delete(ctx, gomock.Any()).Return(ErrMemberNoEffect),
 				)
 			},
 			wantErr: ErrMemberNoEffect,
@@ -121,9 +120,7 @@ func TestMemberUseCase_DeleteMember(t *testing.T) {
 			if !ok {
 				t.Fatalf("expected *mock.MockMemberPersistence, got %T", tt.fields.MemberRepo)
 			}
-			testLogger, _ := console.NewDefaultLogger()
 			m := &MemberUseCase{
-				logger:        testLogger,
 				MemberGateway: mockRepo,
 			}
 			tt.repoSetup(mockRepo)
@@ -175,7 +172,7 @@ func TestMemberUseCase_GetMemberByEmail(t *testing.T) {
 				CreatedAt: testTime,
 			},
 			repoSetup: func(r *mock.MockMemberPersistence) {
-				r.EXPECT().GetByEmail(gomock.Any(), gomock.Any()).Return(&entity.Member{
+				r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(&entity.Member{
 					ID:        0,
 					Name:      "gg",
 					Email:     "gg@gmail.com",
@@ -196,7 +193,7 @@ func TestMemberUseCase_GetMemberByEmail(t *testing.T) {
 			},
 			want: nil,
 			repoSetup: func(r *mock.MockMemberPersistence) {
-				r.EXPECT().GetByEmail(gomock.Any(), gomock.Any()).Return(nil, ErrMemberNotFound)
+				r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, ErrMemberNotFound)
 			},
 			wantErr: ErrMemberNotFound,
 		},
@@ -211,7 +208,7 @@ func TestMemberUseCase_GetMemberByEmail(t *testing.T) {
 			},
 			want: nil,
 			repoSetup: func(r *mock.MockMemberPersistence) {
-				r.EXPECT().GetByEmail(gomock.Any(), gomock.Any()).Return(nil, ErrMemberDBError)
+				r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, ErrMemberDBError)
 			},
 			wantErr: ErrMemberDBError,
 		},
@@ -222,9 +219,7 @@ func TestMemberUseCase_GetMemberByEmail(t *testing.T) {
 			if !ok {
 				t.Fatalf("expected *mock.MockMemberPersistence, got %T", tt.fields.MemberRepo)
 			}
-			testLogger, _ := console.NewDefaultLogger()
 			m := &MemberUseCase{
-				logger:        testLogger,
 				MemberGateway: mockRepo,
 			}
 			tt.repoSetup(mockRepo)
@@ -276,7 +271,7 @@ func TestMemberUseCase_GetMemberByID(t *testing.T) {
 				CreatedAt: testTime,
 			},
 			repoSetup: func(r *mock.MockMemberPersistence) {
-				r.EXPECT().GetByID(gomock.Any(), gomock.Any()).Return(&entity.Member{
+				r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
 					ID:        1,
 					Name:      "gg",
 					Email:     "gg@gmail.com",
@@ -296,7 +291,7 @@ func TestMemberUseCase_GetMemberByID(t *testing.T) {
 			},
 			want: nil,
 			repoSetup: func(r *mock.MockMemberPersistence) {
-				r.EXPECT().GetByID(gomock.Any(), gomock.Any()).Return(nil, ErrMemberNotFound)
+				r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, ErrMemberNotFound)
 			},
 			wantErr: ErrMemberNotFound,
 		},
@@ -307,9 +302,7 @@ func TestMemberUseCase_GetMemberByID(t *testing.T) {
 			if !ok {
 				t.Fatalf("expected *mock.MockMemberPersistence, got %T", tt.fields.MemberRepo)
 			}
-			testLogger, _ := console.NewDefaultLogger()
 			m := &MemberUseCase{
-				logger:        testLogger,
 				MemberGateway: mockRepo,
 			}
 			tt.repoSetup(mockRepo)
@@ -379,7 +372,7 @@ func TestMemberUseCase_ListMembers(t *testing.T) {
 			wantTotal: 2,
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetAll(gomock.Any(), gomock.Any()).Return([]*entity.Member{
+					r.EXPECT().GetAll(ctx, gomock.Any()).Return([]*entity.Member{
 						{
 							ID:        1,
 							Name:      "gg",
@@ -395,7 +388,7 @@ func TestMemberUseCase_ListMembers(t *testing.T) {
 							CreatedAt: testTime,
 						},
 					}, nil),
-					r.EXPECT().CountAll(gomock.Any()).Return(2, nil),
+					r.EXPECT().CountAll(ctx).Return(2, nil),
 				)
 			},
 			wantErr: nil,
@@ -412,7 +405,7 @@ func TestMemberUseCase_ListMembers(t *testing.T) {
 			want:      nil,
 			wantTotal: 0,
 			setupRepo: func(r *mock.MockMemberPersistence) {
-				r.EXPECT().GetAll(gomock.Any(), gomock.Any()).Return(nil, ErrMemberNotFound)
+				r.EXPECT().GetAll(ctx, gomock.Any()).Return(nil, ErrMemberNotFound)
 			},
 			wantErr: ErrMemberNotFound,
 		},
@@ -435,7 +428,7 @@ func TestMemberUseCase_ListMembers(t *testing.T) {
 			wantTotal: 0,
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetAll(gomock.Any(), gomock.Any()).Return([]*entity.Member{
+					r.EXPECT().GetAll(ctx, gomock.Any()).Return([]*entity.Member{
 						{
 							ID:        1,
 							Name:      "gg",
@@ -451,7 +444,7 @@ func TestMemberUseCase_ListMembers(t *testing.T) {
 							CreatedAt: testTime,
 						},
 					}, nil),
-					r.EXPECT().CountAll(gomock.Any()).Return(0, ErrMemberDBError),
+					r.EXPECT().CountAll(ctx).Return(0, ErrMemberDBError),
 				)
 			},
 			wantErr: ErrMemberDBError,
@@ -460,9 +453,7 @@ func TestMemberUseCase_ListMembers(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockRepo := tt.fields.MemberRepo.(*mock.MockMemberPersistence)
-			testLogger, _ := console.NewDefaultLogger()
 			m := &MemberUseCase{
-				logger:        testLogger,
 				MemberGateway: mockRepo,
 			}
 			tt.setupRepo(mockRepo)
@@ -522,9 +513,9 @@ func TestMemberUseCase_RegisterMember(t *testing.T) {
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
 					// 第一次註冊不會回應任何資料
-					r.EXPECT().Create(gomock.Any(), gomock.Any()).Return(nil),
+					r.EXPECT().Create(ctx, gomock.Any()).Return(nil),
 					// 第二次利用email取得資料
-					r.EXPECT().GetByEmail(gomock.Any(), gomock.Any()).Return(&entity.Member{
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(&entity.Member{
 						ID:        1,
 						Name:      "gg",
 						Email:     "gg@gmail.com",
@@ -540,17 +531,13 @@ func TestMemberUseCase_RegisterMember(t *testing.T) {
 				MemberRepo: mock.NewMockMemberPersistence(ctrl),
 			},
 			args: args{
-				ctx: ctx,
-				member: &entity.Member{
-					Name:     "test",
-					Email:    "test@example.com",
-					Password: "password",
-				},
+				ctx:    ctx,
+				member: nil,
 			},
 			want:    nil,
 			wantErr: ErrMemberAlreadyExists,
 			setupRepo: func(r *mock.MockMemberPersistence) {
-				r.EXPECT().Create(gomock.Any(), gomock.Any()).Return(ErrMemberAlreadyExists)
+				r.EXPECT().Create(ctx, gomock.Any()).Return(ErrMemberAlreadyExists)
 			},
 		},
 		{
@@ -567,9 +554,9 @@ func TestMemberUseCase_RegisterMember(t *testing.T) {
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
 					// 第一次註冊不會回應任何資料
-					r.EXPECT().Create(gomock.Any(), gomock.Any()).Return(nil),
+					r.EXPECT().Create(ctx, gomock.Any()).Return(nil),
 					// 第二次利用email取得資料
-					r.EXPECT().GetByEmail(gomock.Any(), gomock.Any()).Return(nil, ErrMemberNotFound),
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, ErrMemberNotFound),
 				)
 			},
 		},
@@ -585,7 +572,7 @@ func TestMemberUseCase_RegisterMember(t *testing.T) {
 			want:    nil,
 			wantErr: ErrMemberDBError,
 			setupRepo: func(r *mock.MockMemberPersistence) {
-				r.EXPECT().Create(gomock.Any(), gomock.Any()).Return(ErrMemberDBError)
+				r.EXPECT().Create(ctx, gomock.Any()).Return(ErrMemberDBError)
 			},
 		},
 		{
@@ -602,9 +589,9 @@ func TestMemberUseCase_RegisterMember(t *testing.T) {
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
 					// 第一次註冊不會回應任何資料
-					r.EXPECT().Create(gomock.Any(), gomock.Any()).Return(nil),
+					r.EXPECT().Create(ctx, gomock.Any()).Return(nil),
 					// 第二次利用email取得資料
-					r.EXPECT().GetByEmail(gomock.Any(), gomock.Any()).Return(nil, ErrMemberDBError),
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, ErrMemberDBError),
 				)
 			},
 		},
@@ -612,9 +599,7 @@ func TestMemberUseCase_RegisterMember(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockRepo := tt.fields.MemberRepo.(*mock.MockMemberPersistence)
-			testLogger, _ := console.NewDefaultLogger()
 			m := &MemberUseCase{
-				logger:        testLogger,
 				MemberGateway: mockRepo,
 			}
 			tt.setupRepo(mockRepo)
@@ -675,14 +660,14 @@ func TestMemberUseCase_UpdateMemberProfile(t *testing.T) {
 			wantErr: nil,
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByID(gomock.Any(), gomock.Any()).Return(&entity.Member{
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
 						ID:        1,
 						Name:      "gg",
 						Email:     "gg@gmail.com",
 						Password:  "",
 						CreatedAt: testTime,
 					}, nil),
-					r.EXPECT().UpdateProfile(gomock.Any(), gomock.Any()).Return(&entity.Member{
+					r.EXPECT().UpdateProfile(ctx, gomock.Any()).Return(&entity.Member{
 						ID:        1,
 						Name:      "gg1",
 						Email:     "gg@gmail.com",
@@ -707,7 +692,7 @@ func TestMemberUseCase_UpdateMemberProfile(t *testing.T) {
 			want:    nil,
 			wantErr: ErrMemberNotFound,
 			setupRepo: func(r *mock.MockMemberPersistence) {
-				r.EXPECT().GetByID(gomock.Any(), gomock.Any()).Return(nil, ErrMemberNotFound)
+				r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, ErrMemberNotFound)
 			},
 		},
 		{
@@ -726,14 +711,14 @@ func TestMemberUseCase_UpdateMemberProfile(t *testing.T) {
 			wantErr: ErrMemberNoEffect,
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByID(gomock.Any(), gomock.Any()).Return(&entity.Member{
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
 						ID:        1,
 						Name:      "gg",
 						Email:     "gg@gmail.com",
 						Password:  "",
 						CreatedAt: testTime,
 					}, nil),
-					r.EXPECT().UpdateProfile(gomock.Any(), gomock.Any()).Return(nil, ErrMemberNoEffect),
+					r.EXPECT().UpdateProfile(ctx, gomock.Any()).Return(nil, ErrMemberNoEffect),
 				)
 			},
 		},
@@ -752,7 +737,7 @@ func TestMemberUseCase_UpdateMemberProfile(t *testing.T) {
 			want:    nil,
 			wantErr: ErrMemberDBError,
 			setupRepo: func(r *mock.MockMemberPersistence) {
-				r.EXPECT().GetByID(gomock.Any(), gomock.Any()).Return(nil, ErrMemberDBError)
+				r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, ErrMemberDBError)
 			},
 		},
 		{
@@ -786,14 +771,14 @@ func TestMemberUseCase_UpdateMemberProfile(t *testing.T) {
 			wantErr: ErrMemberNoEffect,
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByID(gomock.Any(), gomock.Any()).Return(&entity.Member{
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
 						ID:        1,
 						Name:      "gg",
 						Email:     "gg@gmail.com",
 						Password:  "",
 						CreatedAt: testTime,
 					}, nil),
-					r.EXPECT().UpdateProfile(gomock.Any(), gomock.Any()).Return(&entity.Member{
+					r.EXPECT().UpdateProfile(ctx, gomock.Any()).Return(&entity.Member{
 						ID:        1,
 						Name:      "gg1",
 						Email:     "gg@gmail.com",
@@ -807,9 +792,7 @@ func TestMemberUseCase_UpdateMemberProfile(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockRepo := tt.fields.MemberRepo.(*mock.MockMemberPersistence)
-			testLogger, _ := console.NewDefaultLogger()
 			m := &MemberUseCase{
-				logger:        testLogger,
 				MemberGateway: mockRepo,
 			}
 			tt.setupRepo(mockRepo)
@@ -858,15 +841,15 @@ func TestMemberUseCase_UpdateMemberEmail(t *testing.T) {
 			},
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByEmail(gomock.Any(), gomock.Any()).Return(nil, ErrMemberNotFound),
-					r.EXPECT().GetByID(gomock.Any(), gomock.Any()).Return(&entity.Member{
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, ErrMemberNotFound),
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
 						ID:        0,
 						Name:      "test",
 						Email:     "test@gmail.com",
 						Password:  "testpassword",
 						CreatedAt: testTime,
 					}, nil),
-					r.EXPECT().UpdateEmail(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil),
+					r.EXPECT().UpdateEmail(ctx, gomock.Any(), gomock.Any()).Return(nil),
 				)
 			},
 			wantErr: nil,
@@ -883,7 +866,7 @@ func TestMemberUseCase_UpdateMemberEmail(t *testing.T) {
 				password: "",
 			},
 			setupRepo: func(r *mock.MockMemberPersistence) {
-				r.EXPECT().GetByEmail(gomock.Any(), gomock.Any()).Return(&entity.Member{
+				r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(&entity.Member{
 					ID:       2,
 					Name:     "test",
 					Email:    "",
@@ -905,7 +888,7 @@ func TestMemberUseCase_UpdateMemberEmail(t *testing.T) {
 			},
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByEmail(gomock.Any(), gomock.Any()).Return(nil, ErrMemberDBError),
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, ErrMemberDBError),
 				)
 			},
 			wantErr: ErrMemberDBError,
@@ -923,7 +906,7 @@ func TestMemberUseCase_UpdateMemberEmail(t *testing.T) {
 			},
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByEmail(gomock.Any(), gomock.Any()).Return(&entity.Member{
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(&entity.Member{
 						ID:    1,
 						Email: "test@gmail.com",
 					}, nil),
@@ -944,8 +927,8 @@ func TestMemberUseCase_UpdateMemberEmail(t *testing.T) {
 			},
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByEmail(gomock.Any(), gomock.Any()).Return(nil, ErrMemberNotFound),
-					r.EXPECT().GetByID(gomock.Any(), gomock.Any()).Return(nil, ErrMemberNotFound),
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, ErrMemberNotFound),
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, ErrMemberNotFound),
 				)
 			},
 			wantErr: ErrMemberNotFound,
@@ -962,8 +945,8 @@ func TestMemberUseCase_UpdateMemberEmail(t *testing.T) {
 			},
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByEmail(gomock.Any(), gomock.Any()).Return(nil, ErrMemberNotFound),
-					r.EXPECT().GetByID(gomock.Any(), gomock.Any()).Return(nil, ErrMemberDBError),
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, ErrMemberNotFound),
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, ErrMemberDBError),
 				)
 			},
 			wantErr: ErrMemberDBError,
@@ -980,8 +963,8 @@ func TestMemberUseCase_UpdateMemberEmail(t *testing.T) {
 			},
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByEmail(gomock.Any(), gomock.Any()).Return(nil, ErrMemberNotFound),
-					r.EXPECT().GetByID(gomock.Any(), gomock.Any()).Return(&entity.Member{
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, ErrMemberNotFound),
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
 						ID:       1,
 						Password: "rightpassword",
 					}, nil),
@@ -1000,9 +983,9 @@ func TestMemberUseCase_UpdateMemberEmail(t *testing.T) {
 			},
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByEmail(gomock.Any(), gomock.Any()).Return(nil, ErrMemberNotFound),
-					r.EXPECT().GetByID(gomock.Any(), gomock.Any()).Return(&entity.Member{}, nil),
-					r.EXPECT().UpdateEmail(gomock.Any(), gomock.Any(), gomock.Any()).Return(ErrMemberNoEffect),
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, ErrMemberNotFound),
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{}, nil),
+					r.EXPECT().UpdateEmail(ctx, gomock.Any(), gomock.Any()).Return(ErrMemberNoEffect),
 				)
 			},
 
@@ -1019,9 +1002,9 @@ func TestMemberUseCase_UpdateMemberEmail(t *testing.T) {
 			},
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByEmail(gomock.Any(), gomock.Any()).Return(nil, ErrMemberNotFound),
-					r.EXPECT().GetByID(gomock.Any(), gomock.Any()).Return(&entity.Member{}, nil),
-					r.EXPECT().UpdateEmail(gomock.Any(), gomock.Any(), gomock.Any()).Return(ErrMemberDBError),
+					r.EXPECT().GetByEmail(ctx, gomock.Any()).Return(nil, ErrMemberNotFound),
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{}, nil),
+					r.EXPECT().UpdateEmail(ctx, gomock.Any(), gomock.Any()).Return(ErrMemberDBError),
 				)
 			},
 			wantErr: ErrMemberDBError,
@@ -1029,9 +1012,7 @@ func TestMemberUseCase_UpdateMemberEmail(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			testLogger, _ := console.NewDefaultLogger()
 			m := &MemberUseCase{
-				logger:        testLogger,
 				MemberGateway: tt.fields.MemberGateway,
 			}
 			tt.setupRepo(tt.fields.MemberGateway.(*mock.MockMemberPersistence))
@@ -1076,13 +1057,13 @@ func TestMemberUseCase_UpdateMemberPassword(t *testing.T) {
 			},
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByID(gomock.Any(), gomock.Any()).Return(&entity.Member{
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
 						ID:        1,
 						Name:      "test",
 						Password:  "oldpassword",
 						CreatedAt: testTime,
 					}, nil),
-					r.EXPECT().UpdatePassword(gomock.Any(), gomock.Any(), gomock.Any()).Return(nil),
+					r.EXPECT().UpdatePassword(ctx, gomock.Any(), gomock.Any()).Return(nil),
 				)
 			},
 			wantErr: nil,
@@ -1114,7 +1095,7 @@ func TestMemberUseCase_UpdateMemberPassword(t *testing.T) {
 			},
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByID(gomock.Any(), gomock.Any()).Return(nil, ErrMemberNotFound),
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, ErrMemberNotFound),
 				)
 			},
 			wantErr: ErrMemberNotFound,
@@ -1132,7 +1113,7 @@ func TestMemberUseCase_UpdateMemberPassword(t *testing.T) {
 			},
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByID(gomock.Any(), gomock.Any()).Return(nil, ErrMemberDBError),
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(nil, ErrMemberDBError),
 				)
 			},
 			wantErr: ErrMemberDBError,
@@ -1149,7 +1130,7 @@ func TestMemberUseCase_UpdateMemberPassword(t *testing.T) {
 			},
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByID(gomock.Any(), gomock.Any()).Return(&entity.Member{
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
 						ID:       0,
 						Password: "oldpassword",
 					}, nil),
@@ -1170,11 +1151,11 @@ func TestMemberUseCase_UpdateMemberPassword(t *testing.T) {
 			},
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByID(gomock.Any(), gomock.Any()).Return(&entity.Member{
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
 						ID:       0,
 						Password: "oldpassword",
 					}, nil),
-					r.EXPECT().UpdatePassword(gomock.Any(), gomock.Any(), gomock.Any()).Return(ErrMemberNoEffect),
+					r.EXPECT().UpdatePassword(ctx, gomock.Any(), gomock.Any()).Return(ErrMemberNoEffect),
 				)
 			},
 			wantErr: ErrMemberNoEffect,
@@ -1192,11 +1173,11 @@ func TestMemberUseCase_UpdateMemberPassword(t *testing.T) {
 			},
 			setupRepo: func(r *mock.MockMemberPersistence) {
 				gomock.InOrder(
-					r.EXPECT().GetByID(gomock.Any(), gomock.Any()).Return(&entity.Member{
+					r.EXPECT().GetByID(ctx, gomock.Any()).Return(&entity.Member{
 						ID:       0,
 						Password: "oldpassword",
 					}, nil),
-					r.EXPECT().UpdatePassword(gomock.Any(), gomock.Any(), gomock.Any()).Return(ErrMemberDBError),
+					r.EXPECT().UpdatePassword(ctx, gomock.Any(), gomock.Any()).Return(ErrMemberDBError),
 				)
 			},
 			wantErr: ErrMemberDBError,
@@ -1204,9 +1185,7 @@ func TestMemberUseCase_UpdateMemberPassword(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			testLogger, _ := console.NewDefaultLogger()
 			m := &MemberUseCase{
-				logger:        testLogger,
 				MemberGateway: tt.fields.MemberGateway,
 			}
 			tt.setupRepo(tt.fields.MemberGateway.(*mock.MockMemberPersistence))
@@ -1222,9 +1201,7 @@ func TestMemberUseCase_UpdateMemberPassword(t *testing.T) {
 
 func TestNewMemberUseCase(t *testing.T) {
 	repo := mock.NewMockMemberPersistence(gomock.NewController(t))
-	// 創建測試用的 logger
-	testLogger, _ := console.NewDefaultLogger()
-	got := NewMemberUseCase(testLogger, repo)
+	got := NewMemberUseCase(repo)
 	// 確認got不是nil
 	if got == nil {
 		t.Errorf("NewMemberUseCase() = %v, want %v", got, repo)

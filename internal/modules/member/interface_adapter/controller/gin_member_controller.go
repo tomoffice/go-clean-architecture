@@ -8,33 +8,24 @@ import (
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/mapper"
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase/port/input"
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase/port/output"
-	"github.com/tomoffice/go-clean-architecture/pkg/logger"
-	"go.uber.org/zap"
 	"net/http"
 )
 
 type MemberController struct {
-	logger    logger.Logger
 	usecase   input.MemberInputPort
 	presenter output.MemberPresenter
 }
 
-func NewMemberController(logger logger.Logger, memberUseCase input.MemberInputPort, presenter output.MemberPresenter) *MemberController {
+func NewMemberController(memberUseCase input.MemberInputPort, presenter output.MemberPresenter) *MemberController {
 	return &MemberController{
-		logger:    logger,
 		usecase:   memberUseCase,
 		presenter: presenter,
 	}
 }
 
 func (c *MemberController) Register(ctx *gin.Context) {
-	// 從 context 中獲取已有的 trace (來自 middleware)
-	controllerLogger := c.logger.WithContext(ctx.Request.Context())
-	controllerLogger.Info("Controller 處理註冊請求")
-	
 	var ginReqDTO gindto.GinBindingRegisterMemberRequestDTO
 	if err := ctx.ShouldBindJSON(&ginReqDTO); err != nil {
-		controllerLogger.Error("請求綁定失敗", zap.Error(err))
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
 		httpStatus := MapErrorCodeToHTTPStatus(errCode)
@@ -43,7 +34,6 @@ func (c *MemberController) Register(ctx *gin.Context) {
 	}
 	reqDTO := ginmapper.GinDTOToRegisterMemberDTO(ginReqDTO)
 	if err := reqDTO.Validate(); err != nil {
-		controllerLogger.Error("請求驗證失敗", zap.Error(err))
 		errCode, resp := c.presenter.PresentValidationError(err)
 		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
@@ -52,13 +42,11 @@ func (c *MemberController) Register(ctx *gin.Context) {
 	entity := mapper.RegisterMemberDTOToEntity(reqDTO)
 	member, err := c.usecase.RegisterMember(ctx, entity)
 	if err != nil {
-		controllerLogger.Error("UseCase 執行失敗", zap.Error(err))
 		errCode, resp := c.presenter.PresentUseCaseError(err)
 		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
 		return
 	}
-	controllerLogger.Info("註冊請求處理成功", zap.Int("member_id", member.ID))
 	resp := c.presenter.PresentRegisterMember(member)
 	ctx.JSON(http.StatusOK, resp)
 }

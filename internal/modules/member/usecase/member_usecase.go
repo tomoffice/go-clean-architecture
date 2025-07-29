@@ -16,52 +16,28 @@ import (
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase/port/input"
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase/port/output"
 	"github.com/tomoffice/go-clean-architecture/internal/shared/pagination"
-	"github.com/tomoffice/go-clean-architecture/pkg/logger"
-	"go.opentelemetry.io/otel"
-	"go.uber.org/zap"
 )
 
 type MemberUseCase struct {
-	logger        logger.Logger
 	MemberGateway output.MemberPersistence
 }
 
-func NewMemberUseCase(logger logger.Logger, memberRepo output.MemberPersistence) input.MemberInputPort {
+func NewMemberUseCase(memberRepo output.MemberPersistence) input.MemberInputPort {
 	return &MemberUseCase{
-		logger:        logger,
 		MemberGateway: memberRepo,
 	}
 }
 func (m *MemberUseCase) RegisterMember(ctx context.Context, member *entity.Member) (*entity.Member, error) {
-	// 按需創建業務邏輯 tracer
-	businessTracer := otel.Tracer("business-logic")
-	ctx, span := businessTracer.Start(ctx, "member-registration")
-	defer span.End()
-	
-	// 檢查輸入參數
-	if member == nil {
-		return nil, errors.New("member cannot be nil")
-	}
-	
-	// 使用注入的 logger 與 context 中的 trace
-	businessLogger := m.logger.WithContext(ctx)
-	businessLogger.Info("開始用戶註冊", zap.String("email", member.Email))
-	
 	err := m.MemberGateway.Create(ctx, member)
 	if err != nil {
-		businessLogger.Error("用戶註冊失敗", zap.Error(err), zap.String("email", member.Email))
 		return nil, err
 	}
-	
 	// 為了通用 repository，無論底層是否會 mutate 傳入 entity，
 	// 一律透過唯一欄位查詢回傳完整 entity，減少 infra 依賴。
 	retrieveMember, err := m.MemberGateway.GetByEmail(ctx, member.Email)
 	if err != nil {
-		businessLogger.Error("用戶註冊後查詢失敗", zap.Error(err), zap.String("email", member.Email))
 		return nil, err
 	}
-	
-	businessLogger.Info("用戶註冊成功", zap.String("email", member.Email), zap.Int("id", retrieveMember.ID))
 	return retrieveMember, nil
 }
 func (m *MemberUseCase) GetMemberByID(ctx context.Context, id int) (*entity.Member, error) {
