@@ -48,7 +48,7 @@ func (a *App) Run() {
 
 	// 創建會員模組
 	memberModuleFactory := member.NewModuleFactory()
-	memberModule, err := memberModuleFactory.CreateModule(db, apiRouterGroup)
+	memberModule, err := memberModuleFactory.CreateModule(db, apiRouterGroup, a.Logger)
 	if err != nil {
 		//log.Fatalf("創建會員模組失敗: %v", err)
 		a.Logger.Error("創建會員模組失敗", logger.NewField("error", err))

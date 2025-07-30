@@ -52,7 +52,7 @@ func (lm *LoggingMiddleware) HandlerFunc() gin.HandlerFunc {
 		httpTracer := otel.Tracer("http-request")
 		ctx := c.Request.Context()
 		ctx, span := httpTracer.Start(ctx, c.Request.Method+" "+c.Request.URL.Path)
-		
+
 		// 使用注入的 logger 記錄請求開始
 		requestLogger := lm.logger.WithContext(ctx)
 		requestLogger.Info("HTTP 請求開始",
@@ -69,13 +69,13 @@ func (lm *LoggingMiddleware) HandlerFunc() gin.HandlerFunc {
 				attribute.Int("http.status_code", c.Writer.Status()),
 				attribute.Int("http.response_size", c.Writer.Size()),
 			)
-			
+
 			// 使用注入的 logger 記錄請求完成
 			requestLogger.Info("HTTP 請求完成",
 				zap.Int("status", c.Writer.Status()),
 				zap.Int("response_size", c.Writer.Size()),
 			)
-			
+
 			span.End()
 		}()
 

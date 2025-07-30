@@ -8,18 +8,21 @@ import (
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/mapper"
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase/port/input"
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase/port/output"
+	"github.com/tomoffice/go-clean-architecture/pkg/logger"
 	"net/http"
 )
 
 type MemberController struct {
 	usecase   input.MemberInputPort
 	presenter output.MemberPresenter
+	logger    logger.Logger
 }
 
-func NewMemberController(memberUseCase input.MemberInputPort, presenter output.MemberPresenter) *MemberController {
+func NewMemberController(memberUseCase input.MemberInputPort, presenter output.MemberPresenter, logger logger.Logger) *MemberController {
 	return &MemberController{
 		usecase:   memberUseCase,
 		presenter: presenter,
+		logger:    logger,
 	}
 }
 

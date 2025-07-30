@@ -7,8 +7,8 @@ type Module struct {
 	router *router.MemberRouter
 }
 
-// New 創建會員模組實例
-func New(router *router.MemberRouter) *Module {
+// NewModule 創建會員模組實例
+func NewModule(router *router.MemberRouter) *Module {
 	return &Module{
 		router: router,
 	}
