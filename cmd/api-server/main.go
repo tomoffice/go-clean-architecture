@@ -7,6 +7,7 @@ import (
 	"github.com/tomoffice/go-clean-architecture/config"
 	"github.com/tomoffice/go-clean-architecture/internal/bootstrap"
 	"github.com/tomoffice/go-clean-architecture/internal/framework/logger"
+	"github.com/tomoffice/go-clean-architecture/pkg/tracer/adapters/basic"
 )
 
 func main() {
@@ -26,8 +27,11 @@ func main() {
 			log.Printf("Error during cleanup: %v", err)
 		}
 	}()
+	// 3. 創建 tracer
+	tracerConfig := basic.NewConfig(cfg.Tracer.ServiceName, cfg.Tracer.Enabled)
+	appTracer := basic.NewTracer(tracerConfig)
 
-	// 3. 創建並啟動應用
-	app := bootstrap.NewApp(cfg, appLogger)
+	// 4. 創建並啟動應用
+	app := bootstrap.NewApp(cfg, appLogger, appTracer)
 	app.Run()
 }

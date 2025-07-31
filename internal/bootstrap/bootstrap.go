@@ -7,6 +7,7 @@ import (
 	"github.com/tomoffice/go-clean-architecture/internal/framework/http/gin/middleware"
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member"
 	"github.com/tomoffice/go-clean-architecture/pkg/logger"
+	"github.com/tomoffice/go-clean-architecture/pkg/tracer"
 
 	"github.com/tomoffice/go-clean-architecture/config"
 	"log"
@@ -18,11 +19,11 @@ type App struct {
 	Logger              logger.Logger
 }
 
-func NewApp(cfg *config.Config, logger logger.Logger) *App {
+func NewApp(cfg *config.Config, logger logger.Logger, tracer tracer.Tracer) *App {
 	return &App{
 		Config:              cfg,
 		Logger:              logger,
-		MiddlewareContainer: middleware.NewContainer(logger),
+		MiddlewareContainer: middleware.NewContainer(logger, tracer),
 	}
 }
 

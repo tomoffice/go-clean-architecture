@@ -1,12 +1,7 @@
 package logger
 
-
 // Config 是 logger 套件的配置結構，用於初始化整個日誌系統
-// 包含 OpenTelemetry 和各種 logger adapters 的配置
 type Config struct {
-	// OpenTelemetry 配置
-	Telemetry TelemetryConfig `yaml:"telemetry" json:"telemetry"`
-
 	// Logger Adapters 配置
 	Console ConsoleConfig `yaml:"console" json:"console"`
 	GCP     GCPConfig     `yaml:"gcp"     json:"gcp"`
@@ -48,16 +43,9 @@ type SeqConfig struct {
 	Level    string `yaml:"level"    json:"level"    default:"info"`
 }
 
-
 // NewConfig 創建新的預設配置
 func NewConfig() Config {
 	return Config{
-		Telemetry: TelemetryConfig{
-			Enabled:     false,
-			ServiceName: "app",
-			Version:     "1.0.0",
-			Environment: "development",
-		},
 		Console: ConsoleConfig{
 			Enabled: true,
 			Level:   "info",
@@ -71,5 +59,3 @@ func NewConfig() Config {
 		},
 	}
 }
-
-

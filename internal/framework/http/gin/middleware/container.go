@@ -5,11 +5,13 @@ import (
 	"github.com/tomoffice/go-clean-architecture/internal/framework/http/gin/middleware/cors"
 	"github.com/tomoffice/go-clean-architecture/internal/framework/http/gin/middleware/logging"
 	"github.com/tomoffice/go-clean-architecture/pkg/logger"
+	"github.com/tomoffice/go-clean-architecture/pkg/tracer"
 )
 
 // Container 提供所有可用的middleware
 type Container struct {
 	logger    logger.Logger
+	tracer    tracer.Tracer
 	cors      gin.HandlerFunc
 	auth      gin.HandlerFunc
 	rateLimit gin.HandlerFunc
@@ -18,11 +20,12 @@ type Container struct {
 }
 
 // NewContainer 創建並初始化middleware容器
-func NewContainer(logger logger.Logger) *Container {
+func NewContainer(logger logger.Logger, tracer tracer.Tracer) *Container {
 	return &Container{
 		logger:  logger,
+		tracer:  tracer,
 		cors:    cors.NewCORSMiddleware(cors.DefaultCORSConfig()).HandlerFunc(),
-		logging: logging.NewLoggingMiddleware(logging.DefaultLoggingConfig(), logger).HandlerFunc(),
+		logging: logging.NewLoggingMiddleware(logging.DefaultLoggingConfig(), logger, tracer).HandlerFunc(),
 		// 暫時將其他中間件設為nil，之後實現時再添加
 		auth:      nil,
 		rateLimit: nil,

@@ -26,3 +26,6 @@ logger:
     api_key: ""
     level: "debug"
     console_output_enabled: false
+tracer:
+  enabled: true
+  service_name: "api-server"

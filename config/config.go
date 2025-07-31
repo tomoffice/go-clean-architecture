@@ -8,28 +8,30 @@ type Config struct {
 	Database DatabaseConfig `envconfig:"-"        yaml:"database" validate:"required"`
 	Auth     AuthConfig     `envconfig:"-"        yaml:"auth"     validate:"required"`
 	Logger   LoggerConfig   `envconfig:"-"        yaml:"logger"   validate:"required"`
+	Tracer   TracerConfig   `envconfig:"-"        yaml:"tracer"   validate:"required"`
 }
 
 type ServerConfig struct {
-	HTTP HTTPConfig `envconfig:"-"    yaml:"http"    validate:"required"`
+	HTTP HTTPConfig `envconfig:"-" yaml:"http" validate:"required"`
 }
 
 type HTTPConfig struct {
-	Host string `envconfig:"SERVER_HTTP_HOST"    yaml:"host"    validate:"required"`
-	Port string `envconfig:"SERVER_HTTP_PORT"    yaml:"port"    validate:"required"`
+	Host string `envconfig:"SERVER_HTTP_HOST" yaml:"host" validate:"required"`
+	Port string `envconfig:"SERVER_HTTP_PORT" yaml:"port" validate:"required"`
 }
 
 type DatabaseConfig struct {
-	DSN string `envconfig:"DB_DSN"    yaml:"dsn"    validate:"required"`
+	DSN string `envconfig:"DB_DSN" yaml:"dsn" validate:"required"`
 }
 
 type AuthConfig struct {
-	JWT JWTConfig `envconfig:"-"    yaml:"jwt"    validate:"required"`
+	JWT JWTConfig `envconfig:"-" yaml:"jwt" validate:"required"`
 }
+
 type JWTConfig struct {
-	Algorithm string `envconfig:"JWT_ALGORITHM"    yaml:"algorithm" validate:"required"`
-	Secret    string `envconfig:"JWT_SECRET"      yaml:"secret"    validate:"required"`
-	Expire    int    `envconfig:"JWT_EXPIRE"      yaml:"expire"    validate:"required"`
+	Algorithm string `envconfig:"JWT_ALGORITHM" yaml:"algorithm" validate:"required"`
+	Secret    string `envconfig:"JWT_SECRET" yaml:"secret" validate:"required"`
+	Expire    int    `envconfig:"JWT_EXPIRE" yaml:"expire" validate:"required"`
 }
 
 // LoggerConfig 定義日誌配置
@@ -60,4 +62,9 @@ type SeqLoggerConfig struct {
 	APIKey               string `envconfig:"LOGGER_SEQ_API_KEY"  yaml:"api_key"`
 	Level                string `envconfig:"LOGGER_SEQ_LEVEL"    yaml:"level"    default:"info"`
 	ConsoleOutputEnabled bool   `envconfig:"LOGGER_SEQ_CONSOLE_OUTPUT_ENABLED" yaml:"console_output_enabled" default:"false"`
+}
+// TracerConfig 定義追蹤器配置（只保留實際使用的欄位）
+type TracerConfig struct {
+	Enabled     bool   `envconfig:"TRACER_ENABLED" yaml:"enabled" default:"true"`
+	ServiceName string `envconfig:"TRACER_SERVICE_NAME" yaml:"service_name" default:"api-server"`
 }
