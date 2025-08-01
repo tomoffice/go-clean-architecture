@@ -22,7 +22,7 @@ func NewBaseHTTPResponse(status enum.APIStatus) BaseHTTPResponse {
 
 type HTTPResponse[T any] struct {
 	Data  T             `json:"data,omitempty"`
-	Error *ErrorPayload `json:"errordefs,omitempty"`
+	Error *ErrorPayload `json:"error,omitempty"`
 	Meta  *MetaPayload  `json:"meta,omitempty"`
 	BaseHTTPResponse
 }
