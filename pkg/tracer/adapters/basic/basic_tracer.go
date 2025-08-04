@@ -59,5 +59,6 @@ func (t *Tracer) Start(ctx context.Context, name string) (context.Context, trace
 	return ctx, NewSpan(span)
 }
 
+
 // 確保 Tracer 實作 tracer.Tracer 介面
 var _ tracer.Tracer = (*Tracer)(nil)
