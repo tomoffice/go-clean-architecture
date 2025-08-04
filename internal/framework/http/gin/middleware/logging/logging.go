@@ -6,7 +6,7 @@ import (
 	"io"
 	"strings"
 	"time"
-	
+
 	"github.com/gin-gonic/gin"
 	"github.com/tomoffice/go-clean-architecture/pkg/logger"
 	"github.com/tomoffice/go-clean-architecture/pkg/tracer"
@@ -17,16 +17,16 @@ import (
 type LoggingConfig struct {
 	// SkipPaths 定義要跳過追蹤的路徑
 	SkipPaths []string
-	
+
 	// LogRequestBody 是否記錄請求 body
 	LogRequestBody bool
-	
+
 	// LogResponseBody 是否記錄回應 body
 	LogResponseBody bool
-	
+
 	// MaxBodySize body 記錄的最大大小（bytes），超過此大小將被截斷
 	MaxBodySize int
-	
+
 	// LoggableContentTypes 可記錄的 Content-Type 白名單
 	// 空列表表示記錄所有類型
 	LoggableContentTypes []string
@@ -83,22 +83,6 @@ func (lm *LoggingMiddleware) HandlerFunc() gin.HandlerFunc {
 		// 讀取 request body
 		requestBody := lm.readRequestBody(c)
 
-		// 建立日誌欄位
-		requestFields := []logger.Field{
-			logger.NewField("method", c.Request.Method),
-			logger.NewField("path", c.Request.URL.Path),
-			logger.NewField("remote_addr", c.ClientIP()),
-			logger.NewField("user_agent", c.Request.UserAgent()),
-		}
-		
-		// 如果有 request body，加入到日誌中
-		if requestBody != "" {
-			requestFields = append(requestFields, logger.NewField("request_body", requestBody))
-		}
-
-		// 記錄請求開始
-		contextLogger.Info("HTTP 請求開始", requestFields...)
-
 		// 將更新後的 context 設回 request
 		c.Request = c.Request.WithContext(ctx)
 
@@ -110,7 +94,7 @@ func (lm *LoggingMiddleware) HandlerFunc() gin.HandlerFunc {
 		if lm.config.LogResponseBody {
 			responseBodyWriter = &ResponseBodyWriter{
 				ResponseWriter: c.Writer,
-				body:          bytes.NewBufferString(""),
+				body:           bytes.NewBufferString(""),
 			}
 			c.Writer = responseBodyWriter
 		}
@@ -123,11 +107,21 @@ func (lm *LoggingMiddleware) HandlerFunc() gin.HandlerFunc {
 		statusCode := c.Writer.Status()
 		responseSize := c.Writer.Size()
 
-		// 建立回應日誌欄位
-		responseFields := []logger.Field{
+		// 建立完整的日誌欄位（請求和回應資訊合併）
+		logFields := []logger.Field{
+			logger.NewField("method", c.Request.Method),
+			logger.NewField("path", c.Request.URL.Path),
+			logger.NewField("remote_addr", c.ClientIP()),
+			logger.NewField("user_agent", c.Request.UserAgent()),
 			logger.NewField("status_code", statusCode),
 			logger.NewField("response_size", responseSize),
+			logger.NewField("start_time", startTime.Format(time.RFC3339Nano)),
 			logger.NewField("latency_ms", latency.Milliseconds()),
+		}
+
+		// 如果有 request body，加入到日誌中
+		if requestBody != "" {
+			logFields = append(logFields, logger.NewField("request_body", requestBody))
 		}
 
 		// 如果有 response body，加入到日誌中
@@ -136,11 +130,11 @@ func (lm *LoggingMiddleware) HandlerFunc() gin.HandlerFunc {
 			if len(responseBody) > lm.config.MaxBodySize {
 				responseBody = responseBody[:lm.config.MaxBodySize] + "...[truncated]"
 			}
-			responseFields = append(responseFields, logger.NewField("response_body", responseBody))
+			logFields = append(logFields, logger.NewField("response_body", responseBody))
 		}
 
-		// 記錄請求完成
-		contextLogger.Info("HTTP 請求完成", responseFields...)
+		// 記錄 HTTP 請求（單一日誌記錄）
+		contextLogger.Debug("LoggingMiddleware", logFields...)
 	}
 }
 
@@ -159,7 +153,7 @@ func (lm *LoggingMiddleware) shouldLogBody(contentType string) bool {
 	if len(lm.config.LoggableContentTypes) == 0 {
 		return true // 空白名單表示記錄所有類型
 	}
-	
+
 	for _, loggableType := range lm.config.LoggableContentTypes {
 		if strings.Contains(strings.ToLower(contentType), strings.ToLower(loggableType)) {
 			return true
@@ -173,24 +167,24 @@ func (lm *LoggingMiddleware) readRequestBody(c *gin.Context) string {
 	if !lm.config.LogRequestBody {
 		return ""
 	}
-	
+
 	contentType := c.GetHeader("Content-Type")
 	if !lm.shouldLogBody(contentType) {
 		return "[unsupported content type]"
 	}
-	
+
 	var bodyBytes []byte
 	if c.Request.Body != nil {
 		bodyBytes, _ = io.ReadAll(c.Request.Body)
 		// 重新設置 body 供後續使用
 		c.Request.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 	}
-	
+
 	// 檢查大小限制
 	if len(bodyBytes) > lm.config.MaxBodySize {
 		return string(bodyBytes[:lm.config.MaxBodySize]) + "...[truncated]"
 	}
-	
+
 	return string(bodyBytes)
 }
 
@@ -212,7 +206,7 @@ func (lm *LoggingMiddleware) setTraceHeaders(c *gin.Context, ctx context.Context
 	if span == nil {
 		return
 	}
-	
+
 	spanCtx := span.SpanContext()
 	if spanCtx.IsValid() {
 		c.Header("X-Trace-Id", spanCtx.TraceID().String())

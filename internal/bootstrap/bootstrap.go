@@ -17,12 +17,14 @@ type App struct {
 	Config              *config.Config
 	MiddlewareContainer *middleware.Container
 	Logger              logger.Logger
+	Tracer              tracer.Tracer
 }
 
 func NewApp(cfg *config.Config, logger logger.Logger, tracer tracer.Tracer) *App {
 	return &App{
 		Config:              cfg,
 		Logger:              logger,
+		Tracer:              tracer,
 		MiddlewareContainer: middleware.NewContainer(logger, tracer),
 	}
 }
@@ -49,7 +51,7 @@ func (a *App) Run() {
 
 	// 創建會員模組
 	memberModuleFactory := member.NewModuleFactory()
-	memberModule, err := memberModuleFactory.CreateModule(db, apiRouterGroup, a.Logger)
+	memberModule, err := memberModuleFactory.CreateModule(db, apiRouterGroup, a.Logger, a.Tracer)
 	if err != nil {
 		//log.Fatalf("創建會員模組失敗: %v", err)
 		a.Logger.Error("創建會員模組失敗", logger.NewField("error", err))
