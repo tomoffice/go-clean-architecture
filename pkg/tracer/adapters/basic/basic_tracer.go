@@ -2,8 +2,8 @@ package basic
 
 import (
 	"context"
-	"github.com/tomoffice/go-clean-architecture/pkg/tracer"
 
+	"github.com/tomoffice/go-clean-architecture/pkg/tracer"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 )
