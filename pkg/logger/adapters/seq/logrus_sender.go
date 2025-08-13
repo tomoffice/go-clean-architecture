@@ -1,11 +1,12 @@
 package seq
 
 import (
+	"io"
+
 	"github.com/nullseed/logruseq"
 	"github.com/sirupsen/logrus"
 	"github.com/tomoffice/go-clean-architecture/pkg/logger"
 	"go.uber.org/zap/zapcore"
-	"io"
 )
 
 type LogrusSender struct {
@@ -14,7 +15,7 @@ type LogrusSender struct {
 
 func NewLogrusSender(endPoint, api string, level logger.Level, consoleOutputEnable bool) *LogrusSender {
 	lg := logrus.New()
-	lg.SetLevel(mapLevel(level))
+	lg.SetLevel(mapLevel(toZapLevel(level)))
 	if consoleOutputEnable == false {
 		lg.SetOutput(io.Discard) // 不輸出到控制台
 	}

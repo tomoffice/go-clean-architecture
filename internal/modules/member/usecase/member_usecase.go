@@ -26,27 +26,21 @@ type MemberUseCase struct {
 	tracer        tracer.Tracer
 }
 
-func NewMemberUseCase(memberRepo output.MemberPersistence, logger logger.Logger, tracer tracer.Tracer) input.MemberInputPort {
+func NewMemberUseCase(memberRepo output.MemberPersistence, log logger.Logger, tracer tracer.Tracer) input.MemberInputPort {
+	baseLogger := log.With(logger.NewField("layer", "usecase"))
 	return &MemberUseCase{
 		MemberGateway: memberRepo,
-		logger:        logger,
+		logger:        baseLogger,
 		tracer:        tracer,
 	}
 }
 func (m *MemberUseCase) RegisterMember(ctx context.Context, member *entity.Member) (*entity.Member, error) {
 	// 創建帶有 context 的 logger 用於追蹤
-	contextLogger := m.logger.WithContext(ctx).With(logger.NewField("layer", "usecase"))
-
-	// 創建 UseCase 層的子 span，自動記錄執行時間
-	ctx, span := m.tracer.Start(ctx, "MemberController.GetByID")
+	transCtx, contextLogger, span := createTracedLogger(ctx, m.tracer, m.logger)
 	defer span.End()
 
-	contextLogger.Info("開始會員註冊",
-		logger.NewField("member_email", member.Email),
-		logger.NewField("member_name", member.Name),
-	)
 
-	err := m.MemberGateway.Create(ctx, member)
+	err := m.MemberGateway.Create(transCtx, member)
 	if err != nil {
 		contextLogger.Error("會員註冊 Gateway 創建失敗",
 			logger.NewField("error", err),
@@ -56,7 +50,7 @@ func (m *MemberUseCase) RegisterMember(ctx context.Context, member *entity.Membe
 	}
 	// 為了通用 repository，無論底層是否會 mutate 傳入 entity，
 	// 一律透過唯一欄位查詢回傳完整 entity，減少 infra 依賴。
-	retrieveMember, err := m.MemberGateway.GetByEmail(ctx, member.Email)
+	retrieveMember, err := m.MemberGateway.GetByEmail(transCtx, member.Email)
 	if err != nil {
 		contextLogger.Error("會員註冊後查詢失敗",
 			logger.NewField("error", err.Error()),
@@ -72,18 +66,12 @@ func (m *MemberUseCase) RegisterMember(ctx context.Context, member *entity.Membe
 	return retrieveMember, nil
 }
 func (m *MemberUseCase) GetMemberByID(ctx context.Context, id int) (*entity.Member, error) {
-	// 創建 UseCase 層的子 span
-	ctx, span := m.tracer.Start(ctx, "MemberUseCase.GetMemberByID")
+	// 創建帶有 context 的 logger 用於追蹤
+	transCtx, contextLogger, span := createTracedLogger(ctx, m.tracer, m.logger)
 	defer span.End()
 
-	// 創建帶有 context 的 logger 用於追蹤
-	contextLogger := m.logger.WithContext(ctx).With(logger.NewField("layer", "usecase"))
 
-	contextLogger.Debug("開始會員查詢(ID)",
-		logger.NewField("member_id", id),
-	)
-
-	member, err := m.MemberGateway.GetByID(ctx, id)
+	member, err := m.MemberGateway.GetByID(transCtx, id)
 	if err != nil {
 		contextLogger.Error("會員查詢(ID) Gateway 執行失敗",
 			logger.NewField("error", err.Error()),
@@ -99,18 +87,12 @@ func (m *MemberUseCase) GetMemberByID(ctx context.Context, id int) (*entity.Memb
 	return member, nil
 }
 func (m *MemberUseCase) GetMemberByEmail(ctx context.Context, email string) (*entity.Member, error) {
-	// 創建 UseCase 層的子 span
-	ctx, span := m.tracer.Start(ctx, "MemberUseCase.GetMemberByEmail")
+	// 創建帶有 context 的 logger 用於追蹤
+	transCtx, contextLogger, span := createTracedLogger(ctx, m.tracer, m.logger)
 	defer span.End()
 
-	// 創建帶有 context 的 logger 用於追蹤
-	contextLogger := m.logger.WithContext(ctx).With(logger.NewField("layer", "usecase"))
 
-	contextLogger.Debug("開始會員查詢(Email)",
-		logger.NewField("member_email", email),
-	)
-
-	member, err := m.MemberGateway.GetByEmail(ctx, email)
+	member, err := m.MemberGateway.GetByEmail(transCtx, email)
 	if err != nil {
 		contextLogger.Error("會員查詢(Email) Gateway 執行失敗",
 			logger.NewField("error", err.Error()),
@@ -126,19 +108,12 @@ func (m *MemberUseCase) GetMemberByEmail(ctx context.Context, email string) (*en
 	return member, nil
 }
 func (m *MemberUseCase) ListMembers(ctx context.Context, pagination pagination.Pagination) ([]*entity.Member, int, error) {
-	// 創建 UseCase 層的子 span
-	ctx, span := m.tracer.Start(ctx, "MemberUseCase.ListMembers")
+	// 創建帶有 context 的 logger 用於追蹤
+	transCtx, contextLogger, span := createTracedLogger(ctx, m.tracer, m.logger)
 	defer span.End()
 
-	// 創建帶有 context 的 logger 用於追蹤
-	contextLogger := m.logger.WithContext(ctx).With(logger.NewField("layer", "usecase"))
 
-	contextLogger.Debug("開始會員列表查詢",
-		logger.NewField("limit", pagination.Limit),
-		logger.NewField("offset", pagination.Offset),
-	)
-
-	members, err := m.MemberGateway.GetAll(ctx, pagination)
+	members, err := m.MemberGateway.GetAll(transCtx, pagination)
 	if err != nil {
 		contextLogger.Error("會員列表查詢 Gateway 執行失敗",
 			logger.NewField("error", err),
@@ -147,7 +122,7 @@ func (m *MemberUseCase) ListMembers(ctx context.Context, pagination pagination.P
 		)
 		return nil, 0, err
 	}
-	total, err := m.MemberGateway.CountAll(ctx)
+	total, err := m.MemberGateway.CountAll(transCtx)
 	if err != nil {
 		contextLogger.Error("會員總數查詢 Gateway 執行失敗",
 			logger.NewField("error", err),
@@ -162,25 +137,19 @@ func (m *MemberUseCase) ListMembers(ctx context.Context, pagination pagination.P
 	return members, total, nil
 }
 func (m *MemberUseCase) UpdateMemberProfile(ctx context.Context, patch *inputmodel.PatchUpdateMemberProfileInputModel) (*entity.Member, error) {
-	// 創庺 UseCase 層的子 span
-	ctx, span := m.tracer.Start(ctx, "MemberUseCase.UpdateMemberProfile")
+	// 創建帶有 context 的 logger 用於追蹤
+	transCtx, contextLogger, span := createTracedLogger(ctx, m.tracer, m.logger)
 	defer span.End()
 
-	// 創庺帶有 context 的 logger 用於追蹤
-	contextLogger := m.logger.WithContext(ctx).With(logger.NewField("layer", "usecase"))
 
-	contextLogger.Debug("開始會員資料更新",
-		logger.NewField("member_id", patch.ID),
-	)
-
-	member, err := m.MemberGateway.GetByID(ctx, patch.ID)
+	member, err := m.MemberGateway.GetByID(transCtx, patch.ID)
 	if err != nil {
 		return nil, err
 	}
 	if patch.Name != nil {
 		member.Name = *patch.Name
 	}
-	member, err = m.MemberGateway.UpdateProfile(ctx, member)
+	member, err = m.MemberGateway.UpdateProfile(transCtx, member)
 	if err != nil {
 		contextLogger.Error("會員資料更新 Gateway 執行失敗",
 			logger.NewField("error", err),
@@ -196,20 +165,13 @@ func (m *MemberUseCase) UpdateMemberProfile(ctx context.Context, patch *inputmod
 	return member, nil
 }
 func (m *MemberUseCase) UpdateMemberEmail(ctx context.Context, id int, newEmail, password string) error {
-	// 創建 UseCase 層的子 span
-	ctx, span := m.tracer.Start(ctx, "MemberUseCase.UpdateMemberEmail")
+	// 創建帶有 context 的 logger 用於追蹤
+	transCtx, contextLogger, span := createTracedLogger(ctx, m.tracer, m.logger)
 	defer span.End()
 
-	// 創建帶有 context 的 logger 用於追蹤
-	contextLogger := m.logger.WithContext(ctx).With(logger.NewField("layer", "usecase"))
-
-	contextLogger.Debug("開始會員 Email 更新",
-		logger.NewField("member_id", id),
-		logger.NewField("new_email", newEmail),
-	)
 
 	// 先檢查新 email 是否被其他人使用
-	existedMember, err := m.MemberGateway.GetByEmail(ctx, newEmail)
+	existedMember, err := m.MemberGateway.GetByEmail(transCtx, newEmail)
 	if err == nil && existedMember.ID != id {
 		// 新 email 已被其他人使用
 		contextLogger.Error("會員 Email 更新失敗：新 Email 已被使用",
@@ -241,7 +203,7 @@ func (m *MemberUseCase) UpdateMemberEmail(ctx context.Context, id int, newEmail,
 		}
 	}
 	// 驗證是否存在 member
-	member, err := m.MemberGateway.GetByID(ctx, id)
+	member, err := m.MemberGateway.GetByID(transCtx, id)
 	if err != nil {
 		contextLogger.Error("會員 Email 更新檢查會員失敗",
 			logger.NewField("error", err),
@@ -259,7 +221,7 @@ func (m *MemberUseCase) UpdateMemberEmail(ctx context.Context, id int, newEmail,
 		return ErrMemberPasswordIncorrect
 	}
 	// 執行 email 更新
-	err = m.MemberGateway.UpdateEmail(ctx, id, newEmail)
+	err = m.MemberGateway.UpdateEmail(transCtx, id, newEmail)
 	if err != nil {
 		contextLogger.Error("會員 Email 更新 Gateway 執行失敗",
 			logger.NewField("error", err),
@@ -277,16 +239,10 @@ func (m *MemberUseCase) UpdateMemberEmail(ctx context.Context, id int, newEmail,
 	return nil
 }
 func (m *MemberUseCase) UpdateMemberPassword(ctx context.Context, id int, newPassword, oldPassword string) error {
-	// 創建 UseCase 層的子 span
-	ctx, span := m.tracer.Start(ctx, "MemberUseCase.UpdateMemberPassword")
+	// 創建帶有 context 的 logger 用於追蹤
+	transCtx, contextLogger, span := createTracedLogger(ctx, m.tracer, m.logger)
 	defer span.End()
 
-	// 創建帶有 context 的 logger 用於追蹤
-	contextLogger := m.logger.WithContext(ctx).With(logger.NewField("layer", "usecase"))
-
-	contextLogger.Debug("開始會員密碼更新",
-		logger.NewField("member_id", id),
-	)
 
 	// 先檢查新舊密碼是否一樣
 	if newPassword == oldPassword {
@@ -296,7 +252,7 @@ func (m *MemberUseCase) UpdateMemberPassword(ctx context.Context, id int, newPas
 		return ErrMemberUpdateSamePassword
 	}
 	// 取得目前 member，驗證密碼
-	member, err := m.MemberGateway.GetByID(ctx, id)
+	member, err := m.MemberGateway.GetByID(transCtx, id)
 	if err != nil {
 		contextLogger.Error("會員密碼更新檢查會員失敗",
 			logger.NewField("error", err),
@@ -329,18 +285,12 @@ func (m *MemberUseCase) UpdateMemberPassword(ctx context.Context, id int, newPas
 	return nil
 }
 func (m *MemberUseCase) DeleteMember(ctx context.Context, id int) (*entity.Member, error) {
-	// 創建 UseCase 層的子 span
-	ctx, span := m.tracer.Start(ctx, "MemberUseCase.DeleteMember")
+	// 創建帶有 context 的 logger 用於追蹤
+	transCtx, contextLogger, span := createTracedLogger(ctx, m.tracer, m.logger)
 	defer span.End()
 
-	// 創建帶有 context 的 logger 用於追蹤
-	contextLogger := m.logger.WithContext(ctx).With(logger.NewField("layer", "usecase"))
 
-	contextLogger.Debug("開始會員刪除",
-		logger.NewField("member_id", id),
-	)
-
-	member, err := m.MemberGateway.GetByID(ctx, id)
+	member, err := m.MemberGateway.GetByID(transCtx, id)
 	if err != nil {
 		contextLogger.Error("會員刪除檢查會員失敗",
 			logger.NewField("error", err),
@@ -349,7 +299,7 @@ func (m *MemberUseCase) DeleteMember(ctx context.Context, id int) (*entity.Membe
 		return nil, err
 	}
 
-	err = m.MemberGateway.Delete(ctx, id)
+	err = m.MemberGateway.Delete(transCtx, id)
 	if err != nil {
 		contextLogger.Error("會員刪除 Gateway 執行失敗",
 			logger.NewField("error", err),
@@ -364,4 +314,9 @@ func (m *MemberUseCase) DeleteMember(ctx context.Context, id int) (*entity.Membe
 		logger.NewField("member_email", member.Email),
 	)
 	return member, nil
+}
+func createTracedLogger(ctx context.Context, tr tracer.Tracer, log logger.Logger) (context.Context, logger.Logger, tracer.Span) {
+	transCtx, span := tr.Start(ctx, "")
+	lg := log.WithContext(transCtx)
+	return transCtx, lg, span
 }

@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
 	gindto "github.com/tomoffice/go-clean-architecture/internal/framework/http/gin/dto"
 	"github.com/tomoffice/go-clean-architecture/internal/framework/http/gin/errordefs"
@@ -20,20 +21,19 @@ type MemberController struct {
 	tracer    tracer.Tracer
 }
 
-func NewMemberController(memberUseCase input.MemberInputPort, presenter output.MemberPresenter, logger logger.Logger, tracer tracer.Tracer) *MemberController {
+func NewMemberController(memberUseCase input.MemberInputPort, presenter output.MemberPresenter, log logger.Logger, tracer tracer.Tracer) *MemberController {
+	baseLogger := log.With(logger.NewField("layer", "controller"))
 	return &MemberController{
 		usecase:   memberUseCase,
 		presenter: presenter,
-		logger:    logger,
+		logger:    baseLogger,
 		tracer:    tracer,
 	}
 }
 
 func (c *MemberController) Register(ctx *gin.Context) {
 	// 創建帶有 context 的 logger 用於追蹤
-	contextLogger := c.logger.WithContext(ctx.Request.Context()).With(logger.NewField("layer", "controller"))
-
-	requestCtx, span := c.tracer.Start(ctx.Request.Context(), "MemberController.GetByID")
+	requestCtx, contextLogger, span := createTracedLogger(ctx.Request.Context(), c.tracer, c.logger)
 	defer span.End()
 
 	var ginReqDTO gindto.GinBindingRegisterMemberRequestDTO
@@ -75,12 +75,9 @@ func (c *MemberController) Register(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 func (c *MemberController) GetByID(ctx *gin.Context) {
-	// 創建 Controller 層的子 span
-	requestCtx, span := c.tracer.Start(ctx.Request.Context(), "MemberController.GetByID")
-	defer span.End()
-
 	// 創建帶有 context 的 logger 用於追蹤
-	contextLogger := c.logger.WithContext(requestCtx).With(logger.NewField("layer", "controller"))
+	requestCtx, contextLogger, span := createTracedLogger(ctx.Request.Context(), c.tracer, c.logger)
+	defer span.End()
 
 	var ginReqDTO gindto.GinBindingGetMemberByIDURIRequestDTO
 	if err := ctx.ShouldBindUri(&ginReqDTO); err != nil {
@@ -121,12 +118,9 @@ func (c *MemberController) GetByID(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 func (c *MemberController) GetByEmail(ctx *gin.Context) {
-	// 創建 Controller 層的子 span
-	requestCtx, span := c.tracer.Start(ctx.Request.Context(), "MemberController.GetByEmail")
-	defer span.End()
-
 	// 創建帶有 context 的 logger 用於追蹤
-	contextLogger := c.logger.WithContext(requestCtx).With(logger.NewField("layer", "controller"))
+	requestCtx, contextLogger, span := createTracedLogger(ctx.Request.Context(), c.tracer, c.logger)
+	defer span.End()
 
 	var ginReqDTO gindto.GinBindingGetMemberByEmailQueryRequestDTO
 	if err := ctx.ShouldBindQuery(&ginReqDTO); err != nil {
@@ -167,12 +161,9 @@ func (c *MemberController) GetByEmail(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 func (c *MemberController) List(ctx *gin.Context) {
-	// 創建 Controller 層的子 span
-	requestCtx, span := c.tracer.Start(ctx.Request.Context(), "MemberController.List")
-	defer span.End()
-
 	// 創建帶有 context 的 logger 用於追蹤
-	contextLogger := c.logger.WithContext(requestCtx).With(logger.NewField("layer", "controller"))
+	requestCtx, contextLogger, span := createTracedLogger(ctx.Request.Context(), c.tracer, c.logger)
+	defer span.End()
 
 	var ginReqDTO gindto.GinBindingListMemberQueryRequestDTO
 	if err := ctx.ShouldBindQuery(&ginReqDTO); err != nil {
@@ -215,12 +206,9 @@ func (c *MemberController) List(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 func (c *MemberController) UpdateProfile(ctx *gin.Context) {
-	// 創建 Controller 層的子 span
-	requestCtx, span := c.tracer.Start(ctx.Request.Context(), "MemberController.UpdateProfile")
-	defer span.End()
-
 	// 創建帶有 context 的 logger 用於追蹤
-	contextLogger := c.logger.WithContext(requestCtx).With(logger.NewField("layer", "controller"))
+	requestCtx, contextLogger, span := createTracedLogger(ctx.Request.Context(), c.tracer, c.logger)
+	defer span.End()
 
 	var ginURI gindto.GinBindingUpdateMemberURIRequestDTO
 	if err := ctx.ShouldBindUri(&ginURI); err != nil {
@@ -273,12 +261,9 @@ func (c *MemberController) UpdateProfile(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 func (c *MemberController) UpdateEmail(ctx *gin.Context) {
-	// 創建 Controller 層的子 span
-	requestCtx, span := c.tracer.Start(ctx.Request.Context(), "MemberController.UpdateEmail")
-	defer span.End()
-
 	// 創建帶有 context 的 logger 用於追蹤
-	contextLogger := c.logger.WithContext(requestCtx).With(logger.NewField("layer", "controller"))
+	requestCtx, contextLogger, span := createTracedLogger(ctx.Request.Context(), c.tracer, c.logger)
+	defer span.End()
 
 	var ginURI gindto.GinBindingUpdateMemberURIRequestDTO
 	if err := ctx.ShouldBindUri(&ginURI); err != nil {
@@ -332,12 +317,9 @@ func (c *MemberController) UpdateEmail(ctx *gin.Context) {
 
 }
 func (c *MemberController) UpdatePassword(ctx *gin.Context) {
-	// 創建 Controller 層的子 span
-	requestCtx, span := c.tracer.Start(ctx.Request.Context(), "MemberController.UpdatePassword")
-	defer span.End()
-
 	// 創建帶有 context 的 logger 用於追蹤
-	contextLogger := c.logger.WithContext(requestCtx).With(logger.NewField("layer", "controller"))
+	requestCtx, contextLogger, span := createTracedLogger(ctx.Request.Context(), c.tracer, c.logger)
+	defer span.End()
 
 	var ginURI gindto.GinBindingUpdateMemberURIRequestDTO
 	if err := ctx.ShouldBindUri(&ginURI); err != nil {
@@ -389,12 +371,9 @@ func (c *MemberController) UpdatePassword(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 }
 func (c *MemberController) Delete(ctx *gin.Context) {
-	// 創建 Controller 層的子 span
-	requestCtx, span := c.tracer.Start(ctx.Request.Context(), "MemberController.Delete")
-	defer span.End()
-
 	// 創建帶有 context 的 logger 用於追蹤
-	contextLogger := c.logger.WithContext(requestCtx).With(logger.NewField("layer", "controller"))
+	requestCtx, contextLogger, span := createTracedLogger(ctx.Request.Context(), c.tracer, c.logger)
+	defer span.End()
 
 	var ginReqDTO gindto.GinBindingDeleteMemberURIRequestDTO
 	if err := ctx.ShouldBindUri(&ginReqDTO); err != nil {
@@ -433,4 +412,10 @@ func (c *MemberController) Delete(ctx *gin.Context) {
 	}
 	resp := c.presenter.PresentDeleteMember(member)
 	ctx.JSON(http.StatusOK, resp)
+}
+
+func createTracedLogger(ctx context.Context, tr tracer.Tracer, log logger.Logger) (context.Context, logger.Logger, tracer.Span) {
+	requestCtx, span := tr.Start(ctx, "")
+	lg := log.WithContext(requestCtx)
+	return requestCtx, lg, span
 }

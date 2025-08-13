@@ -10,7 +10,6 @@ import (
 
 	gomock "github.com/golang/mock/gomock"
 	logger "github.com/tomoffice/go-clean-architecture/pkg/logger"
-	zapcore "go.uber.org/zap/zapcore"
 )
 
 // MockLogger is a mock of Logger interface.
@@ -319,41 +318,4 @@ func (m *MockTerminatingLogger) WithContext(ctx context.Context) logger.Logger {
 func (mr *MockTerminatingLoggerMockRecorder) WithContext(ctx interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithContext", reflect.TypeOf((*MockTerminatingLogger)(nil).WithContext), ctx)
-}
-
-// MockCore is a mock of Core interface.
-type MockCore struct {
-	ctrl     *gomock.Controller
-	recorder *MockCoreMockRecorder
-}
-
-// MockCoreMockRecorder is the mock recorder for MockCore.
-type MockCoreMockRecorder struct {
-	mock *MockCore
-}
-
-// NewMockCore creates a new mock instance.
-func NewMockCore(ctrl *gomock.Controller) *MockCore {
-	mock := &MockCore{ctrl: ctrl}
-	mock.recorder = &MockCoreMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockCore) EXPECT() *MockCoreMockRecorder {
-	return m.recorder
-}
-
-// GetCore mocks base method.
-func (m *MockCore) GetCore() zapcore.Core {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetCore")
-	ret0, _ := ret[0].(zapcore.Core)
-	return ret0
-}
-
-// GetCore indicates an expected call of GetCore.
-func (mr *MockCoreMockRecorder) GetCore() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCore", reflect.TypeOf((*MockCore)(nil).GetCore))
 }

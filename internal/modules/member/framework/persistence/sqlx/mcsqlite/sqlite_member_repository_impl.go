@@ -17,28 +17,22 @@ type sqlxMemberRepo struct {
 	tracer tracer.Tracer
 }
 
-func NewSQLXMemberRepo(db *sqlx.DB, logger logger.Logger, tracer tracer.Tracer) sqlx2.MemberSQLXRepository {
+func NewSQLXMemberRepo(db *sqlx.DB, log logger.Logger, tracer tracer.Tracer) sqlx2.MemberSQLXRepository {
+	baseLogger := log.With(logger.NewField("layer", "repository"))
 	return &sqlxMemberRepo{
 		db:     db,
-		logger: logger,
+		logger: baseLogger,
 		tracer: tracer,
 	}
 }
 func (s sqlxMemberRepo) Create(ctx context.Context, m *sqlx2.MemberSQLXModel) error {
-	// 創建 Repository 層的子 span
-	ctx, span := s.tracer.Start(ctx, "MemberRepository.Create")
+	// 創建帶有 context 的 logger 用於追蹤
+	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger)
 	defer span.End()
 
-	// 創建帶有 context 的 logger 用於追蹤
-	contextLogger := s.logger.WithContext(ctx).With(logger.NewField("layer", "repository"))
-
 	startTime := time.Now()
-	contextLogger.Debug("開始執行 SQL 插入",
-		logger.NewField("query", "INSERT INTO members"),
-		logger.NewField("member_email", m.Email),
-	)
 
-	_, err := s.db.ExecContext(ctx, queryInsertMember, m.Name, m.Email, m.Password)
+	_, err := s.db.ExecContext(repoCtx, queryInsertMember, m.Name, m.Email, m.Password)
 	duration := time.Since(startTime)
 
 	if err != nil {
@@ -63,21 +57,13 @@ func (s sqlxMemberRepo) Create(ctx context.Context, m *sqlx2.MemberSQLXModel) er
 	return nil
 }
 func (s sqlxMemberRepo) GetByID(ctx context.Context, id int) (*sqlx2.MemberSQLXModel, error) {
-	// 創建 Repository 層的子 span
-	ctx, span := s.tracer.Start(ctx, "MemberRepository.GetByID")
-	defer span.End()
-
 	// 創建帶有 context 的 logger 用於追蹤
-	contextLogger := s.logger.WithContext(ctx).With(logger.NewField("layer", "repository"))
-
+	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger)
+	defer span.End()
 	startTime := time.Now()
-	contextLogger.Debug("開始執行 SQL 查詢(ID)",
-		logger.NewField("query", "SELECT * FROM members WHERE id = ?"),
-		logger.NewField("member_id", id),
-	)
 
 	member := &sqlx2.MemberSQLXModel{}
-	err := s.db.GetContext(ctx, member, querySelectByID, id)
+	err := s.db.GetContext(repoCtx, member, querySelectByID, id)
 	duration := time.Since(startTime)
 
 	if err != nil {
@@ -97,21 +83,13 @@ func (s sqlxMemberRepo) GetByID(ctx context.Context, id int) (*sqlx2.MemberSQLXM
 	return member, nil
 }
 func (s sqlxMemberRepo) GetByEmail(ctx context.Context, email string) (*sqlx2.MemberSQLXModel, error) {
-	// 創建 Repository 層的子 span
-	ctx, span := s.tracer.Start(ctx, "MemberRepository.GetByEmail")
-	defer span.End()
-
 	// 創建帶有 context 的 logger 用於追蹤
-	contextLogger := s.logger.WithContext(ctx).With(logger.NewField("layer", "repository"))
-
+	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger)
+	defer span.End()
 	startTime := time.Now()
-	contextLogger.Debug("開始執行 SQL 查詢",
-		logger.NewField("query", "SELECT * FROM members WHERE email = ?"),
-		logger.NewField("member_email", email),
-	)
 
 	member := &sqlx2.MemberSQLXModel{}
-	err := s.db.GetContext(ctx, member, querySelectByEmail, email)
+	err := s.db.GetContext(repoCtx, member, querySelectByEmail, email)
 	duration := time.Since(startTime)
 
 	if err != nil {
@@ -131,23 +109,14 @@ func (s sqlxMemberRepo) GetByEmail(ctx context.Context, email string) (*sqlx2.Me
 	return member, nil
 }
 func (s sqlxMemberRepo) GetAll(ctx context.Context, pagination pagination.Pagination) ([]*sqlx2.MemberSQLXModel, error) {
-	// 創建 Repository 層的子 span
-	ctx, span := s.tracer.Start(ctx, "MemberRepository.GetAll")
-	defer span.End()
-
 	// 創建帶有 context 的 logger 用於追蹤
-	contextLogger := s.logger.WithContext(ctx).With(logger.NewField("layer", "repository"))
-
+	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger)
+	defer span.End()
 	startTime := time.Now()
 	query := fmt.Sprintf(querySelectAllBase, pagination.SortBy, pagination.OrderBy)
-	contextLogger.Debug("開始執行 SQL 列表查詢",
-		logger.NewField("query", "SELECT * FROM members ORDER BY ... LIMIT ? OFFSET ?"),
-		logger.NewField("limit", pagination.Limit),
-		logger.NewField("offset", pagination.Offset),
-	)
 
 	members := make([]*sqlx2.MemberSQLXModel, 0)
-	err := s.db.SelectContext(ctx, &members, query, pagination.Limit, pagination.Offset)
+	err := s.db.SelectContext(repoCtx, &members, query, pagination.Limit, pagination.Offset)
 	duration := time.Since(startTime)
 
 	if err != nil {
@@ -167,20 +136,14 @@ func (s sqlxMemberRepo) GetAll(ctx context.Context, pagination pagination.Pagina
 	return members, nil
 }
 func (s sqlxMemberRepo) CountAll(ctx context.Context) (int, error) {
-	// 創建 Repository 層的子 span
-	ctx, span := s.tracer.Start(ctx, "MemberRepository.CountAll")
+	// 創建帶有 context 的 logger 用於追蹤
+	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger)
 	defer span.End()
 
-	// 創建帶有 context 的 logger 用於追蹤
-	contextLogger := s.logger.WithContext(ctx).With(logger.NewField("layer", "repository"))
-
 	startTime := time.Now()
-	contextLogger.Debug("開始執行 SQL 總數查詢",
-		logger.NewField("query", "SELECT COUNT(*) FROM members"),
-	)
 
 	var count int
-	err := s.db.GetContext(ctx, &count, queryCountMembers)
+	err := s.db.GetContext(repoCtx, &count, queryCountMembers)
 	duration := time.Since(startTime)
 
 	if err != nil {
@@ -198,21 +161,13 @@ func (s sqlxMemberRepo) CountAll(ctx context.Context) (int, error) {
 	return count, nil
 }
 func (s sqlxMemberRepo) UpdateProfile(ctx context.Context, m *sqlx2.MemberSQLXModel) (*sqlx2.MemberSQLXModel, error) {
-	// 創建 Repository 層的子 span
-	ctx, span := s.tracer.Start(ctx, "MemberRepository.UpdateProfile")
+	// 創建帶有 context 的 logger 用於追蹤
+	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger)
 	defer span.End()
 
-	// 創建帶有 context 的 logger 用於追蹤
-	contextLogger := s.logger.WithContext(ctx).With(logger.NewField("layer", "repository"))
-
 	startTime := time.Now()
-	contextLogger.Debug("開始執行 SQL 資料更新",
-		logger.NewField("query", "UPDATE members SET name = ?, email = ? WHERE id = ?"),
-		logger.NewField("member_id", m.ID),
-		logger.NewField("member_email", m.Email),
-	)
 
-	result, err := s.db.ExecContext(ctx, queryUpdateMemberProfile, m.Name, m.Email, m.ID)
+	result, err := s.db.ExecContext(repoCtx, queryUpdateMemberProfile, m.Name, m.Email, m.ID)
 	duration := time.Since(startTime)
 
 	if err != nil {
@@ -249,21 +204,13 @@ func (s sqlxMemberRepo) UpdateProfile(ctx context.Context, m *sqlx2.MemberSQLXMo
 	return m, nil
 }
 func (s sqlxMemberRepo) UpdateEmail(ctx context.Context, id int, email string) error {
-	// 創建 Repository 層的子 span
-	ctx, span := s.tracer.Start(ctx, "MemberRepository.UpdateEmail")
+	// 創建帶有 context 的 logger 用於追蹤
+	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger)
 	defer span.End()
 
-	// 創建帶有 context 的 logger 用於追蹤
-	contextLogger := s.logger.WithContext(ctx).With(logger.NewField("layer", "repository"))
-
 	startTime := time.Now()
-	contextLogger.Debug("開始執行 SQL Email 更新",
-		logger.NewField("query", "UPDATE members SET email = ? WHERE id = ?"),
-		logger.NewField("member_id", id),
-		logger.NewField("new_email", email),
-	)
 
-	result, err := s.db.ExecContext(ctx, queryUpdateMemberEmail, email, id)
+	result, err := s.db.ExecContext(repoCtx, queryUpdateMemberEmail, email, id)
 	duration := time.Since(startTime)
 
 	if err != nil {
@@ -301,20 +248,13 @@ func (s sqlxMemberRepo) UpdateEmail(ctx context.Context, id int, email string) e
 	return nil
 }
 func (s sqlxMemberRepo) UpdatePassword(ctx context.Context, id int, password string) error {
-	// 創建 Repository 層的子 span
-	ctx, span := s.tracer.Start(ctx, "MemberRepository.UpdatePassword")
+	// 創建帶有 context 的 logger 用於追蹤
+	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger)
 	defer span.End()
 
-	// 創建帶有 context 的 logger 用於追蹤
-	contextLogger := s.logger.WithContext(ctx).With(logger.NewField("layer", "repository"))
-
 	startTime := time.Now()
-	contextLogger.Debug("開始執行 SQL 密碼更新",
-		logger.NewField("query", "UPDATE members SET password = ? WHERE id = ?"),
-		logger.NewField("member_id", id),
-	)
 
-	result, err := s.db.ExecContext(ctx, queryUpdateMemberPassword, password, id)
+	result, err := s.db.ExecContext(repoCtx, queryUpdateMemberPassword, password, id)
 	duration := time.Since(startTime)
 
 	if err != nil {
@@ -350,20 +290,13 @@ func (s sqlxMemberRepo) UpdatePassword(ctx context.Context, id int, password str
 	return nil
 }
 func (s sqlxMemberRepo) Delete(ctx context.Context, id int) error {
-	// 創建 Repository 層的子 span
-	ctx, span := s.tracer.Start(ctx, "MemberRepository.Delete")
+	// 創庺帶有 context 的 logger 用於追蹤
+	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger)
 	defer span.End()
 
-	// 創庺帶有 context 的 logger 用於追蹤
-	contextLogger := s.logger.WithContext(ctx).With(logger.NewField("layer", "repository"))
-
 	startTime := time.Now()
-	contextLogger.Debug("開始執行 SQL 刪除",
-		logger.NewField("query", "DELETE FROM members WHERE id = ?"),
-		logger.NewField("member_id", id),
-	)
 
-	result, err := s.db.ExecContext(ctx, queryDeleteMember, id)
+	result, err := s.db.ExecContext(repoCtx, queryDeleteMember, id)
 	duration := time.Since(startTime)
 
 	if err != nil {
@@ -398,4 +331,10 @@ func (s sqlxMemberRepo) Delete(ctx context.Context, id int) error {
 		logger.NewField("duration_ms", duration.Milliseconds()),
 	)
 	return nil
+}
+
+func createTracedLogger(ctx context.Context, tr tracer.Tracer, log logger.Logger) (context.Context, logger.Logger, tracer.Span) {
+	repoCtx, span := tr.Start(ctx, "")
+	lg := log.WithContext(repoCtx)
+	return repoCtx, lg, span
 }

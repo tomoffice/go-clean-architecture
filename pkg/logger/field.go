@@ -1,11 +1,7 @@
 package logger
 
-import (
-	"go.uber.org/zap"
-)
-
 // Field 代表結構化日誌中的鍵值對欄位。
-// 目前基於 zap.Field 實作，提供高效能的結構化欄位支援。
+// 這是純抽象實作，不依賴任何第三方日誌框架，確保可替換性。
 //
 // Field 用於在日誌訊息中附加額外的結構化資訊，如：
 //   - 使用者 ID
@@ -13,13 +9,15 @@ import (
 //   - 錯誤代碼
 //   - 任何需要記錄的上下文資訊
 //
-// 設計考量：
-// 目前直接使用 zap.Field 以獲得最佳效能，如果未來需要支援其他日誌框架，
-// 可以將此類型改為介面，並在各個 adapter 中實作相應的轉換邏輯。
-type Field = zap.Field
+// 設計原則：
+// 此類型是抽象層的核心，絕不洩漏底層實作細節。
+// 各個 adapter 負責將 logger.Field 轉換為對應框架的欄位格式。
+type Field struct {
+	Key   string
+	Value any
+}
 
 // NewField 創建一個新的結構化欄位，支援任意類型的值。
-// 此函數使用 Go 泛型確保型別安全，並自動處理值的序列化。
 //
 // 參數：
 //   - key: 欄位的鍵名，應該使用具有描述性的名稱
@@ -44,18 +42,6 @@ type Field = zap.Field
 //
 //	// 使用在日誌中
 //	logger.Info("User login", userField, countField)
-func NewField[T any](key string, value T) Field {
-	return zap.Any(key, value)
+func NewField(key string, value any) Field {
+	return Field{Key: key, Value: value}
 }
-
-// 設計備註：
-// 如果未來需要支援其他日誌框架，可以將 Field 改為介面：
-//
-// type Field interface {
-//     Key() string
-//     Value() interface{}
-//     Type() FieldType
-// }
-//
-// 然後在各個 adapter 中實作對應的轉換邏輯，
-// 以支援不同日誌框架的欄位格式。

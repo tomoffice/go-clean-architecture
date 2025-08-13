@@ -1,7 +1,5 @@
 package logger
 
-import "go.uber.org/zap/zapcore"
-
 // Level 代表日誌的重要性等級。
 // 等級由低到高依序為：Debug < Info < Warn < Error < Panic < Fatal
 //
@@ -15,27 +13,30 @@ import "go.uber.org/zap/zapcore"
 //
 // 當設定日誌等級時，只有等於或高於設定等級的日誌才會被輸出。
 // 例如設定為 InfoLevel 時，Debug 等級的日誌不會被輸出。
-type Level = zapcore.Level
+//
+// 這是純抽象實作，不依賴任何第三方日誌框架，確保可替換性。
+type Level int8
 
 // 日誌等級常數定義
+// 數值對應標準日誌等級慣例，確保與底層實作的兼容性
 const (
 	// DebugLevel 除錯等級，用於詳細的程式運行資訊
-	DebugLevel = zapcore.DebugLevel
+	DebugLevel Level = -1
 
 	// InfoLevel 資訊等級，用於一般的程式狀態記錄
-	InfoLevel = zapcore.InfoLevel
+	InfoLevel Level = 0
 
 	// WarnLevel 警告等級，用於潛在問題的提醒
-	WarnLevel = zapcore.WarnLevel
+	WarnLevel Level = 1
 
 	// ErrorLevel 錯誤等級，用於程式錯誤的記錄
-	ErrorLevel = zapcore.ErrorLevel
+	ErrorLevel Level = 2
 
 	// PanicLevel Panic 等級，記錄後會引發 panic
-	PanicLevel = zapcore.PanicLevel
+	PanicLevel Level = 4
 
 	// FatalLevel 致命等級，記錄後會終止程式執行
-	FatalLevel = zapcore.FatalLevel
+	FatalLevel Level = 5
 )
 
 // ParseLevel 將日誌等級字串解析為對應的 Level 常數。

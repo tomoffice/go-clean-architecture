@@ -4,9 +4,9 @@ package seq
 
 import (
 	"context"
-	"github.com/tomoffice/go-clean-architecture/pkg/logger"
 	"time"
 
+	"github.com/tomoffice/go-clean-architecture/pkg/logger"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -57,9 +57,9 @@ func NewLogger(cfg Config) (logger.Logger, error) {
 
 	enc := zapcore.NewJSONEncoder(encCfg)
 
-	core := NewSeqCore(sender, enc, cfg.Level)
+	core := NewSeqCore(sender, enc, toZapLevel(cfg.Level))
 	// 4) 建 zap.Logger
-	zl := zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
+	zl := zap.New(core, zap.AddCaller(), zap.AddStacktrace(toZapLevel(logger.ErrorLevel)))
 
 	return &Logger{
 		core:   core,
@@ -71,20 +71,28 @@ func NewDefaultLogger() (logger.Logger, error) {
 }
 
 // Debug 輸出 Debug 等級的日誌訊息
-func (s *Logger) Debug(msg string, fields ...logger.Field) { s.logger.Debug(msg, fields...) }
+func (s *Logger) Debug(msg string, fields ...logger.Field) {
+	s.logger.Debug(msg, toZapFields(fields...)...)
+}
 
 // Info 輸出 Info 等級的日誌訊息
-func (s *Logger) Info(msg string, fields ...logger.Field) { s.logger.Info(msg, fields...) }
+func (s *Logger) Info(msg string, fields ...logger.Field) {
+	s.logger.Info(msg, toZapFields(fields...)...)
+}
 
 // Warn 輸出 Warn 等級的日誌訊息
-func (s *Logger) Warn(msg string, fields ...logger.Field) { s.logger.Warn(msg, fields...) }
+func (s *Logger) Warn(msg string, fields ...logger.Field) {
+	s.logger.Warn(msg, toZapFields(fields...)...)
+}
 
 // Error 輸出 Error 等級的日誌訊息
-func (s *Logger) Error(msg string, fields ...logger.Field) { s.logger.Error(msg, fields...) }
+func (s *Logger) Error(msg string, fields ...logger.Field) {
+	s.logger.Error(msg, toZapFields(fields...)...)
+}
 
 // With 返回一個新的 Logger 實例，預先附加指定的結構化欄位
 func (s *Logger) With(fields ...logger.Field) logger.Logger {
-	newZap := s.logger.With(fields...)
+	newZap := s.logger.With(toZapFields(fields...)...)
 	return &Logger{
 		core:   s.core, // core 保持不變
 		logger: newZap, // 只更新 logger
@@ -105,12 +113,6 @@ func (s *Logger) WithContext(ctx context.Context) logger.Logger {
 }
 
 func (s *Logger) Sync() error { return s.logger.Sync() }
-func (s *Logger) GetCore() zapcore.Core {
-	return s.logger.Core()
-}
 
 // 確保 Logger 實現 logger.Logger 介面
 var _ logger.Logger = (*Logger)(nil)
-
-// 確保 Logger 實現 logger.Core 介面
-var _ logger.Core = (*Logger)(nil)

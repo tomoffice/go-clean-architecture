@@ -56,7 +56,7 @@ func (a *App) Run() {
 		//log.Fatalf("創建會員模組失敗: %v", err)
 		a.Logger.Error("創建會員模組失敗", logger.NewField("error", err))
 	}
-	a.Logger.Info("會員模組創建成功", logger.NewField("module", memberModule.Name()))
+	a.Logger.Debug("會員模組創建成功", logger.NewField("module", memberModule.Name()))
 
 	// 初始化會員模組
 	if err := memberModule.Setup(); err != nil {
@@ -64,7 +64,7 @@ func (a *App) Run() {
 		a.Logger.Error("初始化會員模組失敗", logger.NewField("error", err))
 	}
 	//log.Printf("模組 %s 初始化成功", memberModule.Name())
-	a.Logger.Info("模組初始化成功", logger.NewField("module", memberModule.Name()))
+	a.Logger.Debug("模組初始化成功", logger.NewField("module", memberModule.Name()))
 
 	// 啟動服務器
 	addr := fmt.Sprintf("%s:%s", a.Config.Server.HTTP.Host, a.Config.Server.HTTP.Port)
