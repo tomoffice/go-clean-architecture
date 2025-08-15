@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"github.com/gin-gonic/gin"
@@ -16,6 +17,8 @@ import (
 	"github.com/tomoffice/go-clean-architecture/internal/shared/enum"
 	"github.com/tomoffice/go-clean-architecture/internal/shared/errorcode"
 	sharedviewmodel "github.com/tomoffice/go-clean-architecture/internal/shared/viewmodel/http"
+	mocklogger "github.com/tomoffice/go-clean-architecture/pkg/logger/mock"
+	mocktracer "github.com/tomoffice/go-clean-architecture/pkg/tracer/mock"
 	"net/http"
 	"net/http/httptest"
 	"strconv"
@@ -37,7 +40,7 @@ func TestMemberController_Delete(t *testing.T) {
 		name        string
 		fields      fields
 		args        args
-		setupPort   func(*mock.MockMemberInputPort, *mock.MockMemberPresenter)
+		setupPort   func(*mock.MockMemberInputPort, *mock.MockMemberPresenter, *mock.MockValidator)
 		setupGinCtx func(ginCtx *gin.Context)
 		want        *outputmodel.DeleteMemberResponse
 		wantErr     *outputmodel.ErrorResponse
@@ -52,7 +55,8 @@ func TestMemberController_Delete(t *testing.T) {
 			args: args{
 				ctx: nil,
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateDeleteMember(gomock.Any()).Return(nil)
 				uc.EXPECT().DeleteMember(gomock.Any(), gomock.Any()).Return(
 					&entity.Member{
 						ID:        1,
@@ -80,6 +84,11 @@ func TestMemberController_Delete(t *testing.T) {
 				ginCtx.Params = gin.Params{
 					gin.Param{Key: "id", Value: "1"},
 				}
+				ginCtx.Request = httptest.NewRequest(
+					"DELETE",
+					"/api/v1/members/1",
+					nil,
+				)
 			},
 			want: &outputmodel.DeleteMemberResponse{
 				Data: dto.DeleteMemberResponseDTO{
@@ -108,7 +117,8 @@ func TestMemberController_Delete(t *testing.T) {
 			args: args{
 				ctx: nil,
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				// binding error 不會執行到 validation，所以不需要添加 validator 期望
 				p.EXPECT().PresentBindingError(gomock.Any(), gomock.Any()).Return(
 					outputmodel.ErrorResponse{
 						Data: nil,
@@ -128,6 +138,11 @@ func TestMemberController_Delete(t *testing.T) {
 				ginCtx.Params = gin.Params{
 					gin.Param{Key: "id", Value: "invalid_id"},
 				}
+				ginCtx.Request = httptest.NewRequest(
+					"DELETE",
+					"/api/v1/members/invalid_id",
+					nil,
+				)
 			},
 			want: nil,
 			wantErr: &outputmodel.ErrorResponse{
@@ -154,7 +169,8 @@ func TestMemberController_Delete(t *testing.T) {
 			args: args{
 				ctx: nil,
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateDeleteMember(gomock.Any()).Return(errors.New("validation error"))
 				p.EXPECT().PresentValidationError(gomock.Any()).Return(
 					errorcode.ErrInvalidParams, outputmodel.ErrorResponse{
 						Data: nil,
@@ -171,6 +187,11 @@ func TestMemberController_Delete(t *testing.T) {
 				ginCtx.Params = gin.Params{
 					gin.Param{Key: "id", Value: "-1"}, // 因為validation會檢查ID是否大於0，所以這裡使用-1來觸發驗證錯誤
 				}
+				ginCtx.Request = httptest.NewRequest(
+					"DELETE",
+					"/api/v1/members/-1",
+					nil,
+				)
 			},
 			want: nil,
 			wantErr: &outputmodel.ErrorResponse{
@@ -193,7 +214,8 @@ func TestMemberController_Delete(t *testing.T) {
 			args: args{
 				ctx: nil,
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateDeleteMember(gomock.Any()).Return(nil)
 				uc.EXPECT().DeleteMember(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrMemberNotFound)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberNotFound,
@@ -216,6 +238,11 @@ func TestMemberController_Delete(t *testing.T) {
 				ginCtx.Params = gin.Params{
 					gin.Param{Key: "id", Value: "1"},
 				}
+				ginCtx.Request = httptest.NewRequest(
+					"DELETE",
+					"/api/v1/members/1",
+					nil,
+				)
 			},
 			want: nil,
 			wantErr: &outputmodel.ErrorResponse{
@@ -242,7 +269,8 @@ func TestMemberController_Delete(t *testing.T) {
 			args: args{
 				ctx: nil,
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateDeleteMember(gomock.Any()).Return(nil)
 				uc.EXPECT().DeleteMember(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrMemberNoEffect)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberNoEffect,
@@ -266,6 +294,11 @@ func TestMemberController_Delete(t *testing.T) {
 				ginCtx.Params = gin.Params{
 					gin.Param{Key: "id", Value: "1"},
 				}
+				ginCtx.Request = httptest.NewRequest(
+					"DELETE",
+					"/api/v1/members/1",
+					nil,
+				)
 			},
 			want: nil,
 			wantErr: &outputmodel.ErrorResponse{
@@ -292,7 +325,8 @@ func TestMemberController_Delete(t *testing.T) {
 			args: args{
 				ctx: nil,
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateDeleteMember(gomock.Any()).Return(nil)
 				uc.EXPECT().DeleteMember(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrMemberDBError)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberDBError,
@@ -315,6 +349,11 @@ func TestMemberController_Delete(t *testing.T) {
 				ginCtx.Params = gin.Params{
 					gin.Param{Key: "id", Value: "1"},
 				}
+				ginCtx.Request = httptest.NewRequest(
+					"DELETE",
+					"/api/v1/members/1",
+					nil,
+				)
 			},
 			want: nil,
 			wantErr: &outputmodel.ErrorResponse{
@@ -341,7 +380,8 @@ func TestMemberController_Delete(t *testing.T) {
 			args: args{
 				ctx: nil,
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateDeleteMember(gomock.Any()).Return(nil)
 				uc.EXPECT().DeleteMember(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrMemberUnexpectedError)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrUnexpectedMemberUseCaseError,
@@ -364,6 +404,11 @@ func TestMemberController_Delete(t *testing.T) {
 				ginCtx.Params = gin.Params{
 					gin.Param{Key: "id", Value: "1"},
 				}
+				ginCtx.Request = httptest.NewRequest(
+					"DELETE",
+					"/api/v1/members/1",
+					nil,
+				)
 			},
 			want: nil,
 			wantErr: &outputmodel.ErrorResponse{
@@ -384,14 +429,25 @@ func TestMemberController_Delete(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
 			mockUseCase := tt.fields.usecase.(*mock.MockMemberInputPort)
 			mockPresenter := tt.fields.presenter.(*mock.MockMemberPresenter)
+			mockValidator := mock.NewMockValidator(ctrl)
+			mockLogger := mocklogger.NewMockLogger(ctrl)
+			mockTracer := mocktracer.NewMockTracer(ctrl)
+
+			// 使用 helper 設置基本期望
+			setupDefaultMockExpectations(ctrl, mockLogger, mockTracer)
+
 			c := &MemberController{
-				usecase:   mockUseCase,
-				presenter: mockPresenter,
+				usecase:      mockUseCase,
+				presenter:    mockPresenter,
+				dtoValidator: mockValidator,
+				logger:       mockLogger,
+				tracer:       mockTracer,
 			}
 			ginCtx, responseWriter := GinCtxHelper(t)
-			tt.setupPort(mockUseCase, mockPresenter)
+			tt.setupPort(mockUseCase, mockPresenter, mockValidator)
 			tt.setupGinCtx(ginCtx)
 			c.Delete(ginCtx)
 			response := responseWriter.Body.String()
@@ -436,7 +492,7 @@ func TestMemberController_GetByEmail(t *testing.T) {
 		fields      fields
 		args        args
 		setupGinCtx func(ginCtx *gin.Context)
-		setupPort   func(*mock.MockMemberInputPort, *mock.MockMemberPresenter)
+		setupPort   func(*mock.MockMemberInputPort, *mock.MockMemberPresenter, *mock.MockValidator)
 		want        *outputmodel.GetMemberByEmailResponse
 		wantErr     *outputmodel.ErrorResponse
 		wantStatus  int
@@ -453,7 +509,8 @@ func TestMemberController_GetByEmail(t *testing.T) {
 			setupGinCtx: func(ginCtx *gin.Context) {
 				ginCtx.Request, _ = http.NewRequest("GET", "/api/member?email=test@gmail.com", nil)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateGetMemberByEmail(gomock.Any()).Return(nil)
 				uc.EXPECT().GetMemberByEmail(gomock.Any(), gomock.Any()).Return(
 					&entity.Member{
 						ID:        0,
@@ -512,7 +569,8 @@ func TestMemberController_GetByEmail(t *testing.T) {
 					nil,
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				// binding error 不會執行到 validation，所以不需要添加 validator 期望
 				p.EXPECT().PresentBindingError(gomock.Any(), gomock.Any()).Return(
 					outputmodel.ErrorResponse{
 						Data: nil,
@@ -560,7 +618,8 @@ func TestMemberController_GetByEmail(t *testing.T) {
 					nil,
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateGetMemberByEmail(gomock.Any()).Return(errors.New("validation error"))
 				p.EXPECT().PresentValidationError(gomock.Any()).Return(
 					errorcode.ErrInvalidParams, outputmodel.ErrorResponse{
 						Data: nil,
@@ -609,7 +668,8 @@ func TestMemberController_GetByEmail(t *testing.T) {
 					nil,
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateGetMemberByEmail(gomock.Any()).Return(nil)
 				uc.EXPECT().GetMemberByEmail(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrMemberNotFound)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberNotFound,
@@ -660,7 +720,8 @@ func TestMemberController_GetByEmail(t *testing.T) {
 					nil,
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateGetMemberByEmail(gomock.Any()).Return(nil)
 				uc.EXPECT().GetMemberByEmail(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrMemberDBError)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberDBError,
@@ -698,15 +759,26 @@ func TestMemberController_GetByEmail(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
 			mockUseCase := tt.fields.usecase.(*mock.MockMemberInputPort)
 			mockPresenter := tt.fields.presenter.(*mock.MockMemberPresenter)
+			mockValidator := mock.NewMockValidator(ctrl)
+			mockLogger := mocklogger.NewMockLogger(ctrl)
+			mockTracer := mocktracer.NewMockTracer(ctrl)
+
+			// 使用 helper 設置基本期望
+			setupDefaultMockExpectations(ctrl, mockLogger, mockTracer)
+
 			c := &MemberController{
-				usecase:   mockUseCase,
-				presenter: mockPresenter,
+				usecase:      mockUseCase,
+				presenter:    mockPresenter,
+				dtoValidator: mockValidator,
+				logger:       mockLogger,
+				tracer:       mockTracer,
 			}
 			ginCtx, responseWriter := GinCtxHelper(t)
 			tt.setupGinCtx(ginCtx)
-			tt.setupPort(mockUseCase, mockPresenter)
+			tt.setupPort(mockUseCase, mockPresenter, mockValidator)
 			c.GetByEmail(ginCtx)
 			response := responseWriter.Body.String()
 			gotStatus := responseWriter.Code
@@ -749,7 +821,7 @@ func TestMemberController_GetByID(t *testing.T) {
 		name        string
 		fields      fields
 		args        args
-		setupPort   func(*mock.MockMemberInputPort, *mock.MockMemberPresenter)
+		setupPort   func(*mock.MockMemberInputPort, *mock.MockMemberPresenter, *mock.MockValidator)
 		setupGinCtx func(ginCtx *gin.Context)
 		want        *outputmodel.GetMemberByIDResponse
 		wantErr     *outputmodel.ErrorResponse
@@ -764,7 +836,8 @@ func TestMemberController_GetByID(t *testing.T) {
 			args: args{
 				ctx: nil,
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateGetMemberByID(gomock.Any()).Return(nil)
 				uc.EXPECT().GetMemberByID(gomock.Any(), gomock.Any()).Return(
 					&entity.Member{
 						ID:        1,
@@ -791,6 +864,7 @@ func TestMemberController_GetByID(t *testing.T) {
 				)
 			},
 			setupGinCtx: func(ginCtx *gin.Context) {
+				ginCtx.Request = httptest.NewRequest("GET", "/api/member/1", nil)
 				ginCtx.Params = gin.Params{
 					gin.Param{Key: "id", Value: "1"},
 				}
@@ -822,7 +896,7 @@ func TestMemberController_GetByID(t *testing.T) {
 			args: args{
 				ctx: nil,
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
 				p.EXPECT().PresentBindingError(gomock.Any(), gomock.Any()).Return(
 					outputmodel.ErrorResponse{
 						Data: nil,
@@ -836,6 +910,7 @@ func TestMemberController_GetByID(t *testing.T) {
 				)
 			},
 			setupGinCtx: func(ginCtx *gin.Context) {
+				ginCtx.Request = httptest.NewRequest("GET", "/api/member/invalid_id", nil)
 				ginCtx.Params = gin.Params{
 					gin.Param{Key: "id", Value: "invalid_id"},
 				}
@@ -861,7 +936,8 @@ func TestMemberController_GetByID(t *testing.T) {
 			args: args{
 				ctx: nil,
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateGetMemberByID(gomock.Any()).Return(errors.New("validation error"))
 				p.EXPECT().PresentValidationError(gomock.Any()).Return(
 					errorcode.ErrInvalidParams, outputmodel.ErrorResponse{
 						Data: nil,
@@ -875,6 +951,7 @@ func TestMemberController_GetByID(t *testing.T) {
 				)
 			},
 			setupGinCtx: func(ginCtx *gin.Context) {
+				ginCtx.Request = httptest.NewRequest("GET", "/api/member/-1", nil)
 				ginCtx.Params = gin.Params{
 					gin.Param{Key: "id", Value: "-1"}, // 因為validation會檢查ID是否大於0，所以這裡使用-1來觸發驗證錯誤
 				}
@@ -900,7 +977,8 @@ func TestMemberController_GetByID(t *testing.T) {
 			args: args{
 				ctx: nil,
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateGetMemberByID(gomock.Any()).Return(nil)
 				// uc錯誤後傳給presenter輸出錯誤
 				uc.EXPECT().GetMemberByID(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrMemberNotFound)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
@@ -917,6 +995,7 @@ func TestMemberController_GetByID(t *testing.T) {
 				)
 			},
 			setupGinCtx: func(ginCtx *gin.Context) {
+				ginCtx.Request = httptest.NewRequest("GET", "/api/member/1", nil)
 				ginCtx.Params = gin.Params{
 					gin.Param{Key: "id", Value: "1"},
 				}
@@ -942,7 +1021,8 @@ func TestMemberController_GetByID(t *testing.T) {
 			args: args{
 				ctx: nil,
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateGetMemberByID(gomock.Any()).Return(nil)
 				uc.EXPECT().GetMemberByID(gomock.Any(), gomock.Any()).Return(nil, usecase.ErrMemberDBError)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberDBError,
@@ -958,6 +1038,7 @@ func TestMemberController_GetByID(t *testing.T) {
 				)
 			},
 			setupGinCtx: func(ginCtx *gin.Context) {
+				ginCtx.Request = httptest.NewRequest("GET", "/api/member/1", nil)
 				ginCtx.Params = gin.Params{
 					gin.Param{Key: "id", Value: "1"},
 				}
@@ -977,15 +1058,26 @@ func TestMemberController_GetByID(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
 			mockUseCase := tt.fields.usecase.(*mock.MockMemberInputPort)
 			mockPresenter := tt.fields.presenter.(*mock.MockMemberPresenter)
+			mockValidator := mock.NewMockValidator(ctrl)
+			mockLogger := mocklogger.NewMockLogger(ctrl)
+			mockTracer := mocktracer.NewMockTracer(ctrl)
+
+			// 使用 helper 設置基本期望
+			setupDefaultMockExpectations(ctrl, mockLogger, mockTracer)
+
 			c := &MemberController{
-				usecase:   mockUseCase,
-				presenter: mockPresenter,
+				usecase:      mockUseCase,
+				presenter:    mockPresenter,
+				dtoValidator: mockValidator,
+				logger:       mockLogger,
+				tracer:       mockTracer,
 			}
 			ginCtx, responseWriter := GinCtxHelper(t)
 			tt.setupGinCtx(ginCtx)
-			tt.setupPort(mockUseCase, mockPresenter)
+			tt.setupPort(mockUseCase, mockPresenter, mockValidator)
 			c.GetByID(ginCtx)
 			response := responseWriter.Body.String()
 			gotStatus := responseWriter.Code
@@ -1052,7 +1144,7 @@ func TestMemberController_List(t *testing.T) {
 		args            args
 		setupPagination testPagination
 		setupGinCtx     func(ginCtx *gin.Context, testArgs testPagination)
-		setupPort       func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, testArgs testPagination)
+		setupPort       func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator, testArgs testPagination)
 		want            *outputmodel.ListMemberResponse
 		wantErr         *outputmodel.ErrorResponse
 		wantStatus      int
@@ -1076,7 +1168,8 @@ func TestMemberController_List(t *testing.T) {
 				//[GIN-debug] GET    /api/v1/members           --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).List-fm (2 handlers)
 				ginCtx.Request = httptest.NewRequest("GET", "/api/v1/members?page="+strconv.Itoa(testArgs.Page)+"&limit="+strconv.Itoa(testArgs.Limit), nil)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, testArgs testPagination) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator, testArgs testPagination) {
+				v.EXPECT().ValidateListMember(gomock.Any()).Return(nil)
 				listItem := make([]dto.ListMemberItemDTO, 0, len(members))
 				for _, member := range members {
 					listItem = append(listItem, dto.ListMemberItemDTO{
@@ -1148,7 +1241,7 @@ func TestMemberController_List(t *testing.T) {
 			setupGinCtx: func(ginCtx *gin.Context, testArgs testPagination) {
 				ginCtx.Request, _ = http.NewRequest("GET", "/api/v1/members?page=invalid&limit="+strconv.Itoa(testArgs.Limit), nil)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, testArgs testPagination) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator, testArgs testPagination) {
 				p.EXPECT().PresentBindingError(gomock.Any(), gomock.Any()).Return(
 					outputmodel.ErrorResponse{
 						Data: nil,
@@ -1191,7 +1284,8 @@ func TestMemberController_List(t *testing.T) {
 			setupGinCtx: func(ginCtx *gin.Context, testArgs testPagination) {
 				ginCtx.Request, _ = http.NewRequest("GET", "/api/v1/members?page=-1&limit="+strconv.Itoa(testArgs.Limit), nil)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, testArgs testPagination) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator, testArgs testPagination) {
+				v.EXPECT().ValidateListMember(gomock.Any()).Return(errors.New("validation error"))
 				p.EXPECT().PresentValidationError(gomock.Any()).Return(
 					errorcode.ErrInvalidParams, outputmodel.ErrorResponse{
 						Data: nil,
@@ -1234,7 +1328,8 @@ func TestMemberController_List(t *testing.T) {
 			setupGinCtx: func(ginCtx *gin.Context, testArgs testPagination) {
 				ginCtx.Request, _ = http.NewRequest("GET", "/api/v1/members?page="+strconv.Itoa(testArgs.Page)+"&limit="+strconv.Itoa(testArgs.Limit), nil)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, testArgs testPagination) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator, testArgs testPagination) {
+				v.EXPECT().ValidateListMember(gomock.Any()).Return(nil)
 				uc.EXPECT().ListMembers(gomock.Any(), gomock.Any()).Return(nil, 0, usecase.ErrMemberDBError)
 				p.EXPECT().PresentUseCaseError(gomock.Any()).Return(
 					errorcode.ErrMemberDBError,
@@ -1265,15 +1360,26 @@ func TestMemberController_List(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
 			mockUseCase := mock.NewMockMemberInputPort(ctrl)
 			mockPresenter := mock.NewMockMemberPresenter(ctrl)
+			mockValidator := mock.NewMockValidator(ctrl)
+			mockLogger := mocklogger.NewMockLogger(ctrl)
+			mockTracer := mocktracer.NewMockTracer(ctrl)
+
+			// 使用 helper 設置基本期望
+			setupDefaultMockExpectations(ctrl, mockLogger, mockTracer)
+
 			c := &MemberController{
-				usecase:   mockUseCase,
-				presenter: mockPresenter,
+				usecase:      mockUseCase,
+				presenter:    mockPresenter,
+				dtoValidator: mockValidator,
+				logger:       mockLogger,
+				tracer:       mockTracer,
 			}
 			ginCtx, responseWriter := GinCtxHelper(t)
 			tt.setupGinCtx(ginCtx, tt.setupPagination)
-			tt.setupPort(mockUseCase, mockPresenter, tt.setupPagination)
+			tt.setupPort(mockUseCase, mockPresenter, mockValidator, tt.setupPagination)
 			c.List(ginCtx)
 			response := responseWriter.Body.String()
 			gotStatus := responseWriter.Code
@@ -1318,7 +1424,7 @@ func TestMemberController_Register(t *testing.T) {
 		fields      fields
 		args        args
 		setupGinCtx func(ginCtx *gin.Context)
-		setupPort   func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter)
+		setupPort   func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator)
 		want        *outputmodel.RegisterMemberResponse
 		wantErr     *outputmodel.ErrorResponse
 		wantStatus  int
@@ -1341,7 +1447,8 @@ func TestMemberController_Register(t *testing.T) {
 				)
 				ginCtx.Request.Header.Set("Content-Type", "application/json")
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateRegisterMember(gomock.Any()).Return(nil)
 				uc.EXPECT().RegisterMember(gomock.Any(), gomock.Any()).Return(
 					&entity.Member{
 						ID:        1,
@@ -1392,7 +1499,7 @@ func TestMemberController_Register(t *testing.T) {
 				)
 				ginCtx.Request.Header.Set("Content-Type", "application/json")
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
 				p.EXPECT().PresentBindingError(gomock.Any(), gomock.Any()).Return(
 					outputmodel.ErrorResponse{
 						Data: nil,
@@ -1432,8 +1539,10 @@ func TestMemberController_Register(t *testing.T) {
 					"/api/v1/members",
 					strings.NewReader(`{"name":"test","email":"invalid-email","password":"test123"}`),
 				)
+				ginCtx.Request.Header.Set("Content-Type", "application/json")
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateRegisterMember(gomock.Any()).Return(errors.New("validation error"))
 				p.EXPECT().PresentValidationError(gomock.Any()).Return(
 					errorcode.ErrValidationFailed, outputmodel.ErrorResponse{
 						Data: nil,
@@ -1473,8 +1582,10 @@ func TestMemberController_Register(t *testing.T) {
 					"/api/v1/members",
 					strings.NewReader(`{"name":"test","email":"test@gmail.com","password":"test123"}`),
 				)
+				ginCtx.Request.Header.Set("Content-Type", "application/json")
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateRegisterMember(gomock.Any()).Return(nil)
 				uc.EXPECT().RegisterMember(gomock.Any(), gomock.Any()).Return(
 					nil,
 					usecase.ErrMemberAlreadyExists,
@@ -1519,8 +1630,10 @@ func TestMemberController_Register(t *testing.T) {
 					"/api/v1/members",
 					strings.NewReader(`{"name":"test","email":"test@gmail.com","password":"test123"}`),
 				)
+				ginCtx.Request.Header.Set("Content-Type", "application/json")
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateRegisterMember(gomock.Any()).Return(nil)
 				uc.EXPECT().RegisterMember(gomock.Any(), gomock.Any()).Return(
 					nil,
 					usecase.ErrMemberDBError,
@@ -1566,8 +1679,10 @@ func TestMemberController_Register(t *testing.T) {
 					"/api/v1/members",
 					strings.NewReader(`{"name":"test","email":"test@gmail.com","password":"test123"}`),
 				)
+				ginCtx.Request.Header.Set("Content-Type", "application/json")
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateRegisterMember(gomock.Any()).Return(nil)
 				uc.EXPECT().RegisterMember(gomock.Any(), gomock.Any()).Return(
 					nil,
 					usecase.ErrMemberNotFound,
@@ -1600,15 +1715,26 @@ func TestMemberController_Register(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
 			mockUseCase := mock.NewMockMemberInputPort(ctrl)
 			mockPresenter := mock.NewMockMemberPresenter(ctrl)
+			mockValidator := mock.NewMockValidator(ctrl)
+			mockLogger := mocklogger.NewMockLogger(ctrl)
+			mockTracer := mocktracer.NewMockTracer(ctrl)
+
+			// 使用 helper 設置基本期望
+			setupDefaultMockExpectations(ctrl, mockLogger, mockTracer)
+
 			c := &MemberController{
-				usecase:   mockUseCase,
-				presenter: mockPresenter,
+				usecase:      mockUseCase,
+				presenter:    mockPresenter,
+				dtoValidator: mockValidator,
+				logger:       mockLogger,
+				tracer:       mockTracer,
 			}
 			ginCtx, responseWriter := GinCtxHelper(t)
 			tt.setupGinCtx(ginCtx)
-			tt.setupPort(mockUseCase, mockPresenter)
+			tt.setupPort(mockUseCase, mockPresenter, mockValidator)
 			c.Register(ginCtx)
 			response := responseWriter.Body.String()
 			gotStatus := responseWriter.Code
@@ -1652,7 +1778,7 @@ func TestMemberController_UpdateProfile(t *testing.T) {
 		fields      fields
 		args        args
 		setupGinCtx func(ginCtx *gin.Context)
-		setupPort   func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter)
+		setupPort   func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator)
 		want        *outputmodel.UpdateMemberProfileResponse
 		wantErr     *outputmodel.ErrorResponse
 		wantStatus  int
@@ -1677,7 +1803,8 @@ func TestMemberController_UpdateProfile(t *testing.T) {
 					strings.NewReader(`{"name":"new_name"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdateProfile(gomock.Any()).Return(nil)
 				uc.EXPECT().UpdateMemberProfile(gomock.Any(), gomock.Any()).Return(
 					&entity.Member{
 						ID:        1,
@@ -1729,7 +1856,7 @@ func TestMemberController_UpdateProfile(t *testing.T) {
 					strings.NewReader(`{"name":"new_name"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
 				p.EXPECT().PresentBindingError(gomock.Any(), gomock.Any()).Return(
 					outputmodel.ErrorResponse{
 						Data: nil,
@@ -1774,7 +1901,7 @@ func TestMemberController_UpdateProfile(t *testing.T) {
 					strings.NewReader(`{"name":123}`), // invalid name type
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
 				p.EXPECT().PresentBindingError(gomock.Any(), gomock.Any()).Return(
 					outputmodel.ErrorResponse{
 						Data: nil,
@@ -1815,11 +1942,13 @@ func TestMemberController_UpdateProfile(t *testing.T) {
 				}
 				ginCtx.Request = httptest.NewRequest(
 					"PATCH",
-					"/api/v1/members/invalid-id",
+					"/api/v1/members/-1",
 					strings.NewReader(`{"name":"new_name"}`),
 				)
+				ginCtx.Request.Header.Set("Content-Type", "application/json")
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdateProfile(gomock.Any()).Return(errors.New("validation error"))
 				p.EXPECT().PresentValidationError(gomock.Any()).Return(
 					errorcode.ErrInvalidParams, outputmodel.ErrorResponse{
 						Data: nil,
@@ -1863,8 +1992,10 @@ func TestMemberController_UpdateProfile(t *testing.T) {
 					"/api/v1/members/1",
 					strings.NewReader(`{"name":""}`), // empty name
 				)
+				ginCtx.Request.Header.Set("Content-Type", "application/json")
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdateProfile(gomock.Any()).Return(errors.New("validation error"))
 				p.EXPECT().PresentValidationError(gomock.Any()).Return(
 					errorcode.ErrValidationFailed, outputmodel.ErrorResponse{
 						Data: nil,
@@ -1909,7 +2040,8 @@ func TestMemberController_UpdateProfile(t *testing.T) {
 					strings.NewReader(`{"name":"new_name"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdateProfile(gomock.Any()).Return(nil)
 				uc.EXPECT().UpdateMemberProfile(gomock.Any(), gomock.Any()).Return(
 					nil,
 					usecase.ErrMemberNotFound,
@@ -1959,7 +2091,8 @@ func TestMemberController_UpdateProfile(t *testing.T) {
 					strings.NewReader(`{"name":"new_name"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdateProfile(gomock.Any()).Return(nil)
 				uc.EXPECT().UpdateMemberProfile(gomock.Any(), gomock.Any()).Return(
 					nil,
 					usecase.ErrMemberDBError,
@@ -2009,7 +2142,8 @@ func TestMemberController_UpdateProfile(t *testing.T) {
 					strings.NewReader(`{"name":"new_name"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdateProfile(gomock.Any()).Return(nil)
 				uc.EXPECT().UpdateMemberProfile(gomock.Any(), gomock.Any()).Return(
 					nil,
 					usecase.ErrMemberNoEffect,
@@ -2042,15 +2176,26 @@ func TestMemberController_UpdateProfile(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
 			mockUseCase := mock.NewMockMemberInputPort(ctrl)
 			mockPresenter := mock.NewMockMemberPresenter(ctrl)
+			mockValidator := mock.NewMockValidator(ctrl)
+			mockLogger := mocklogger.NewMockLogger(ctrl)
+			mockTracer := mocktracer.NewMockTracer(ctrl)
+
+			// 使用 helper 設置基本期望
+			setupDefaultMockExpectations(ctrl, mockLogger, mockTracer)
+
 			c := &MemberController{
-				usecase:   mockUseCase,
-				presenter: mockPresenter,
+				usecase:      mockUseCase,
+				presenter:    mockPresenter,
+				dtoValidator: mockValidator,
+				logger:       mockLogger,
+				tracer:       mockTracer,
 			}
 			ginCtx, responseWriter := GinCtxHelper(t)
 			tt.setupGinCtx(ginCtx)
-			tt.setupPort(mockUseCase, mockPresenter)
+			tt.setupPort(mockUseCase, mockPresenter, mockValidator)
 			c.UpdateProfile(ginCtx)
 			response := responseWriter.Body.String()
 			gotStatus := responseWriter.Code
@@ -2094,7 +2239,7 @@ func TestMemberController_UpdateEmail(t *testing.T) {
 		fields      fields
 		args        args
 		setupGinCtx func(ginCtx *gin.Context)
-		setupPort   func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter)
+		setupPort   func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator)
 		want        *outputmodel.UpdateMemberEmailResponse
 		wantErr     *outputmodel.ErrorResponse
 		wantStatus  int
@@ -2119,7 +2264,8 @@ func TestMemberController_UpdateEmail(t *testing.T) {
 					strings.NewReader(`{"new_email":"test@gmail.com","password":"test123"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdateEmail(gomock.Any()).Return(nil)
 				uc.EXPECT().UpdateMemberEmail(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
 				p.EXPECT().PresentUpdateMemberEmail().Return(
 					outputmodel.UpdateMemberEmailResponse{
@@ -2158,11 +2304,16 @@ func TestMemberController_UpdateEmail(t *testing.T) {
 			},
 			setupGinCtx: func(ginCtx *gin.Context) {
 				//[GIN-debug] PATCH  /api/v1/members/:id/email --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdateEmail-fm (2 handlers)
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1/email",
+					strings.NewReader(`{"new_email":"","password":"test123"}`),
+				)
 				ginCtx.Params = gin.Params{
 					gin.Param{Key: "id", Value: "invalid-id"},
 				}
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
 				p.EXPECT().PresentBindingError(gomock.Any(), gomock.Any()).Return(
 					outputmodel.ErrorResponse{
 						Data: nil,
@@ -2204,7 +2355,7 @@ func TestMemberController_UpdateEmail(t *testing.T) {
 					strings.NewReader(`{"new_email":"","password":"test123"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
 				p.EXPECT().PresentBindingError(gomock.Any(), gomock.Any()).Return(
 					outputmodel.ErrorResponse{
 						Data: nil,
@@ -2246,7 +2397,8 @@ func TestMemberController_UpdateEmail(t *testing.T) {
 					strings.NewReader(`{"new_email":"test@gmail.com","password":"test123"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdateEmail(gomock.Any()).Return(errors.New("validation error"))
 				p.EXPECT().PresentValidationError(gomock.Any()).Return(
 					errorcode.ErrInvalidParams, outputmodel.ErrorResponse{
 						Data: nil,
@@ -2288,7 +2440,8 @@ func TestMemberController_UpdateEmail(t *testing.T) {
 					strings.NewReader(`{"new_email":"invalid-email","password":"test123"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdateEmail(gomock.Any()).Return(errors.New("validation error"))
 				p.EXPECT().PresentValidationError(gomock.Any()).Return(
 					errorcode.ErrValidationFailed, outputmodel.ErrorResponse{
 						Data: nil,
@@ -2330,7 +2483,8 @@ func TestMemberController_UpdateEmail(t *testing.T) {
 					strings.NewReader(`{"new_email":"test@gmail.com","password":"6666"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdateEmail(gomock.Any()).Return(errors.New("validation error"))
 				p.EXPECT().PresentValidationError(gomock.Any()).Return(
 					errorcode.ErrValidationFailed, outputmodel.ErrorResponse{
 						Data: nil,
@@ -2372,7 +2526,8 @@ func TestMemberController_UpdateEmail(t *testing.T) {
 					strings.NewReader(`{"new_email":"testupdate@gmail.com","password":"test123"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdateEmail(gomock.Any()).Return(nil)
 				uc.EXPECT().UpdateMemberEmail(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
 					usecase.ErrMemberNotFound,
 				)
@@ -2418,7 +2573,8 @@ func TestMemberController_UpdateEmail(t *testing.T) {
 					strings.NewReader(`{"new_email":"testupdate@gmail.com","password":"test123"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdateEmail(gomock.Any()).Return(nil)
 				uc.EXPECT().UpdateMemberEmail(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
 					usecase.ErrMemberDBError,
 				)
@@ -2464,7 +2620,8 @@ func TestMemberController_UpdateEmail(t *testing.T) {
 					strings.NewReader(`{"new_email":"updatetest@gmail.com","password":"test123"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdateEmail(gomock.Any()).Return(nil)
 				uc.EXPECT().UpdateMemberEmail(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
 					usecase.ErrMemberEmailAlreadyExists,
 				)
@@ -2510,7 +2667,8 @@ func TestMemberController_UpdateEmail(t *testing.T) {
 					strings.NewReader(`{"new_email":"updateemail@gmail.com","password":"test123"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdateEmail(gomock.Any()).Return(nil)
 				uc.EXPECT().UpdateMemberEmail(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
 					usecase.ErrMemberUpdateSameEmail,
 				)
@@ -2555,7 +2713,8 @@ func TestMemberController_UpdateEmail(t *testing.T) {
 					strings.NewReader(`{"new_email":"updatetest@gmail.com","password":"test123"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdateEmail(gomock.Any()).Return(nil)
 				uc.EXPECT().UpdateMemberEmail(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
 					usecase.ErrMemberPasswordIncorrect,
 				)
@@ -2601,7 +2760,8 @@ func TestMemberController_UpdateEmail(t *testing.T) {
 					strings.NewReader(`{"new_email":"updatetest@gmail.com","password":"test123"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdateEmail(gomock.Any()).Return(nil)
 				uc.EXPECT().UpdateMemberEmail(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
 					usecase.ErrMemberNoEffect,
 				)
@@ -2647,7 +2807,8 @@ func TestMemberController_UpdateEmail(t *testing.T) {
 					strings.NewReader(`{"new_email":"updatetest@gmail.com","password":"test123"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdateEmail(gomock.Any()).Return(nil)
 				uc.EXPECT().UpdateMemberEmail(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
 					errors.New("unknown error"),
 				)
@@ -2676,15 +2837,26 @@ func TestMemberController_UpdateEmail(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
 			mockUseCase := mock.NewMockMemberInputPort(ctrl)
 			mockPresenter := mock.NewMockMemberPresenter(ctrl)
+			mockValidator := mock.NewMockValidator(ctrl)
+			mockLogger := mocklogger.NewMockLogger(ctrl)
+			mockTracer := mocktracer.NewMockTracer(ctrl)
+
+			// 使用 helper 設置基本期望
+			setupDefaultMockExpectations(ctrl, mockLogger, mockTracer)
+
 			c := &MemberController{
-				usecase:   mockUseCase,
-				presenter: mockPresenter,
+				usecase:      mockUseCase,
+				presenter:    mockPresenter,
+				dtoValidator: mockValidator,
+				logger:       mockLogger,
+				tracer:       mockTracer,
 			}
 			ginCtx, responseWriter := GinCtxHelper(t)
 			tt.setupGinCtx(ginCtx)
-			tt.setupPort(mockUseCase, mockPresenter)
+			tt.setupPort(mockUseCase, mockPresenter, mockValidator)
 			c.UpdateEmail(ginCtx)
 			response := responseWriter.Body.String()
 			gotStatus := responseWriter.Code
@@ -2728,7 +2900,7 @@ func TestMemberController_UpdatePassword(t *testing.T) {
 		fields      fields
 		args        args
 		setupGinCtx func(ginCtx *gin.Context)
-		setupPort   func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter)
+		setupPort   func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator)
 		want        *outputmodel.UpdateMemberPasswordResponse
 		wantErr     *outputmodel.ErrorResponse
 		wantStatus  int
@@ -2753,7 +2925,8 @@ func TestMemberController_UpdatePassword(t *testing.T) {
 					strings.NewReader(`{"old_password":"oldpass123","new_password":"newpass123"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdatePassword(gomock.Any()).Return(nil)
 				uc.EXPECT().UpdateMemberPassword(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(nil)
 				p.EXPECT().PresentUpdateMemberPassword().Return(
 					outputmodel.UpdateMemberPasswordResponse{
@@ -2792,11 +2965,16 @@ func TestMemberController_UpdatePassword(t *testing.T) {
 			},
 			setupGinCtx: func(ginCtx *gin.Context) {
 				//[GIN-debug] PATCH  /api/v1/members/:id/password --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdatePassword-fm (2 handlers)
+				ginCtx.Request = httptest.NewRequest(
+					"PATCH",
+					"/api/v1/members/1/email",
+					strings.NewReader(`{"new_email":"","password":"test123"}`),
+				)
 				ginCtx.Params = gin.Params{
 					gin.Param{Key: "id", Value: "invalid-id"},
 				}
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
 				p.EXPECT().PresentBindingError(gomock.Any(), gomock.Any()).Return(
 					outputmodel.ErrorResponse{
 						Data: nil,
@@ -2838,7 +3016,8 @@ func TestMemberController_UpdatePassword(t *testing.T) {
 					strings.NewReader(`{"old_password":"oldpass123","new_password":"newpass123"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdatePassword(gomock.Any()).Return(errors.New("validation error"))
 				p.EXPECT().PresentValidationError(gomock.Any()).Return(
 					errorcode.ErrInvalidParams, outputmodel.ErrorResponse{
 						Data: nil,
@@ -2880,7 +3059,7 @@ func TestMemberController_UpdatePassword(t *testing.T) {
 					strings.NewReader(`{"old_password":"","new_password":"newpass123"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
 				p.EXPECT().PresentBindingError(gomock.Any(), gomock.Any()).Return(
 					outputmodel.ErrorResponse{
 						Data: nil,
@@ -2922,7 +3101,8 @@ func TestMemberController_UpdatePassword(t *testing.T) {
 					strings.NewReader(`{"old_password":"123","new_password":"newpass123"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdatePassword(gomock.Any()).Return(errors.New("validation error"))
 				p.EXPECT().PresentValidationError(gomock.Any()).Return(
 					errorcode.ErrValidationFailed, outputmodel.ErrorResponse{
 						Data: nil,
@@ -2955,16 +3135,17 @@ func TestMemberController_UpdatePassword(t *testing.T) {
 			},
 			setupGinCtx: func(ginCtx *gin.Context) {
 				//[GIN-debug] PATCH  /api/v1/members/:id/password --> module-clean/internal/modules/member/interface_adapter/controller.(*MemberController).UpdatePassword-fm (2 handlers)
-				ginCtx.Params = gin.Params{
-					gin.Param{Key: "id", Value: "1"},
-				}
 				ginCtx.Request = httptest.NewRequest(
 					"PATCH",
 					"/api/v1/members/1/password",
 					strings.NewReader(`{"old_password":"oldpass123","new_password":"123"}`),
 				)
+				ginCtx.Params = gin.Params{
+					gin.Param{Key: "id", Value: "1"},
+				}
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdatePassword(gomock.Any()).Return(errors.New("validation error"))
 				p.EXPECT().PresentValidationError(gomock.Any()).Return(
 					errorcode.ErrValidationFailed, outputmodel.ErrorResponse{
 						Data: nil,
@@ -3006,7 +3187,8 @@ func TestMemberController_UpdatePassword(t *testing.T) {
 					strings.NewReader(`{"old_password":"oldpass123","new_password":"oldpass123"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdatePassword(gomock.Any()).Return(nil)
 				uc.EXPECT().UpdateMemberPassword(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
 					usecase.ErrMemberUpdateSamePassword,
 				)
@@ -3052,7 +3234,8 @@ func TestMemberController_UpdatePassword(t *testing.T) {
 					strings.NewReader(`{"old_password":"oldpass123","new_password":"newpass123"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdatePassword(gomock.Any()).Return(nil)
 				uc.EXPECT().UpdateMemberPassword(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
 					usecase.ErrMemberNotFound,
 				)
@@ -3098,7 +3281,8 @@ func TestMemberController_UpdatePassword(t *testing.T) {
 					strings.NewReader(`{"old_password":"wrongpass123","new_password":"newpass123"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdatePassword(gomock.Any()).Return(nil)
 				uc.EXPECT().UpdateMemberPassword(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
 					usecase.ErrMemberPasswordIncorrect,
 				)
@@ -3144,7 +3328,8 @@ func TestMemberController_UpdatePassword(t *testing.T) {
 					strings.NewReader(`{"old_password":"oldpass123","new_password":"newpass123"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdatePassword(gomock.Any()).Return(nil)
 				uc.EXPECT().UpdateMemberPassword(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
 					usecase.ErrMemberNoEffect,
 				)
@@ -3190,7 +3375,8 @@ func TestMemberController_UpdatePassword(t *testing.T) {
 					strings.NewReader(`{"old_password":"oldpass123","new_password":"newpass123"}`),
 				)
 			},
-			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter) {
+			setupPort: func(uc *mock.MockMemberInputPort, p *mock.MockMemberPresenter, v *mock.MockValidator) {
+				v.EXPECT().ValidateUpdatePassword(gomock.Any()).Return(nil)
 				uc.EXPECT().UpdateMemberPassword(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(
 					usecase.ErrMemberDBError,
 				)
@@ -3219,15 +3405,26 @@ func TestMemberController_UpdatePassword(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
 			mockUseCase := mock.NewMockMemberInputPort(ctrl)
 			mockPresenter := mock.NewMockMemberPresenter(ctrl)
+			mockValidator := mock.NewMockValidator(ctrl)
+			mockLogger := mocklogger.NewMockLogger(ctrl)
+			mockTracer := mocktracer.NewMockTracer(ctrl)
+
+			// 使用 helper 設置基本期望
+			setupDefaultMockExpectations(ctrl, mockLogger, mockTracer)
+
 			c := &MemberController{
-				usecase:   mockUseCase,
-				presenter: mockPresenter,
+				usecase:      mockUseCase,
+				presenter:    mockPresenter,
+				dtoValidator: mockValidator,
+				logger:       mockLogger,
+				tracer:       mockTracer,
 			}
 			ginCtx, responseWriter := GinCtxHelper(t)
 			tt.setupGinCtx(ginCtx)
-			tt.setupPort(mockUseCase, mockPresenter)
+			tt.setupPort(mockUseCase, mockPresenter, mockValidator)
 			c.UpdatePassword(ginCtx)
 			response := responseWriter.Body.String()
 			gotStatus := responseWriter.Code
@@ -3261,7 +3458,14 @@ func TestNewMemberController(t *testing.T) {
 	ctrl, _ := portHelper(t)
 	usecaseGateway := mock.NewMockMemberInputPort(ctrl)
 	presenterGateway := mock.NewMockMemberPresenter(ctrl)
-	got := NewMemberController(usecaseGateway, presenterGateway)
+	mockValidator := mock.NewMockValidator(ctrl)
+	mockLogger := mocklogger.NewMockLogger(ctrl)
+	mockTracer := mocktracer.NewMockTracer(ctrl)
+
+	// 設置預期的 logger.With 調用
+	mockLogger.EXPECT().With(gomock.Any()).Return(mockLogger).Times(1)
+
+	got := NewMemberController(usecaseGateway, presenterGateway, mockValidator, mockLogger, mockTracer)
 	assert.NotNil(t, got)
 	assert.Equal(t, usecaseGateway, got.usecase)
 	assert.Equal(t, presenterGateway, got.presenter)
@@ -3282,4 +3486,22 @@ func GinCtxHelper(t *testing.T) (*gin.Context, *httptest.ResponseRecorder) {
 	w := httptest.NewRecorder()
 	ginCtx, _ := gin.CreateTestContext(w)
 	return ginCtx, w
+}
+
+// setupDefaultMockExpectations 設置基本的 mock 期望行為（不包含 validator，因為每個測試的 validator 期望都不同）
+func setupDefaultMockExpectations(ctrl *gomock.Controller, mockLogger *mocklogger.MockLogger, mockTracer *mocktracer.MockTracer) *mocktracer.MockSpan {
+	// logger expectations
+	mockLogger.EXPECT().With(gomock.Any()).Return(mockLogger).AnyTimes()
+	mockLogger.EXPECT().WithContext(gomock.Any()).Return(mockLogger).AnyTimes()
+	mockLogger.EXPECT().Debug(gomock.Any(), gomock.Any()).AnyTimes()
+	mockLogger.EXPECT().Info(gomock.Any(), gomock.Any()).AnyTimes()
+	mockLogger.EXPECT().Warn(gomock.Any(), gomock.Any()).AnyTimes()
+	mockLogger.EXPECT().Error(gomock.Any(), gomock.Any()).AnyTimes()
+
+	// tracer expectations
+	mockSpan := mocktracer.NewMockSpan(ctrl)
+	mockSpan.EXPECT().End().AnyTimes()
+	mockTracer.EXPECT().Start(gomock.Any(), gomock.Any()).Return(context.Background(), mockSpan).AnyTimes()
+
+	return mockSpan
 }

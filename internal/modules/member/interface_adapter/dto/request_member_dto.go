@@ -8,46 +8,18 @@
 // - 不包含資料轉換、不依賴 domain 與 usecase
 package dto
 
-import (
-	"github.com/go-playground/validator/v10"
-)
-
 type RegisterMemberRequestDTO struct {
 	Name     string `json:"name" validate:"required"`
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required,min=6"`
 }
 
-func (dto *RegisterMemberRequestDTO) Validate() error {
-	validate := validator.New()
-	if err := validate.Struct(dto); err != nil {
-		return err
-	}
-	return nil
-}
-
 type GetMemberByIDRequestDTO struct {
 	ID int `validate:"required,gte=1"`
 }
 
-func (dto *GetMemberByIDRequestDTO) Validate() error {
-	validate := validator.New()
-	if err := validate.Struct(dto); err != nil {
-		return err
-	}
-	return nil
-}
-
 type GetMemberByEmailRequestDTO struct {
 	Email string `validate:"required,email"`
-}
-
-func (dto *GetMemberByEmailRequestDTO) Validate() error {
-	validate := validator.New()
-	if err := validate.Struct(dto); err != nil {
-		return err
-	}
-	return nil
 }
 
 type ListMemberRequestDTO struct {
@@ -57,26 +29,10 @@ type ListMemberRequestDTO struct {
 	OrderBy string `validate:"omitempty,oneof=asc desc"`
 }
 
-func (dto *ListMemberRequestDTO) Validate() error {
-	validate := validator.New()
-	if err := validate.Struct(dto); err != nil {
-		return err
-	}
-	return nil
-}
-
 // UpdateMemberProfileRequestDTO 更新會員個人資料
 type UpdateMemberProfileRequestDTO struct {
 	ID   int     `json:"id" validate:"required,gte=1"`
 	Name *string `json:"name,omitempty" validate:"omitempty,min=3,max=20"`
-}
-
-func (dto *UpdateMemberProfileRequestDTO) Validate() error {
-	validate := validator.New()
-	if err := validate.Struct(dto); err != nil {
-		return err
-	}
-	return nil
 }
 
 // UpdateMemberEmailRequestDTO 更新會員電子郵件
@@ -88,14 +44,6 @@ type UpdateMemberEmailRequestDTO struct {
 	Password string `json:"password" validate:"required,min=6"`
 }
 
-func (dto *UpdateMemberEmailRequestDTO) Validate() error {
-	validate := validator.New()
-	if err := validate.Struct(dto); err != nil {
-		return err
-	}
-	return nil
-}
-
 // UpdateMemberPasswordRequestDTO 更新會員密碼
 //   - OldPassword 舊密碼
 //   - NewPassword 新密碼
@@ -105,22 +53,6 @@ type UpdateMemberPasswordRequestDTO struct {
 	NewPassword string `json:"new_password" validate:"required,min=6"`
 }
 
-func (dto *UpdateMemberPasswordRequestDTO) Validate() error {
-	validate := validator.New()
-	if err := validate.Struct(dto); err != nil {
-		return err
-	}
-	return nil
-}
-
 type DeleteMemberRequestDTO struct {
 	ID int `validate:"required,gte=1"`
-}
-
-func (dto *DeleteMemberRequestDTO) Validate() error {
-	validate := validator.New()
-	if err := validate.Struct(dto); err != nil {
-		return err
-	}
-	return nil
 }

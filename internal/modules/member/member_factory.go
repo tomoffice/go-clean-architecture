@@ -3,6 +3,7 @@ package member
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/validation"
 	"github.com/tomoffice/go-clean-architecture/pkg/logger"
 	"github.com/tomoffice/go-clean-architecture/pkg/tracer"
 
@@ -29,11 +30,12 @@ func (f *Factory) CreateModule(db *sqlx.DB, rg *gin.RouterGroup, log logger.Logg
 	moduleLogger := log.With(logger.NewField("module", "member"))
 
 	// 組裝所有組件
-	repo := mcsqlite.NewSQLXMemberRepo(db, moduleLogger, tracer)
-	gateway := repository.NewMemberSQLXGateway(repo, moduleLogger, tracer)
+	validator := validation.NewMemberValidator()
+	repo := mcsqlite.NewSqlxMemberSqlite(db, moduleLogger, tracer)
+	gateway := repository.NewMemberRepoGateway(repo, moduleLogger, tracer)
 	useCase := usecase.NewMemberUseCase(gateway, moduleLogger, tracer) // UseCase 注入 logger 和 tracer
 	presenter := http.NewMemberPresenter()
-	controller := controller.NewMemberController(useCase, presenter, moduleLogger, tracer) // Controller 注入 logger 和 tracer
+	controller := controller.NewMemberController(useCase, presenter, validator, moduleLogger, tracer) // Controller 注入 logger 和 tracer
 	router := router.NewMemberRouter(controller, rg)
 
 	// 創建並返回模組實例

@@ -30,6 +30,9 @@ var (
 	// ErrDBUnexpectedError 不知道怎麼歸類的 DB 錯誤（像第三方套件 bug、panic 等）。
 	ErrDBUnexpectedError = errors.New("db: unexpected error")
 
-	// ErrDBLastInsertId INSERT 沒拿到 last insert id，理論上很少遇到，但有時候 framework 會這樣。
-	ErrDBLastInsertId = errors.New("db: failed to get last insert id")
+	// ErrDBLastInsertId INSERT 沒拿到 last insert id，理論上很少遇到，但有時候 framework 會這樣。(暫不開啟)
+	//ErrDBLastInsertId = errors.New("db: failed to get last insert id")
+
+	// ErrMapperTimeParseFailed 時間格式解析失敗，通常是從 DB 讀取時間時格式不對。
+	ErrMapperTimeParseFailed = errors.New("mapper: time parse failed")
 )

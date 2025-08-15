@@ -7,6 +7,7 @@ import (
 	"github.com/tomoffice/go-clean-architecture/internal/framework/http/gin/errordefs"
 	ginmapper "github.com/tomoffice/go-clean-architecture/internal/framework/http/gin/mapper"
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/mapper"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/validation"
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase/port/input"
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase/port/output"
 	"github.com/tomoffice/go-clean-architecture/pkg/logger"
@@ -15,19 +16,21 @@ import (
 )
 
 type MemberController struct {
-	usecase   input.MemberInputPort
-	presenter output.MemberPresenter
-	logger    logger.Logger
-	tracer    tracer.Tracer
+	usecase      input.MemberInputPort
+	presenter    output.MemberPresenter
+	dtoValidator validation.Validator
+	logger       logger.Logger
+	tracer       tracer.Tracer
 }
 
-func NewMemberController(memberUseCase input.MemberInputPort, presenter output.MemberPresenter, log logger.Logger, tracer tracer.Tracer) *MemberController {
+func NewMemberController(memberUseCase input.MemberInputPort, presenter output.MemberPresenter, dtoValidator validation.Validator, log logger.Logger, tracer tracer.Tracer) *MemberController {
 	baseLogger := log.With(logger.NewField("layer", "controller"))
 	return &MemberController{
-		usecase:   memberUseCase,
-		presenter: presenter,
-		logger:    baseLogger,
-		tracer:    tracer,
+		usecase:      memberUseCase,
+		presenter:    presenter,
+		dtoValidator: dtoValidator,
+		logger:       baseLogger,
+		tracer:       tracer,
 	}
 }
 
@@ -49,7 +52,7 @@ func (c *MemberController) Register(ctx *gin.Context) {
 		return
 	}
 	reqDTO := ginmapper.GinDTOToRegisterMemberDTO(ginReqDTO)
-	if err := reqDTO.Validate(); err != nil {
+	if err := c.dtoValidator.ValidateRegisterMember(reqDTO); err != nil {
 		contextLogger.Error("會員註冊參數驗證錯誤",
 			logger.NewField("error", err.Error()),
 			logger.NewField("request_data", ginReqDTO),
@@ -92,7 +95,7 @@ func (c *MemberController) GetByID(ctx *gin.Context) {
 		return
 	}
 	reqDTO := ginmapper.GinDTOToGetMemberByIDDTO(ginReqDTO)
-	if err := reqDTO.Validate(); err != nil {
+	if err := c.dtoValidator.ValidateGetMemberByID(reqDTO); err != nil {
 		contextLogger.Error("會員查詢(ID)參數驗證錯誤",
 			logger.NewField("error", err.Error()),
 			logger.NewField("member_id", ginReqDTO.ID),
@@ -135,7 +138,7 @@ func (c *MemberController) GetByEmail(ctx *gin.Context) {
 		return
 	}
 	reqDTO := ginmapper.GinDTOToGetMemberByEmailDTO(ginReqDTO)
-	if err := reqDTO.Validate(); err != nil {
+	if err := c.dtoValidator.ValidateGetMemberByEmail(reqDTO); err != nil {
 		contextLogger.Error("會員查詢(Email)參數驗證錯誤",
 			logger.NewField("error", err.Error()),
 			logger.NewField("email", ginReqDTO.Email),
@@ -178,7 +181,7 @@ func (c *MemberController) List(ctx *gin.Context) {
 		return
 	}
 	reqDTO := ginmapper.GinDTOtoListMemberDTO(ginReqDTO)
-	if err := reqDTO.Validate(); err != nil {
+	if err := c.dtoValidator.ValidateListMember(reqDTO); err != nil {
 		contextLogger.Error("會員列表查詢參數驗證錯誤",
 			logger.NewField("error", err.Error()),
 			logger.NewField("page", ginReqDTO.Page),
@@ -235,7 +238,7 @@ func (c *MemberController) UpdateProfile(ctx *gin.Context) {
 		return
 	}
 	reqDTO := ginmapper.GinDTOToUpdateMemberProfileDTO(ginURI, ginBody)
-	if err := reqDTO.Validate(); err != nil {
+	if err := c.dtoValidator.ValidateUpdateProfile(reqDTO); err != nil {
 		contextLogger.Error("會員資料更新參數驗證錯誤",
 			logger.NewField("error", err.Error()),
 			logger.NewField("member_id", ginURI.ID),
@@ -290,7 +293,7 @@ func (c *MemberController) UpdateEmail(ctx *gin.Context) {
 		return
 	}
 	reqDTO := ginmapper.GinDTOToUpdateMemberEmailDTO(ginURI, ginBody)
-	if err := reqDTO.Validate(); err != nil {
+	if err := c.dtoValidator.ValidateUpdateEmail(reqDTO); err != nil {
 		contextLogger.Error("會員 Email 更新參數驗證錯誤",
 			logger.NewField("error", err.Error()),
 			logger.NewField("member_id", ginURI.ID),
@@ -346,7 +349,7 @@ func (c *MemberController) UpdatePassword(ctx *gin.Context) {
 		return
 	}
 	reqDTO := ginmapper.GinDTOToUpdateMemberPasswordDTO(ginURI, ginBody)
-	if err := reqDTO.Validate(); err != nil {
+	if err := c.dtoValidator.ValidateUpdatePassword(reqDTO); err != nil {
 		contextLogger.Error("會員密碼更新參數驗證錯誤",
 			logger.NewField("error", err.Error()),
 			logger.NewField("member_id", ginURI.ID),
@@ -388,7 +391,7 @@ func (c *MemberController) Delete(ctx *gin.Context) {
 		return
 	}
 	reqDTO := ginmapper.GinDTOToDeleteMemberDTO(ginReqDTO)
-	if err := reqDTO.Validate(); err != nil {
+	if err := c.dtoValidator.ValidateDeleteMember(reqDTO); err != nil {
 		contextLogger.Error("會員刪除參數驗證錯誤",
 			logger.NewField("error", err.Error()),
 			logger.NewField("member_id", ginReqDTO.ID),

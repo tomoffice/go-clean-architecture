@@ -5,29 +5,31 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	sqlx2 "github.com/tomoffice/go-clean-architecture/internal/modules/member/framework/persistence/sqlx"
+	"github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/dao"
 	"github.com/tomoffice/go-clean-architecture/internal/shared/pagination"
 	"github.com/tomoffice/go-clean-architecture/pkg/logger"
 	"github.com/tomoffice/go-clean-architecture/pkg/tracer"
 	"time"
 )
 
-type sqlxMemberRepo struct {
+// sqlxMemberRepo 實作 dao.MemberDAO
+type sqlxMemberSqlite struct {
 	db     *sqlx.DB
 	logger logger.Logger
 	tracer tracer.Tracer
 }
 
-func NewSQLXMemberRepo(db *sqlx.DB, log logger.Logger, tracer tracer.Tracer) sqlx2.MemberSQLXRepository {
+func NewSqlxMemberSqlite(db *sqlx.DB, log logger.Logger, tracer tracer.Tracer) dao.MemberDAO {
 	baseLogger := log.With(logger.NewField("layer", "repository"))
-	return &sqlxMemberRepo{
+	return &sqlxMemberSqlite{
 		db:     db,
 		logger: baseLogger,
 		tracer: tracer,
 	}
 }
-func (s sqlxMemberRepo) Create(ctx context.Context, m *sqlx2.MemberSQLXModel) error {
+func (s sqlxMemberSqlite) Create(ctx context.Context, m *dao.MemberRecord) error {
 	// 創建帶有 context 的 logger 用於追蹤
-	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger)
+	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger, "Repository.Create")
 	defer span.End()
 
 	startTime := time.Now()
@@ -56,16 +58,15 @@ func (s sqlxMemberRepo) Create(ctx context.Context, m *sqlx2.MemberSQLXModel) er
 	//m.ID = int(id)
 	return nil
 }
-func (s sqlxMemberRepo) GetByID(ctx context.Context, id int) (*sqlx2.MemberSQLXModel, error) {
+func (s sqlxMemberSqlite) GetByID(ctx context.Context, id int) (*dao.MemberRecord, error) {
 	// 創建帶有 context 的 logger 用於追蹤
-	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger)
+	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger, "Repository.GetByID")
 	defer span.End()
 	startTime := time.Now()
 
 	member := &sqlx2.MemberSQLXModel{}
 	err := s.db.GetContext(repoCtx, member, querySelectByID, id)
 	duration := time.Since(startTime)
-
 	if err != nil {
 		contextLogger.Error("SQL 查詢(ID)失敗",
 			logger.NewField("error", err),
@@ -74,24 +75,31 @@ func (s sqlxMemberRepo) GetByID(ctx context.Context, id int) (*sqlx2.MemberSQLXM
 		)
 		return nil, mapSQLError(err)
 	}
-
+	record, err := sqlxModelToDTO(member)
+	if err != nil {
+		contextLogger.Error("SQL 查詢(ID) DTO 轉換失敗",
+			logger.NewField("error", err),
+			logger.NewField("member_id", id),
+			logger.NewField("duration_ms", duration.Milliseconds()),
+		)
+		return nil, err
+	}
 	contextLogger.Debug("SQL 查詢(ID)成功",
 		logger.NewField("member_id", member.ID),
 		logger.NewField("member_email", member.Email),
 		logger.NewField("duration_ms", duration.Milliseconds()),
 	)
-	return member, nil
+	return record, nil
 }
-func (s sqlxMemberRepo) GetByEmail(ctx context.Context, email string) (*sqlx2.MemberSQLXModel, error) {
+func (s sqlxMemberSqlite) GetByEmail(ctx context.Context, email string) (*dao.MemberRecord, error) {
 	// 創建帶有 context 的 logger 用於追蹤
-	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger)
+	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger, "Repository.GetByEmail")
 	defer span.End()
 	startTime := time.Now()
 
 	member := &sqlx2.MemberSQLXModel{}
 	err := s.db.GetContext(repoCtx, member, querySelectByEmail, email)
 	duration := time.Since(startTime)
-
 	if err != nil {
 		contextLogger.Error("SQL 查詢失敗",
 			logger.NewField("error", err),
@@ -100,17 +108,25 @@ func (s sqlxMemberRepo) GetByEmail(ctx context.Context, email string) (*sqlx2.Me
 		)
 		return nil, mapSQLError(err)
 	}
-
+	record, err := sqlxModelToDTO(member)
+	if err != nil {
+		contextLogger.Error("SQL 查詢 DTO 轉換失敗",
+			logger.NewField("error", err),
+			logger.NewField("member_email", email),
+			logger.NewField("duration_ms", duration.Milliseconds()),
+		)
+		return nil, err
+	}
 	contextLogger.Debug("SQL 查詢成功",
 		logger.NewField("member_id", member.ID),
 		logger.NewField("member_email", email),
 		logger.NewField("duration_ms", duration.Milliseconds()),
 	)
-	return member, nil
+	return record, nil
 }
-func (s sqlxMemberRepo) GetAll(ctx context.Context, pagination pagination.Pagination) ([]*sqlx2.MemberSQLXModel, error) {
+func (s sqlxMemberSqlite) GetAll(ctx context.Context, pagination pagination.Pagination) ([]*dao.MemberRecord, error) {
 	// 創建帶有 context 的 logger 用於追蹤
-	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger)
+	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger, "Repository.GetAll")
 	defer span.End()
 	startTime := time.Now()
 	query := fmt.Sprintf(querySelectAllBase, pagination.SortBy, pagination.OrderBy)
@@ -128,16 +144,28 @@ func (s sqlxMemberRepo) GetAll(ctx context.Context, pagination pagination.Pagina
 		)
 		return nil, mapSQLError(err)
 	}
-
+	records := make([]*dao.MemberRecord, 0, len(members))
+	for _, member := range members {
+		record, err := sqlxModelToDTO(member)
+		if err != nil {
+			contextLogger.Error("SQL 列表查詢 DTO 轉換失敗",
+				logger.NewField("error", err),
+				logger.NewField("member_id", member.ID),
+				logger.NewField("duration_ms", duration.Milliseconds()),
+			)
+			return nil, err
+		}
+		records = append(records, record)
+	}
 	contextLogger.Debug("SQL 列表查詢成功",
 		logger.NewField("count", len(members)),
 		logger.NewField("duration_ms", duration.Milliseconds()),
 	)
-	return members, nil
+	return records, nil
 }
-func (s sqlxMemberRepo) CountAll(ctx context.Context) (int, error) {
+func (s sqlxMemberSqlite) CountAll(ctx context.Context) (int, error) {
 	// 創建帶有 context 的 logger 用於追蹤
-	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger)
+	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger, "Repository.CountAll")
 	defer span.End()
 
 	startTime := time.Now()
@@ -160,9 +188,9 @@ func (s sqlxMemberRepo) CountAll(ctx context.Context) (int, error) {
 	)
 	return count, nil
 }
-func (s sqlxMemberRepo) UpdateProfile(ctx context.Context, m *sqlx2.MemberSQLXModel) (*sqlx2.MemberSQLXModel, error) {
+func (s sqlxMemberSqlite) UpdateProfile(ctx context.Context, m *dao.MemberRecord) (*dao.MemberRecord, error) {
 	// 創建帶有 context 的 logger 用於追蹤
-	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger)
+	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger, "Repository.UpdateProfile")
 	defer span.End()
 
 	startTime := time.Now()
@@ -203,9 +231,9 @@ func (s sqlxMemberRepo) UpdateProfile(ctx context.Context, m *sqlx2.MemberSQLXMo
 	)
 	return m, nil
 }
-func (s sqlxMemberRepo) UpdateEmail(ctx context.Context, id int, email string) error {
+func (s sqlxMemberSqlite) UpdateEmail(ctx context.Context, id int, email string) error {
 	// 創建帶有 context 的 logger 用於追蹤
-	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger)
+	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger, "Repository.UpdateEmail")
 	defer span.End()
 
 	startTime := time.Now()
@@ -247,9 +275,9 @@ func (s sqlxMemberRepo) UpdateEmail(ctx context.Context, id int, email string) e
 	)
 	return nil
 }
-func (s sqlxMemberRepo) UpdatePassword(ctx context.Context, id int, password string) error {
+func (s sqlxMemberSqlite) UpdatePassword(ctx context.Context, id int, password string) error {
 	// 創建帶有 context 的 logger 用於追蹤
-	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger)
+	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger, "Repository.UpdatePassword")
 	defer span.End()
 
 	startTime := time.Now()
@@ -289,9 +317,9 @@ func (s sqlxMemberRepo) UpdatePassword(ctx context.Context, id int, password str
 	)
 	return nil
 }
-func (s sqlxMemberRepo) Delete(ctx context.Context, id int) error {
-	// 創庺帶有 context 的 logger 用於追蹤
-	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger)
+func (s sqlxMemberSqlite) Delete(ctx context.Context, id int) error {
+	// 創建帶有 context 的 logger 用於追蹤
+	repoCtx, contextLogger, span := createTracedLogger(ctx, s.tracer, s.logger, "Repository.Delete")
 	defer span.End()
 
 	startTime := time.Now()
@@ -333,8 +361,8 @@ func (s sqlxMemberRepo) Delete(ctx context.Context, id int) error {
 	return nil
 }
 
-func createTracedLogger(ctx context.Context, tr tracer.Tracer, log logger.Logger) (context.Context, logger.Logger, tracer.Span) {
-	repoCtx, span := tr.Start(ctx, "")
+func createTracedLogger(ctx context.Context, tr tracer.Tracer, log logger.Logger, operationName string) (context.Context, logger.Logger, tracer.Span) {
+	repoCtx, span := tr.Start(ctx, operationName)
 	lg := log.WithContext(repoCtx)
 	return repoCtx, lg, span
 }

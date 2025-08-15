@@ -16,6 +16,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/stretchr/testify v1.10.0
 	github.com/tomoffice/go-clean-architecture/pkg/logger v0.0.0-00010101000000-000000000000
+	github.com/tomoffice/go-clean-architecture/pkg/tracer v0.0.0-00010101000000-000000000000
 	go.opentelemetry.io/otel v1.37.0
 	go.opentelemetry.io/otel/sdk v1.37.0
 	go.opentelemetry.io/otel/trace v1.37.0
@@ -93,3 +94,5 @@ require (
 )
 
 replace github.com/tomoffice/go-clean-architecture/pkg/logger => ./pkg/logger
+
+replace github.com/tomoffice/go-clean-architecture/pkg/tracer => ./pkg/tracer

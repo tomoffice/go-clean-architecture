@@ -10,10 +10,13 @@ import (
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase/mock"
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase/port/output"
 	"github.com/tomoffice/go-clean-architecture/internal/shared/pagination"
+	mocklogger "github.com/tomoffice/go-clean-architecture/pkg/logger/mock"
+	mocktracer "github.com/tomoffice/go-clean-architecture/pkg/tracer/mock"
 	"reflect"
 	"testing"
 	"time"
 )
+
 
 func TestMemberUseCase_DeleteMember(t *testing.T) {
 	type fields struct {
@@ -23,7 +26,7 @@ func TestMemberUseCase_DeleteMember(t *testing.T) {
 		ctx context.Context
 		id  int
 	}
-	ctrl, ctx, testTime := repoHelper(t)
+	ctrl, ctx, testTime, mockLogger, mockTracer := repoHelper(t)
 	tests := []struct {
 		name      string
 		fields    fields
@@ -122,6 +125,8 @@ func TestMemberUseCase_DeleteMember(t *testing.T) {
 			}
 			m := &MemberUseCase{
 				MemberGateway: mockRepo,
+				logger:        mockLogger,
+				tracer:        mockTracer,
 			}
 			tt.repoSetup(mockRepo)
 			got, err := m.DeleteMember(tt.args.ctx, tt.args.id)
@@ -146,7 +151,7 @@ func TestMemberUseCase_GetMemberByEmail(t *testing.T) {
 		ctx   context.Context
 		email string
 	}
-	ctrl, ctx, testTime := repoHelper(t)
+	ctrl, ctx, testTime, mockLogger, mockTracer := repoHelper(t)
 	tests := []struct {
 		name      string
 		fields    fields
@@ -221,6 +226,8 @@ func TestMemberUseCase_GetMemberByEmail(t *testing.T) {
 			}
 			m := &MemberUseCase{
 				MemberGateway: mockRepo,
+				logger:        mockLogger,
+				tracer:        mockTracer,
 			}
 			tt.repoSetup(mockRepo)
 			got, err := m.GetMemberByEmail(tt.args.ctx, tt.args.email)
@@ -245,7 +252,7 @@ func TestMemberUseCase_GetMemberByID(t *testing.T) {
 		ctx context.Context
 		id  int
 	}
-	ctrl, ctx, testTime := repoHelper(t)
+	ctrl, ctx, testTime, mockLogger, mockTracer := repoHelper(t)
 	tests := []struct {
 		name      string
 		fields    fields
@@ -304,6 +311,8 @@ func TestMemberUseCase_GetMemberByID(t *testing.T) {
 			}
 			m := &MemberUseCase{
 				MemberGateway: mockRepo,
+				logger:        mockLogger,
+				tracer:        mockTracer,
 			}
 			tt.repoSetup(mockRepo)
 			got, err := m.GetMemberByID(tt.args.ctx, tt.args.id)
@@ -328,7 +337,7 @@ func TestMemberUseCase_ListMembers(t *testing.T) {
 		ctx        context.Context
 		pagination pagination.Pagination
 	}
-	ctrl, ctx, testTime := repoHelper(t)
+	ctrl, ctx, testTime, mockLogger, mockTracer := repoHelper(t)
 	tests := []struct {
 		name      string
 		fields    fields
@@ -455,6 +464,8 @@ func TestMemberUseCase_ListMembers(t *testing.T) {
 			mockRepo := tt.fields.MemberRepo.(*mock.MockMemberPersistence)
 			m := &MemberUseCase{
 				MemberGateway: mockRepo,
+				logger:        mockLogger,
+				tracer:        mockTracer,
 			}
 			tt.setupRepo(mockRepo)
 			got, gotTotal, err := m.ListMembers(tt.args.ctx, tt.args.pagination)
@@ -483,7 +494,7 @@ func TestMemberUseCase_RegisterMember(t *testing.T) {
 		ctx    context.Context
 		member *entity.Member
 	}
-	ctrl, ctx, testTime := repoHelper(t)
+	ctrl, ctx, testTime, mockLogger, mockTracer := repoHelper(t)
 
 	tests := []struct {
 		name      string
@@ -532,7 +543,9 @@ func TestMemberUseCase_RegisterMember(t *testing.T) {
 			},
 			args: args{
 				ctx:    ctx,
-				member: nil,
+				member: &entity.Member{
+					Email: "existing@example.com",
+				},
 			},
 			want:    nil,
 			wantErr: ErrMemberAlreadyExists,
@@ -601,6 +614,8 @@ func TestMemberUseCase_RegisterMember(t *testing.T) {
 			mockRepo := tt.fields.MemberRepo.(*mock.MockMemberPersistence)
 			m := &MemberUseCase{
 				MemberGateway: mockRepo,
+				logger:        mockLogger,
+				tracer:        mockTracer,
 			}
 			tt.setupRepo(mockRepo)
 			got, err := m.RegisterMember(tt.args.ctx, tt.args.member)
@@ -626,7 +641,7 @@ func TestMemberUseCase_UpdateMemberProfile(t *testing.T) {
 		ctx   context.Context
 		patch *inputmodel.PatchUpdateMemberProfileInputModel
 	}
-	ctrl, ctx, testTime := repoHelper(t)
+	ctrl, ctx, testTime, mockLogger, mockTracer := repoHelper(t)
 	stringPtr := func(s string) *string {
 		return &s
 	}
@@ -794,6 +809,8 @@ func TestMemberUseCase_UpdateMemberProfile(t *testing.T) {
 			mockRepo := tt.fields.MemberRepo.(*mock.MockMemberPersistence)
 			m := &MemberUseCase{
 				MemberGateway: mockRepo,
+				logger:        mockLogger,
+				tracer:        mockTracer,
 			}
 			tt.setupRepo(mockRepo)
 			got, err := m.UpdateMemberProfile(tt.args.ctx, tt.args.patch)
@@ -820,7 +837,7 @@ func TestMemberUseCase_UpdateMemberEmail(t *testing.T) {
 		newEmail string
 		password string
 	}
-	ctrl, ctx, testTime := repoHelper(t)
+	ctrl, ctx, testTime, mockLogger, mockTracer := repoHelper(t)
 	tests := []struct {
 		name      string
 		fields    fields
@@ -1014,6 +1031,8 @@ func TestMemberUseCase_UpdateMemberEmail(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			m := &MemberUseCase{
 				MemberGateway: tt.fields.MemberGateway,
+				logger:        mockLogger,
+				tracer:        mockTracer,
 			}
 			tt.setupRepo(tt.fields.MemberGateway.(*mock.MockMemberPersistence))
 			got := m.UpdateMemberEmail(tt.args.ctx, tt.args.id, tt.args.newEmail, tt.args.password)
@@ -1036,7 +1055,7 @@ func TestMemberUseCase_UpdateMemberPassword(t *testing.T) {
 		newPassword string
 		oldPassword string
 	}
-	ctrl, ctx, testTime := repoHelper(t)
+	ctrl, ctx, testTime, mockLogger, mockTracer := repoHelper(t)
 	tests := []struct {
 		name      string
 		fields    fields
@@ -1187,6 +1206,8 @@ func TestMemberUseCase_UpdateMemberPassword(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			m := &MemberUseCase{
 				MemberGateway: tt.fields.MemberGateway,
+				logger:        mockLogger,
+				tracer:        mockTracer,
 			}
 			tt.setupRepo(tt.fields.MemberGateway.(*mock.MockMemberPersistence))
 			err := m.UpdateMemberPassword(tt.args.ctx, tt.args.id, tt.args.newPassword, tt.args.oldPassword)
@@ -1200,8 +1221,15 @@ func TestMemberUseCase_UpdateMemberPassword(t *testing.T) {
 }
 
 func TestNewMemberUseCase(t *testing.T) {
-	repo := mock.NewMockMemberPersistence(gomock.NewController(t))
-	got := NewMemberUseCase(repo)
+	ctrl := gomock.NewController(t)
+	repo := mock.NewMockMemberPersistence(ctrl)
+	mockLogger := mocklogger.NewMockLogger(ctrl)
+	mockTracer := mocktracer.NewMockTracer(ctrl)
+	
+	// 設置預期的 logger.With 調用
+	mockLogger.EXPECT().With(gomock.Any()).Return(mockLogger).Times(1)
+	
+	got := NewMemberUseCase(repo, mockLogger, mockTracer)
 	// 確認got不是nil
 	if got == nil {
 		t.Errorf("NewMemberUseCase() = %v, want %v", got, repo)
@@ -1217,11 +1245,26 @@ func TestNewMemberUseCase(t *testing.T) {
 	}
 }
 
-func repoHelper(t *testing.T) (*gomock.Controller, context.Context, time.Time) {
+func repoHelper(t *testing.T) (*gomock.Controller, context.Context, time.Time, *mocklogger.MockLogger, *mocktracer.MockTracer) {
 	t.Helper()
 	ctrl := gomock.NewController(t)
 	t.Cleanup(func() { ctrl.Finish() })
 	ctx := context.Background()
 	testTime := time.Date(2025, 1, 1, 0, 0, 0, 0, time.UTC)
-	return ctrl, ctx, testTime
+	mockLogger := mocklogger.NewMockLogger(ctrl)
+	mockTracer := mocktracer.NewMockTracer(ctrl)
+	
+	// 設置基本的 mock 行為
+	mockLogger.EXPECT().With(gomock.Any()).Return(mockLogger).AnyTimes()
+	mockLogger.EXPECT().WithContext(gomock.Any()).Return(mockLogger).AnyTimes()
+	mockLogger.EXPECT().Debug(gomock.Any(), gomock.Any()).AnyTimes()
+	mockLogger.EXPECT().Info(gomock.Any(), gomock.Any()).AnyTimes()
+	mockLogger.EXPECT().Warn(gomock.Any(), gomock.Any()).AnyTimes()
+	mockLogger.EXPECT().Error(gomock.Any(), gomock.Any()).AnyTimes()
+	
+	mockSpan := mocktracer.NewMockSpan(ctrl)
+	mockSpan.EXPECT().End().AnyTimes()
+	mockTracer.EXPECT().Start(gomock.Any(), gomock.Any()).Return(ctx, mockSpan).AnyTimes()
+	
+	return ctrl, ctx, testTime, mockLogger, mockTracer
 }

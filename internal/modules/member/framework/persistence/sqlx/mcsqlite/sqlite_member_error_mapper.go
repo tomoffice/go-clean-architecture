@@ -22,6 +22,9 @@ func mapSQLError(err error) error {
 	if errors.Is(err, sql.ErrTxDone) {
 		return wrap(err, ErrDBTransactionDone)
 	}
+	if errors.Is(err, ErrMapperTimeParseFailed) {
+		return wrap(err, ErrMapperTimeParseFailed)
+	}
 	// 任何帶 context 的 DB 操作（ExecContext, QueryContext, QueryRowContext, GetContext, SelectContext 等）都可能收到以下錯誤
 	if errors.Is(err, context.DeadlineExceeded) {
 		return wrap(err, ErrDBContextTimeout)
