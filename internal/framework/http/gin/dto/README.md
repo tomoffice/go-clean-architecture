@@ -1,94 +1,76 @@
-# **internal/framework/http/gin/dto**
+# internal/framework/http/gin/dto
 
-## **目錄說明**
+## 用途與職責
 
-這層只放 Gin 專用的 Request/Response DTO。
+Gin 框架專用 DTO 目錄，負責處理 HTTP 請求的資料綁定和驗證。作為 Framework 層的一部分，專門處理 Gin 特有的 Request/Response 資料結構，包含 JSON、URI、Query 參數的綁定邏輯。
 
-用途就兩個：
+## 設計原則
 
-- Controller 拿來 binding（binding tag）、驗證、JSON/URI/Query 解析。
-- 這邊的 DTO 不做業務、不參與核心流程，用完就轉業務 DTO。
+- **框架隔離**: 僅供 Controller 層和 Gin Mapper 使用
+- **邊界清晰**: 不參與業務邏輯，用完即轉換為業務 DTO
+- **職責單一**: 專注於 HTTP 資料綁定和基礎驗證
+- **依賴方向**: 絕不流入 UseCase、Entity、Repository 等內層
 
----
-
-## **設計原則**
-
-- 只能 Controller 或 Gin 的 Mapper 用到，其他地方都別碰。
-- 禁止用在 UseCase、Entity、Domain、Repository、Presenter 等任何業務/核心層。
-- 要給 UseCase，自己轉到 internal/modules/**/interface_adapter/dto 下的 DTO，再丟進去。
-
----
-
-## **命名規範**
-
-- 統一加 Gin 前綴，看到就知道是哪層來的。
-    - 範例：
-        - GinCreateMemberRequestDTO
-        - GinUpdateMemberRequestDTO
-        - GinListMemberRequestDTO
-        - GinGetMemberByIDURIRequestDTO
-        - GinGetMemberByEmailQueryRequestDTO
-- 來源（URI/Query/JSON）一定要標明，別搞混。
-
----
-
-## **使用範例**
-
-### **1. Controller 綁定/驗證**
+## 目錄結構
 
 ```
-// 綁 JSON
+internal/framework/http/gin/dto/
+├── member_dto.go               # Member 相關 Gin DTO
+├── common_dto.go              # 共用 DTO 結構
+└── README.md                  # 本說明檔
+```
+
+## 使用方式
+
+### Controller 資料綁定
+
+```go
+// JSON 綁定
 var req gindto.GinCreateMemberRequestDTO
 if err := ctx.ShouldBindJSON(&req); err != nil {
-    // 處理綁定錯誤
+    return c.presenter.ValidationError(ctx, err)
 }
 
-// 綁 URI
+// URI 參數綁定
 var uriReq gindto.GinGetMemberByIDURIRequestDTO
 if err := ctx.ShouldBindUri(&uriReq); err != nil {
-    // 處理綁定錯誤
+    return c.presenter.ValidationError(ctx, err)
 }
 
-// 綁 Query
+// Query 參數綁定
 var queryReq gindto.GinGetMemberByEmailQueryRequestDTO
 if err := ctx.ShouldBindQuery(&queryReq); err != nil {
-    // 處理綁定錯誤
+    return c.presenter.ValidationError(ctx, err)
 }
 ```
 
-### **2. DTO 轉換給 UseCase**
+### DTO 轉換
 
-```
-// 一律轉成業務用 DTO
+```go
+// 轉換為業務 DTO 後傳入 UseCase
 businessReq := ginmapper.GinCreateMemberRequestDTOToCreateMemberDTO(req)
+result, err := c.usecase.CreateMember(ctx, businessReq)
 ```
 
----
+### DTO 定義範例
 
-## **避免事項**
-
-- Gin DTO 不准直接塞進 UseCase、Entity 或其他業務流程。
-- 業務 DTO 也不要亂丟進來（interface_adapter/dto 的東西別放這）。
-
----
-
-## **參考範例**
-
-```
-// GinCreateMemberRequestDTO - 綁 JSON
+```go
+// GinCreateMemberRequestDTO - JSON 請求
 type GinCreateMemberRequestDTO struct {
     Name     string `json:"name" binding:"required"`
     Email    string `json:"email" binding:"required,email"`
     Password string `json:"password" binding:"required,min=6"`
 }
 
-// GinGetMemberByIDURIRequestDTO - 綁 URI
+// GinGetMemberByIDURIRequestDTO - URI 參數
 type GinGetMemberByIDURIRequestDTO struct {
     ID int `uri:"id" binding:"required,min=1"`
 }
-
-// GinGetMemberByEmailQueryRequestDTO - 綁 Query
-type GinGetMemberByEmailQueryRequestDTO struct {
-    Email string `form:"email" binding:"required,email"`
-}
 ```
+
+## 注意事項
+
+- **嚴禁直接傳入 UseCase 層**，必須先轉換為業務 DTO
+- **命名必須加 Gin 前綴**，並標明資料來源（JSON/URI/Query）
+- **僅處理資料綁定和基礎驗證**，不包含業務邏輯驗證
+- **不可在業務層引用**，保持 Framework 層邊界清晰
