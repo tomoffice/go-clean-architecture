@@ -1,3 +1,5 @@
+//go:generate mockgen -source=tracer.go -destination=mock/mock_tracer.go -package=mock
+
 // Package tracer 提供分散式追蹤功能的封裝
 // 基於 OpenTelemetry 實作，隱藏底層複雜性，提供清晰的 API
 package tracer
