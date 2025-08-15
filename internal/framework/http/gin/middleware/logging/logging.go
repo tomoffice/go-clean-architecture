@@ -3,7 +3,9 @@ package logging
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"io"
+	"mime/multipart"
 	"strings"
 	"time"
 
@@ -30,6 +32,9 @@ type LoggingConfig struct {
 	// LoggableContentTypes 可記錄的 Content-Type 白名單
 	// 空列表表示記錄所有類型
 	LoggableContentTypes []string
+
+	// SensitiveKeys 敏感資訊的鍵名列表
+	SensitiveKeys []string
 }
 
 // DefaultLoggingConfig 返回預設配置
@@ -40,6 +45,20 @@ func DefaultLoggingConfig() LoggingConfig {
 		LogResponseBody:      true,
 		MaxBodySize:          1024, // 1KB
 		LoggableContentTypes: []string{"application/json", "text/plain", "application/xml"},
+		SensitiveKeys: []string{
+			"password",
+			"new_password",
+			"old_password",
+			"confirm_password",
+			"token",
+			"access_token",
+			"refresh_token",
+			"api_key",
+			"secret",
+			"secret_key",
+			"key",
+			"authorization",
+		},
 	}
 }
 
@@ -121,16 +140,78 @@ func (lm *LoggingMiddleware) HandlerFunc() gin.HandlerFunc {
 
 		// 如果有 request body，加入到日誌中
 		if requestBody != "" {
+			ct := strings.ToLower(c.Request.Header.Get("Content-Type"))
+			sensitive := NewSensitiveKeys(lm.config.SensitiveKeys)
+
+			switch {
+			case strings.HasPrefix(ct, "application/json"):
+				var anyBody any
+				if err := json.Unmarshal([]byte(requestBody), &anyBody); err == nil {
+					masked := sensitive.Mask(anyBody)
+					if b, e := json.Marshal(masked); e == nil {
+						requestBody = string(b)
+					}
+				} // 解析失敗就維持原樣（但已受 MaxBodySize 限制）
+
+			case strings.HasPrefix(ct, "application/x-www-form-urlencoded"):
+				// 解析表單並遮罩
+				_ = c.Request.ParseForm()
+				form := make(map[string]any, len(c.Request.PostForm))
+				for k, vals := range c.Request.PostForm {
+					if sensitive.isSensitive(k) {
+						masked := make([]string, len(vals))
+						for i := range vals {
+							masked[i] = "******"
+						}
+						form[k] = masked
+					} else {
+						form[k] = vals
+					}
+				}
+				if b, e := json.Marshal(form); e == nil {
+					requestBody = string(b)
+				}
+
+			case strings.HasPrefix(ct, "multipart/form-data"):
+				// 切記：不要記檔案內容！只記欄位名與檔名
+				if err := c.Request.ParseMultipartForm(int64(lm.config.MaxBodySize)); err == nil && c.Request.MultipartForm != nil {
+					desc := map[string]any{
+						"fields": mapsKeys(c.Request.MultipartForm.Value),
+						"files":  fileFieldNames(c.Request.MultipartForm.File),
+					}
+					if b, e := json.Marshal(desc); e == nil {
+						requestBody = string(b)
+					}
+				} else {
+					requestBody = "[multipart skipped]"
+				}
+
+			default:
+				// 其他型態：避免原樣落盤
+				requestBody = "[skipped: unsupported content type]"
+			}
+
 			logFields = append(logFields, logger.NewField("request_body", requestBody))
 		}
 
 		// 如果有 response body，加入到日誌中
 		if lm.config.LogResponseBody && responseBodyWriter != nil {
-			responseBody := responseBodyWriter.body.String()
-			if len(responseBody) > lm.config.MaxBodySize {
-				responseBody = responseBody[:lm.config.MaxBodySize] + "...[truncated]"
+			resp := responseBodyWriter.body.String()
+			if len(resp) > lm.config.MaxBodySize {
+				resp = resp[:lm.config.MaxBodySize] + "...[truncated]"
 			}
-			logFields = append(logFields, logger.NewField("response_body", responseBody))
+			// 嘗試遮罩 JSON 回應（避免把 token/secret 打出去）
+			ct := strings.ToLower(c.Writer.Header().Get("Content-Type"))
+			if strings.HasPrefix(ct, "application/json") {
+				var anyResp any
+				if err := json.Unmarshal([]byte(resp), &anyResp); err == nil {
+					masked := NewSensitiveKeys(lm.config.SensitiveKeys).Mask(anyResp)
+					if b, e := json.Marshal(masked); e == nil {
+						resp = string(b)
+					}
+				}
+			}
+			logFields = append(logFields, logger.NewField("response_body", resp))
 		}
 
 		// 記錄 HTTP 請求（單一日誌記錄）
@@ -212,4 +293,22 @@ func (lm *LoggingMiddleware) setTraceHeaders(c *gin.Context, ctx context.Context
 		c.Header("X-Trace-Id", spanCtx.TraceID().String())
 		c.Header("X-Span-Id", spanCtx.SpanID().String())
 	}
+}
+func mapsKeys(m map[string][]string) []string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	return keys
+}
+func fileFieldNames(m map[string][]*multipart.FileHeader) map[string][]string {
+	out := make(map[string][]string, len(m))
+	for field, files := range m {
+		names := make([]string, 0, len(files))
+		for _, fh := range files {
+			names = append(names, fh.Filename)
+		}
+		out[field] = names
+	}
+	return out
 }
