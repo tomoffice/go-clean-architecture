@@ -65,13 +65,14 @@ func (c *MemberController) Register(ctx *gin.Context) {
 	entity := mapper.RegisterMemberDTOToEntity(reqDTO)
 	member, err := c.usecase.RegisterMember(requestCtx, entity)
 	if err != nil {
-		contextLogger.Error("會員註冊 UseCase 執行錯誤",
-			logger.NewField("error", err.Error()),
-			logger.NewField("member_email", entity.Email),
-		)
 		errCode, resp := c.presenter.PresentUseCaseError(err)
 		httpStatus := MapErrorCodeToHTTPStatus(errCode)
 		ctx.JSON(httpStatus, resp)
+		contextLogger.Error("會員註冊失敗",
+			logger.NewField("error", err),
+			logger.NewField("error_code", errCode),
+			logger.NewField("member_email", entity.Email),
+		)
 		return
 	}
 	resp := c.presenter.PresentRegisterMember(member)
