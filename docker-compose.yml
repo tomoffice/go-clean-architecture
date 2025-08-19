@@ -1,0 +1,14 @@
+services:
+  seq:
+    image: datalust/seq:latest
+    restart: unless-stopped
+    environment:
+      - ACCEPT_EULA=Y
+    volumes:
+      - seq-data:/data
+    ports:
+      - "127.0.0.1:5341:80"
+      - "127.0.0.1:5343:5343/udp"
+
+volumes:
+  seq-data:
