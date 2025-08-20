@@ -2,11 +2,11 @@ package controller
 
 import (
 	"context"
-	"github.com/gin-gonic/gin"
 	gindto "github.com/tomoffice/go-clean-architecture/internal/framework/http/gin/dto"
 	"github.com/tomoffice/go-clean-architecture/internal/framework/http/gin/errordefs"
 	ginmapper "github.com/tomoffice/go-clean-architecture/internal/framework/http/gin/mapper"
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/mapper"
+	memberhttp "github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/transport/http"
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/validation"
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase/port/input"
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase/port/output"
@@ -34,13 +34,13 @@ func NewMemberController(memberUseCase input.MemberInputPort, presenter output.M
 	}
 }
 
-func (c *MemberController) Register(ctx *gin.Context) {
+func (c *MemberController) Register(ctx memberhttp.Context) {
 	// 創建帶有 context 的 logger 用於追蹤
-	requestCtx, contextLogger, span := createTracedLogger(ctx.Request.Context(), c.tracer, c.logger)
+	requestCtx, contextLogger, span := createTracedLogger(ctx.RequestCtx(), c.tracer, c.logger)
 	defer span.End()
 
 	var ginReqDTO gindto.GinBindingRegisterMemberRequestDTO
-	if err := ctx.ShouldBindJSON(&ginReqDTO); err != nil {
+	if err := ctx.BindJSON(&ginReqDTO); err != nil {
 		contextLogger.Error("會員註冊參數綁定錯誤",
 			logger.NewField("error", err.Error()),
 			logger.NewField("content_type", ctx.GetHeader("Content-Type")),
@@ -78,16 +78,16 @@ func (c *MemberController) Register(ctx *gin.Context) {
 	resp := c.presenter.PresentRegisterMember(member)
 	ctx.JSON(http.StatusOK, resp)
 }
-func (c *MemberController) GetByID(ctx *gin.Context) {
+func (c *MemberController) GetByID(ctx memberhttp.Context) {
 	// 創建帶有 context 的 logger 用於追蹤
-	requestCtx, contextLogger, span := createTracedLogger(ctx.Request.Context(), c.tracer, c.logger)
+	requestCtx, contextLogger, span := createTracedLogger(ctx.RequestCtx(), c.tracer, c.logger)
 	defer span.End()
 
 	var ginReqDTO gindto.GinBindingGetMemberByIDURIRequestDTO
-	if err := ctx.ShouldBindUri(&ginReqDTO); err != nil {
+	if err := ctx.BindURI(&ginReqDTO); err != nil {
 		contextLogger.Error("會員查詢(ID)參數綁定錯誤",
 			logger.NewField("error", err.Error()),
-			logger.NewField("uri", ctx.Request.RequestURI),
+			logger.NewField("uri", ctx.Request().RequestURI),
 		)
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
@@ -121,16 +121,16 @@ func (c *MemberController) GetByID(ctx *gin.Context) {
 	resp := c.presenter.PresentGetMemberByID(member)
 	ctx.JSON(http.StatusOK, resp)
 }
-func (c *MemberController) GetByEmail(ctx *gin.Context) {
+func (c *MemberController) GetByEmail(ctx memberhttp.Context) {
 	// 創建帶有 context 的 logger 用於追蹤
-	requestCtx, contextLogger, span := createTracedLogger(ctx.Request.Context(), c.tracer, c.logger)
+	requestCtx, contextLogger, span := createTracedLogger(ctx.RequestCtx(), c.tracer, c.logger)
 	defer span.End()
 
 	var ginReqDTO gindto.GinBindingGetMemberByEmailQueryRequestDTO
-	if err := ctx.ShouldBindQuery(&ginReqDTO); err != nil {
+	if err := ctx.BindQuery(&ginReqDTO); err != nil {
 		contextLogger.Error("會員查詢(Email)參數綁定錯誤",
 			logger.NewField("error", err.Error()),
-			logger.NewField("query", ctx.Request.URL.RawQuery),
+			logger.NewField("query", ctx.Request().URL.RawQuery),
 		)
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
@@ -164,16 +164,16 @@ func (c *MemberController) GetByEmail(ctx *gin.Context) {
 	resp := c.presenter.PresentGetMemberByEmail(member)
 	ctx.JSON(http.StatusOK, resp)
 }
-func (c *MemberController) List(ctx *gin.Context) {
+func (c *MemberController) List(ctx memberhttp.Context) {
 	// 創建帶有 context 的 logger 用於追蹤
-	requestCtx, contextLogger, span := createTracedLogger(ctx.Request.Context(), c.tracer, c.logger)
+	requestCtx, contextLogger, span := createTracedLogger(ctx.RequestCtx(), c.tracer, c.logger)
 	defer span.End()
 
 	var ginReqDTO gindto.GinBindingListMemberQueryRequestDTO
-	if err := ctx.ShouldBindQuery(&ginReqDTO); err != nil {
+	if err := ctx.BindQuery(&ginReqDTO); err != nil {
 		contextLogger.Error("會員列表查詢參數綁定錯誤",
 			logger.NewField("error", err.Error()),
-			logger.NewField("query", ctx.Request.URL.RawQuery),
+			logger.NewField("query", ctx.Request().URL.RawQuery),
 		)
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
@@ -209,16 +209,16 @@ func (c *MemberController) List(ctx *gin.Context) {
 	resp := c.presenter.PresentListMembers(members, total)
 	ctx.JSON(http.StatusOK, resp)
 }
-func (c *MemberController) UpdateProfile(ctx *gin.Context) {
+func (c *MemberController) UpdateProfile(ctx memberhttp.Context) {
 	// 創建帶有 context 的 logger 用於追蹤
-	requestCtx, contextLogger, span := createTracedLogger(ctx.Request.Context(), c.tracer, c.logger)
+	requestCtx, contextLogger, span := createTracedLogger(ctx.RequestCtx(), c.tracer, c.logger)
 	defer span.End()
 
 	var ginURI gindto.GinBindingUpdateMemberURIRequestDTO
-	if err := ctx.ShouldBindUri(&ginURI); err != nil {
+	if err := ctx.BindURI(&ginURI); err != nil {
 		contextLogger.Error("會員資料更新 URI 參數綁定錯誤",
 			logger.NewField("error", err.Error()),
-			logger.NewField("uri", ctx.Request.RequestURI),
+			logger.NewField("uri", ctx.Request().RequestURI),
 		)
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
@@ -227,7 +227,7 @@ func (c *MemberController) UpdateProfile(ctx *gin.Context) {
 		return
 	}
 	var ginBody gindto.GinBindingUpdateMemberProfileBodyRequestDTO
-	if err := ctx.ShouldBindJSON(&ginBody); err != nil {
+	if err := ctx.BindJSON(&ginBody); err != nil {
 		contextLogger.Error("會員資料更新 Body 參數綁定錯誤",
 			logger.NewField("error", err.Error()),
 			logger.NewField("content_type", ctx.GetHeader("Content-Type")),
@@ -264,16 +264,16 @@ func (c *MemberController) UpdateProfile(ctx *gin.Context) {
 	resp := c.presenter.PresentUpdateMemberProfile(member)
 	ctx.JSON(http.StatusOK, resp)
 }
-func (c *MemberController) UpdateEmail(ctx *gin.Context) {
+func (c *MemberController) UpdateEmail(ctx memberhttp.Context) {
 	// 創建帶有 context 的 logger 用於追蹤
-	requestCtx, contextLogger, span := createTracedLogger(ctx.Request.Context(), c.tracer, c.logger)
+	requestCtx, contextLogger, span := createTracedLogger(ctx.RequestCtx(), c.tracer, c.logger)
 	defer span.End()
 
 	var ginURI gindto.GinBindingUpdateMemberURIRequestDTO
-	if err := ctx.ShouldBindUri(&ginURI); err != nil {
+	if err := ctx.BindURI(&ginURI); err != nil {
 		contextLogger.Error("會員 Email 更新 URI 參數綁定錯誤",
 			logger.NewField("error", err.Error()),
-			logger.NewField("uri", ctx.Request.RequestURI),
+			logger.NewField("uri", ctx.Request().RequestURI),
 		)
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
@@ -282,7 +282,7 @@ func (c *MemberController) UpdateEmail(ctx *gin.Context) {
 		return
 	}
 	var ginBody gindto.GinBindingUpdateMemberEmailBodyRequestDTO
-	if err := ctx.ShouldBindJSON(&ginBody); err != nil {
+	if err := ctx.BindJSON(&ginBody); err != nil {
 		contextLogger.Error("會員 Email 更新 Body 參數綁定錯誤",
 			logger.NewField("error", err.Error()),
 			logger.NewField("content_type", ctx.GetHeader("Content-Type")),
@@ -320,16 +320,16 @@ func (c *MemberController) UpdateEmail(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, resp)
 
 }
-func (c *MemberController) UpdatePassword(ctx *gin.Context) {
+func (c *MemberController) UpdatePassword(ctx memberhttp.Context) {
 	// 創建帶有 context 的 logger 用於追蹤
-	requestCtx, contextLogger, span := createTracedLogger(ctx.Request.Context(), c.tracer, c.logger)
+	requestCtx, contextLogger, span := createTracedLogger(ctx.RequestCtx(), c.tracer, c.logger)
 	defer span.End()
 
 	var ginURI gindto.GinBindingUpdateMemberURIRequestDTO
-	if err := ctx.ShouldBindUri(&ginURI); err != nil {
+	if err := ctx.BindURI(&ginURI); err != nil {
 		contextLogger.Error("會員密碼更新 URI 參數綁定錯誤",
 			logger.NewField("error", err.Error()),
-			logger.NewField("uri", ctx.Request.RequestURI),
+			logger.NewField("uri", ctx.Request().RequestURI),
 		)
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
@@ -338,7 +338,7 @@ func (c *MemberController) UpdatePassword(ctx *gin.Context) {
 		return
 	}
 	var ginBody gindto.GinBindingUpdateMemberPasswordBodyRequestDTO
-	if err := ctx.ShouldBindJSON(&ginBody); err != nil {
+	if err := ctx.BindJSON(&ginBody); err != nil {
 		contextLogger.Error("會員密碼更新 Body 參數綁定錯誤",
 			logger.NewField("error", err.Error()),
 			logger.NewField("content_type", ctx.GetHeader("Content-Type")),
@@ -374,16 +374,16 @@ func (c *MemberController) UpdatePassword(ctx *gin.Context) {
 	resp := c.presenter.PresentUpdateMemberPassword()
 	ctx.JSON(http.StatusOK, resp)
 }
-func (c *MemberController) Delete(ctx *gin.Context) {
+func (c *MemberController) Delete(ctx memberhttp.Context) {
 	// 創建帶有 context 的 logger 用於追蹤
-	requestCtx, contextLogger, span := createTracedLogger(ctx.Request.Context(), c.tracer, c.logger)
+	requestCtx, contextLogger, span := createTracedLogger(ctx.RequestCtx(), c.tracer, c.logger)
 	defer span.End()
 
 	var ginReqDTO gindto.GinBindingDeleteMemberURIRequestDTO
-	if err := ctx.ShouldBindUri(&ginReqDTO); err != nil {
+	if err := ctx.BindURI(&ginReqDTO); err != nil {
 		contextLogger.Error("會員刪除參數綁定錯誤",
 			logger.NewField("error", err.Error()),
-			logger.NewField("uri", ctx.Request.RequestURI),
+			logger.NewField("uri", ctx.Request().RequestURI),
 		)
 		errCode, errMsg := errordefs.MapGinBindingError(err)
 		resp := c.presenter.PresentBindingError(errCode, errMsg)
