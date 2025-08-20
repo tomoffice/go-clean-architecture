@@ -2,17 +2,18 @@ package controller
 
 import (
 	"context"
+	memberhttp "github.com/tomoffice/go-clean-architecture/internal/interface_adapter/transport/http"
+	"net/http"
+
 	gindto "github.com/tomoffice/go-clean-architecture/internal/framework/http/gin/dto"
 	"github.com/tomoffice/go-clean-architecture/internal/framework/http/gin/errordefs"
 	ginmapper "github.com/tomoffice/go-clean-architecture/internal/framework/http/gin/mapper"
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/mapper"
-	memberhttp "github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/transport/http"
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/interface_adapter/validation"
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase/port/input"
 	"github.com/tomoffice/go-clean-architecture/internal/modules/member/usecase/port/output"
 	"github.com/tomoffice/go-clean-architecture/pkg/logger"
 	"github.com/tomoffice/go-clean-architecture/pkg/tracer"
-	"net/http"
 )
 
 type MemberController struct {
